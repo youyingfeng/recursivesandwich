@@ -15,6 +15,10 @@ Week 3: Design
 - Refine the looks of the player, obstacles and background
 - Compose soundtrack for the background
 - Add sound effects for movement, damage and atmosphere
+- Create horror and story elements to increase interest in the game
+
+Week 4: Levels
+- Design all the levels of the game, ensuring increasing difficulty
 
 # Visual Elements
 - Dystopian image of the Singapore skyline as the player approaches the tower, should be a wide image so that it can be scrolled (with parallax effects).
