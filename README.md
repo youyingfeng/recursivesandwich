@@ -23,6 +23,5 @@ https://stackoverflow.com/questions/14354171/add-scrolling-to-a-platformer-in-py
 and pretty much the entire book lmao.  
 
 ## Timeline  
-Week 1: Start off with the base of the game.  
-Week 2:  
-Week 3:  
+Week 1: Start off with the base of the game (camera movements, collisions, main player)
+Week 2: Implement several obstacles (spikes, point system, healthbar) 
