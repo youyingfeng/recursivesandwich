@@ -1,19 +1,11 @@
 import pygame as pg
 
-# Initialise pygame
-pg.init()
+# Load Textures
+grass_img = pg.image.load('assets/textures/grass.png')
+dirt_img = pg.image.load('assets/textures/dirt.png')
 
-# Programme name
-pg.display.set_caption("The Tower", "The Tower")
-
-# Initialise game window
-window = pg.display.set_mode((800, 600))
-
-# Initialise surface for drawing
-display = pg.Surface((400, 300))
-
-
-def load_map(path):
+# ---------- FUNCTION DECLARATIONS ---------- #
+def load_map(path: str):
     f = open(path + '.txt', 'r')
     data = f.read()
     f.close()
@@ -23,114 +15,144 @@ def load_map(path):
         game_map.append(list(row))
     return game_map
 
-# TODO: split classes into individual files
 
+def handle_input(player, terrain):
+    current_keys = pg.key.get_pressed()
+    player.move(current_keys[pg.K_UP],
+              current_keys[pg.K_DOWN],
+              current_keys[pg.K_LEFT],
+              current_keys[pg.K_RIGHT],
+              terrain
+              )
+
+
+def add_blocks_to_group(group: pg.sprite.Group, map):
+    for y in range(len(map)):
+        for x in range(len(map[0])):
+            if map[y][x] == '1':
+                group.add(Block(grass_img, x * 20, y * 20))
+
+
+def get_colliding_sides(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
+    top, bottom, left, right = False, False, False, False
+    for colliding_sprite in pg.sprite.spritecollide(sprite, group, False):
+        if colliding_sprite.rect.top <= sprite.rect.top <= colliding_sprite.rect.bottom:
+            top = True
+        if colliding_sprite.rect.top <= sprite.rect.bottom <= colliding_sprite.rect.bottom:
+            bottom = True
+        if colliding_sprite.rect.left <= sprite.rect.left <= colliding_sprite.rect.right:
+            left = True
+        if colliding_sprite.rect.left <= sprite.rect.right <= colliding_sprite.rect.right:
+            right = True
+    return top, bottom, left, right
+
+
+# ---------- CLASS DECLARATIONS ---------- #
 class Player(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
+        self.sprite = pg.image.load('assets/sprites/player.png').convert()
+        self.image = pg.transform.scale(self.sprite, (20, 40))
+        self.image.set_colorkey((255, 255, 255))
 
-        # Override
-        self.image = pg.Surface([50, 50])
-        self.image.fill([255, 0, 0])
+        self.rect = pg.Rect(0, 0, 20, 40)
 
-        self.rect = pg.Rect(-25, -25, 25, 25)
+        self.velocity = 1
+
+    def move(self, up: bool, down: bool, left: bool, right: bool, terrain):
+        colliding_sides = get_colliding_sides(self, terrain)
+
+        # makes it such that the colliding sides are not touching
+
+        if up and not colliding_sides[0]:
+            self.rect.y -= self.velocity
+        if down and not colliding_sides[1]:
+            self.rect.y += self.velocity
+        if left and not colliding_sides[2]:
+            self.rect.x -= self.velocity
+        if right and not colliding_sides[3]:
+            self.rect.x += self.velocity
+
+    def draw(self, surface: pg.Surface):
+        """Draws the player on the specified surface"""
+        surface.blit(self.image, (self.rect.x, self.rect.y))
+
+
 
 
 class Block(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, image, x, y):
         super().__init__()
+        self.image = pg.transform.scale(image.convert(), (20, 20))
+        self.rect = pg.Rect(x, y , 20, 20)
 
 
-# Camera function to enable the camera to follow player
-class Camera(object):
-    def __init__(self, camera_func, level_width, level_height):
-        self.camera_func = camera_func
-        self.state = pg.Rect(0, 0, level_width, level_height)
+# ---------- GLOBAL VARIABLES ---------- #
 
-    def apply(self, target):
-        return target.rect.move(self.state.topleft)
-
-    def update(self, target):
-        self.state = self.camera_func(self.state, target.rect)
+WINDOW_SIZE = (800, 600)
+SURFACE_SIZE = (400, 300)
 
 
-def simple_camera(camera, target_rect):
-    l, t, _, _ = target_rect  # l = left,  t = top
-    _, _, w, h = camera  # w = width, h = height
-    return pg.Rect(-l + 400, -t + 300, w, h)
+# ---------- ACTUAL GAME STARTS HERE ---------- #
 
-game_map = load_map('map')
+# Initialise pygame
+pg.init()
 
-all_sprites_list = pg.sprite.Group()
+# Programme name
+pg.display.set_caption("The Tower", "The Tower")
 
-# Initialises player
-player = Player()
-all_sprites_list.add(player)
+# Initialise game window
+window = pg.display.set_mode(WINDOW_SIZE)
 
-# Initialise clock
+# Initialise surface for drawing, which is scaled
+game_display = pg.Surface(SURFACE_SIZE)
+
+# Loads the game map as a 2D array
+game_map = load_map('map2')
+
+# Adds the blocks to a sprite group
+terrain_group = pg.sprite.RenderPlain()
+add_blocks_to_group(terrain_group, game_map)
+
+
+
+# Starts the clock to limit to 60fps
 clock = pg.time.Clock()
 
-# Initialise camera
-camera = Camera(simple_camera, 1920, 1080)
+# Initialise characters
+player = Player()
+player_sprite_group = pg.sprite.GroupSingle(player)
 
-grass_img = pg.image.load('grass.png')
-dirt_img = pg.image.load('dirt.png')
 
-# ---------- Main loop ----------
+## ideas for camera
+## initialise the map as a big rect, then make the camera follow the character
+
+# ---------- MAIN LOOP ----------
 run = True
 while run:
-    # clear screen by filling it with blue
-    display.fill((146, 244, 255))
-
-    # process the input
     for event in pg.event.get():
         if event.type == pg.QUIT:
             run = False
 
-    # Get keys pressed
-    current_keys = pg.key.get_pressed()
+    # Fills the game display with a color
+    game_display.fill((146, 255, 255))
 
-    # TODO: refactor to allow custom controls
-    if current_keys[pg.K_LEFT]:
-        player.rect.x -= 5
-    if current_keys[pg.K_RIGHT]:
-        player.rect.x += 5
-    if current_keys[pg.K_UP]:
-        player.rect.y -= 5
-    if current_keys[pg.K_DOWN]:
-        player.rect.y += 5
+    # Draws the map
+    terrain_group.draw(game_display)
 
-    # update the game by one step
+    # Process keyboard inputs
+    handle_input(player, terrain_group)
 
-    # renders the map
-    tile_rects = []
-    y = 0
-    for layer in game_map:
-        x = 0
-        for tile in layer:
-            if tile == '1':
-                display.blit(dirt_img, (x * 16 + camera.state.x, y * 16 + camera.state.y))
-            if tile == '2':
-                display.blit(grass_img, (x * 16 + camera.state.x, y * 16 + camera.state.y))
-            if tile != '0':
-                tile_rects.append(pg.Rect(x * 16 + camera.state.x, y * 16 + camera.state.y, 16, 16))
-            x += 1
-        y += 1
+    # Render the player character
+    player.draw(game_display)
 
-    # render the changes
-    camera.update(player)
+    # Renders the display onto the window
+    window.blit(pg.transform.scale(game_display, WINDOW_SIZE), (0, 0))
 
-    window.fill([0, 0, 0])
-    # all_sprites_list.draw(window)
-
-
-
-    window.blit(pg.transform.scale(display, (800, 600)), (0, 0))
-    for sprite in all_sprites_list:
-        window.blit(sprite.image, camera.apply(sprite))
+    # Updates the window
     pg.display.update()
 
-    # Limit to 60 fps
+    # Limits the game to 60 fps
     clock.tick(60)
 
 # Quit pygame after terminating main loop
