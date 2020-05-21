@@ -1,15 +1,12 @@
 import pygame as pg
-
-# TODO: Currently character gets stuck due to a fucked up collision handling.
+import enum
 
 # TODO: Camera structure
 # Since the map can be structured as a rect, and the player is a rect also,
 # make the camera class to follow the player around and only draw stuff in the rect.
 # possibly using collision. Block detection in a rect is possible.
 
-# Load Textures
-grass_img = pg.image.load('assets/textures/grass.png')
-dirt_img = pg.image.load('assets/textures/dirt.png')
+
 
 # ---------- FUNCTION DECLARATIONS ---------- #
 def load_map(path: str):
@@ -25,34 +22,17 @@ def load_map(path: str):
 
 def handle_input(player, terrain):
     current_keys = pg.key.get_pressed()
-    player.move(current_keys[pg.K_UP],
-              current_keys[pg.K_DOWN],
-              current_keys[pg.K_LEFT],
-              current_keys[pg.K_RIGHT],
-              terrain
-              )
-
+    player.move(current_keys[pg.K_LEFT],
+                current_keys[pg.K_RIGHT],
+                current_keys[pg.K_SPACE],
+                terrain
+                )
 
 def add_blocks_to_group(group: pg.sprite.Group, map):
     for y in range(len(map)):
         for x in range(len(map[0])):
             if map[y][x] == '1':
                 group.add(Block(grass_img, x * 20, y * 20))
-
-
-def get_colliding_sides(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
-    # This gets the colliding sides.
-    top, bottom, left, right = False, False, False, False
-    for colliding_sprite in pg.sprite.spritecollide(sprite, group, False):
-        if colliding_sprite.rect.top < sprite.rect.top < colliding_sprite.rect.bottom:
-            top = True
-        if colliding_sprite.rect.top < sprite.rect.bottom < colliding_sprite.rect.bottom:
-            bottom = True
-        if colliding_sprite.rect.left < sprite.rect.left < colliding_sprite.rect.right:
-            left = True
-        if colliding_sprite.rect.left < sprite.rect.right < colliding_sprite.rect.right:
-            right = True
-    return top, bottom, left, right
 
 
 def enforce_collision_x(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
@@ -67,16 +47,21 @@ def enforce_collision_x(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
 
 
 def enforce_collision_y(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
-    for colliding_sprite in pg.sprite.spritecollide(sprite, group, False):
+    all_colliding_sprites = pg.sprite.spritecollide(sprite, group, False)
+    for colliding_sprite in all_colliding_sprites:
         if colliding_sprite.rect.top < sprite.rect.top < colliding_sprite.rect.bottom:
             sprite.rect.top = colliding_sprite.rect.bottom
         if colliding_sprite.rect.top < sprite.rect.bottom < colliding_sprite.rect.bottom:
             sprite.rect.bottom = colliding_sprite.rect.top
-
+    return len(all_colliding_sprites) > 0
 
 
 # ---------- CLASS DECLARATIONS ---------- #
 class Player(pg.sprite.Sprite):
+    class State(enum.Enum):
+        IDLE = 0
+        WALKING = 0
+        JUMPING = 0
     def __init__(self):
         super().__init__()
         self.sprite = pg.image.load('assets/sprites/player.png').convert()
@@ -85,27 +70,51 @@ class Player(pg.sprite.Sprite):
 
         self.rect = pg.Rect(0, 0, 20, 40)
 
-        self.velocity = 1
+        self.xvelocity = 3
+        self.yvelocity = 5
 
-    def move(self, up: bool, down: bool, left: bool, right: bool, terrain):
+        # this updates every tick, so should keep it small
+        self.gravity = 1
+
+        self.isJumping = False
+
+    def move(self, left: bool, right: bool, jump: bool, terrain):
         # moves the player first, then check for collision. if collided, make them such that they are touching.
-        if up:
-            self.rect.y -= self.velocity
-        if down:
-            self.rect.y += self.velocity
-        enforce_collision_y(self, terrain)
-        if left:
-            self.rect.x -= self.velocity
-        if right:
-            self.rect.x += self.velocity
-        enforce_collision_x(self, terrain)
 
+        if self.isJumping:
+            # block further jump inputs
+            # allow left and right
+            self.yvelocity += self.gravity
+            self.rect.y += self.yvelocity
+            landed = enforce_collision_y(self, terrain)
+
+            if landed:
+                self.isJumping = False
+                self.yvelocity = 5
+
+            if left:
+                self.rect.x -= self.xvelocity
+            if right:
+                self.rect.x += self.xvelocity
+            enforce_collision_x(self, terrain)
+
+        else:
+            if jump:
+                self.yvelocity = -10
+                self.isJumping = True
+
+            self.rect.y += self.yvelocity
+            enforce_collision_y(self, terrain)
+
+            if left:
+                self.rect.x -= self.xvelocity
+            if right:
+                self.rect.x += self.xvelocity
+            enforce_collision_x(self, terrain)
 
     def draw(self, surface: pg.Surface):
         """Draws the player on the specified surface"""
         surface.blit(self.image, (self.rect.x, self.rect.y))
-
-
 
 
 class Block(pg.sprite.Sprite):
@@ -114,9 +123,25 @@ class Block(pg.sprite.Sprite):
         self.image = pg.transform.scale(image.convert(), (20, 20))
         self.rect = pg.Rect(x, y , 20, 20)
 
+class Camera:
+    def __init__(self):
+        self.rect = pg.Rect((0, 0), SURFACE_SIZE)
+
+    def update(self, target: pg.sprite.Sprite):
+        self.rect.x = target.rect.x - int(SURFACE_SIZE[0] / 2)
+        self.rect.y = target.rect.y - int(SURFACE_SIZE[1] / 2)
+
+    def draw(self, surface, all_sprites_group: pg.sprite.Group):
+        all_sprites = all_sprites_group.sprites()
+        colliding_sprites = []
+        for sprite in all_sprites:
+            if self.rect.colliderect(sprite.rect):
+                colliding_sprites.append(sprite)
+        for sprite in colliding_sprites:
+            surface.blit(sprite.image, (sprite.rect.x - self.rect.x, sprite.rect.y - self.rect.y))
+
 
 # ---------- GLOBAL VARIABLES ---------- #
-
 WINDOW_SIZE = (800, 600)
 SURFACE_SIZE = (400, 300)
 
@@ -135,6 +160,10 @@ window = pg.display.set_mode(WINDOW_SIZE)
 # Initialise surface for drawing, which is scaled
 game_display = pg.Surface(SURFACE_SIZE)
 
+# Load Textures
+grass_img = pg.image.load('assets/textures/grass.png')
+dirt_img = pg.image.load('assets/textures/dirt.png')
+
 # Loads the game map as a 2D array
 game_map = load_map('map2')
 
@@ -142,6 +171,11 @@ game_map = load_map('map2')
 terrain_group = pg.sprite.RenderPlain()
 add_blocks_to_group(terrain_group, game_map)
 
+# Constructs a rect representing the entire map
+map_rect = pg.Rect(0, 0, len(game_map[0]), len(game_map))
+
+# Initialise camera
+camera = Camera()
 
 
 # Starts the clock to limit to 60fps
@@ -150,6 +184,11 @@ clock = pg.time.Clock()
 # Initialise characters
 player = Player()
 player_sprite_group = pg.sprite.GroupSingle(player)
+
+# Initialise all sprite group
+all_sprites_group = pg.sprite.Group()
+all_sprites_group.add(player)
+all_sprites_group.add(terrain_group.sprites())
 
 
 ## ideas for camera
@@ -166,13 +205,19 @@ while run:
     game_display.fill((146, 255, 255))
 
     # Draws the map
-    terrain_group.draw(game_display)
+    # terrain_group.draw(game_display)
 
     # Process keyboard inputs
     handle_input(player, terrain_group)
 
     # Render the player character
-    player.draw(game_display)
+    # player.draw(game_display)
+
+    camera.update(player)
+
+    camera.draw(game_display, all_sprites_group)
+
+
 
     # Renders the display onto the window
     window.blit(pg.transform.scale(game_display, WINDOW_SIZE), (0, 0))
