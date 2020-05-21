@@ -1,5 +1,12 @@
 import pygame as pg
 
+# TODO: Currently character gets stuck due to a fucked up collision handling.
+
+# TODO: Camera structure
+# Since the map can be structured as a rect, and the player is a rect also,
+# make the camera class to follow the player around and only draw stuff in the rect.
+# possibly using collision. Block detection in a rect is possible.
+
 # Load Textures
 grass_img = pg.image.load('assets/textures/grass.png')
 dirt_img = pg.image.load('assets/textures/dirt.png')
@@ -34,17 +41,38 @@ def add_blocks_to_group(group: pg.sprite.Group, map):
 
 
 def get_colliding_sides(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
+    # This gets the colliding sides.
     top, bottom, left, right = False, False, False, False
     for colliding_sprite in pg.sprite.spritecollide(sprite, group, False):
-        if colliding_sprite.rect.top <= sprite.rect.top <= colliding_sprite.rect.bottom:
+        if colliding_sprite.rect.top < sprite.rect.top < colliding_sprite.rect.bottom:
             top = True
-        if colliding_sprite.rect.top <= sprite.rect.bottom <= colliding_sprite.rect.bottom:
+        if colliding_sprite.rect.top < sprite.rect.bottom < colliding_sprite.rect.bottom:
             bottom = True
-        if colliding_sprite.rect.left <= sprite.rect.left <= colliding_sprite.rect.right:
+        if colliding_sprite.rect.left < sprite.rect.left < colliding_sprite.rect.right:
             left = True
-        if colliding_sprite.rect.left <= sprite.rect.right <= colliding_sprite.rect.right:
+        if colliding_sprite.rect.left < sprite.rect.right < colliding_sprite.rect.right:
             right = True
     return top, bottom, left, right
+
+
+def enforce_collision_x(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
+    # applied after a movement to make sure that the sprite does not clip
+    # This method is a bit inefficient though
+    # Checks each axis individually
+    for colliding_sprite in pg.sprite.spritecollide(sprite, group, False):
+        if colliding_sprite.rect.left < sprite.rect.left < colliding_sprite.rect.right:
+            sprite.rect.left = colliding_sprite.rect.right
+        if colliding_sprite.rect.left < sprite.rect.right < colliding_sprite.rect.right:
+            sprite.rect.right = colliding_sprite.rect.left
+
+
+def enforce_collision_y(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
+    for colliding_sprite in pg.sprite.spritecollide(sprite, group, False):
+        if colliding_sprite.rect.top < sprite.rect.top < colliding_sprite.rect.bottom:
+            sprite.rect.top = colliding_sprite.rect.bottom
+        if colliding_sprite.rect.top < sprite.rect.bottom < colliding_sprite.rect.bottom:
+            sprite.rect.bottom = colliding_sprite.rect.top
+
 
 
 # ---------- CLASS DECLARATIONS ---------- #
@@ -60,18 +88,18 @@ class Player(pg.sprite.Sprite):
         self.velocity = 1
 
     def move(self, up: bool, down: bool, left: bool, right: bool, terrain):
-        colliding_sides = get_colliding_sides(self, terrain)
-
-        # makes it such that the colliding sides are not touching
-
-        if up and not colliding_sides[0]:
+        # moves the player first, then check for collision. if collided, make them such that they are touching.
+        if up:
             self.rect.y -= self.velocity
-        if down and not colliding_sides[1]:
+        if down:
             self.rect.y += self.velocity
-        if left and not colliding_sides[2]:
+        enforce_collision_y(self, terrain)
+        if left:
             self.rect.x -= self.velocity
-        if right and not colliding_sides[3]:
+        if right:
             self.rect.x += self.velocity
+        enforce_collision_x(self, terrain)
+
 
     def draw(self, surface: pg.Surface):
         """Draws the player on the specified surface"""
