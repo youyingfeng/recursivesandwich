@@ -9,15 +9,14 @@ import pygame as pg
 
 
 class Camera:
-    SURFACE_SIZE = (400, 300)
-
-    def __init__(self):
-        self.rect = pg.Rect((0, 0), Camera.SURFACE_SIZE)
+    def __init__(self, camera_size):
+        self.camera_size = camera_size
+        self.rect = pg.Rect((0, 0), camera_size)
 
     # Moves this camera's position to the target's position
     def update(self, target: pg.sprite.Sprite):
-        self.rect.x = target.rect.x - int(Camera.SURFACE_SIZE[0] / 2)
-        self.rect.y = target.rect.y - int(Camera.SURFACE_SIZE[1] / 2)
+        self.rect.x = target.rect.x - int(self.camera_size[0] / 2)
+        self.rect.y = target.rect.y - int(self.camera_size[1] / 2)
 
     def draw(self, surface, all_sprites_group: pg.sprite.Group):
         all_sprites = all_sprites_group.sprites()

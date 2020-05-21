@@ -47,7 +47,7 @@ dirt_img = pg.image.load('assets/textures/dirt.png')
 game_map = load_map('assets/maps/map2.txt')
 
 WINDOW_SIZE = (800, 600)
-SURFACE_SIZE = Camera.SURFACE_SIZE
+SURFACE_SIZE = (400, 300)
 
 
 # ---------- INITIALIZATION ---------- #
@@ -57,7 +57,7 @@ window = pg.display.set_mode(WINDOW_SIZE)                   # Initialize game wi
 pg.display.set_caption("The Tower", "The Tower")            # Set window caption
 game_display = pg.Surface(SURFACE_SIZE)                     # Initialize surface for drawing
 map_rect = pg.Rect(0, 0, len(game_map[0]), len(game_map))   # Initialize Rect representing entire map
-camera = Camera()                                           # Initialize camera
+camera = Camera(SURFACE_SIZE)                               # Initialize camera
 clock = pg.time.Clock()                                     # Initialize clock
 
 player = Player()                                           # Initialize player
