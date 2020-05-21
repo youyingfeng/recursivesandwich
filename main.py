@@ -1,7 +1,7 @@
 import pygame as pg
-from block import Block
-from camera import Camera
-from player import Player
+from modules.block import Block
+from modules.camera import Camera
+from modules.player import Player
 
 
 # ---------- FUNCTION DEFINITIONS ---------- #

@@ -16,7 +16,6 @@ class Player(pg.sprite.Sprite):
         self.yvelocity = 5
         self.gravity = 1.3  # keep small as it updates every tick
         self.isJumping = False
-        self.mask = pg.mask.from_surface(self.image)
 
     # Moves the player first, then if collided with terrain, enforces collision
     def move(self, left: bool, right: bool, jump: bool, terrain):
@@ -55,18 +54,18 @@ class Player(pg.sprite.Sprite):
     """ Collision methods applied after a movement to make sure that the sprite does not clip.
     Methods are a bit inefficient - checks each axis individually """
 
-    def enforce_collision_x(self: pg.sprite.Sprite, group: pg.sprite.Group):
-        for colliding_sprite in pg.sprite.spritecollide(self, group, False, pg.sprite.collide_mask):
-            if colliding_sprite.rect.left < self.rect.left < colliding_sprite.rect.right:
-                self.rect.left = colliding_sprite.rect.right
-            if colliding_sprite.rect.left < self.rect.right < colliding_sprite.rect.right:
-                self.rect.right = colliding_sprite.rect.left
+    def enforce_collision_x(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
+        for colliding_sprite in pg.sprite.spritecollide(sprite, group, False):
+            if colliding_sprite.rect.left < sprite.rect.left < colliding_sprite.rect.right:
+                sprite.rect.left = colliding_sprite.rect.right
+            if colliding_sprite.rect.left < sprite.rect.right < colliding_sprite.rect.right:
+                sprite.rect.right = colliding_sprite.rect.left
 
-    def enforce_collision_y(self: pg.sprite.Sprite, group: pg.sprite.Group):
-        all_colliding_sprites = pg.sprite.spritecollide(self, group, False, pg.sprite.collide_mask)
+    def enforce_collision_y(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
+        all_colliding_sprites = pg.sprite.spritecollide(sprite, group, False)
         for colliding_sprite in all_colliding_sprites:
-            if colliding_sprite.rect.top < self.rect.top < colliding_sprite.rect.bottom:
-                self.rect.top = colliding_sprite.rect.bottom
-            if colliding_sprite.rect.top < self.rect.bottom < colliding_sprite.rect.bottom:
-                self.rect.bottom = colliding_sprite.rect.top
+            if colliding_sprite.rect.top < sprite.rect.top < colliding_sprite.rect.bottom:
+                sprite.rect.top = colliding_sprite.rect.bottom
+            if colliding_sprite.rect.top < sprite.rect.bottom < colliding_sprite.rect.bottom:
+                sprite.rect.bottom = colliding_sprite.rect.top
         return len(all_colliding_sprites) > 0
