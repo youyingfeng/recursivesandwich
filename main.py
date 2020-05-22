@@ -38,7 +38,7 @@ game_map = Map('assets/maps/map2.txt')                      # Game Map (as 2D ar
 map_rect = pg.Rect((0, 0), game_map.dimensions)             # Initialize Rect representing entire map
 terrain_group = game_map.terrain_group                      # Initialize terrain sprite group
 
-camera = Camera(SURFACE_SIZE, game_map)                               # Initialize camera
+camera = Camera(SURFACE_SIZE, game_map)                     # Initialize camera
 
 clock = pg.time.Clock()                                     # Initialize clock
 

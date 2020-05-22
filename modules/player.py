@@ -9,12 +9,12 @@ class Player(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.sprite = player_img.convert()
-        self.image = pg.transform.scale(self.sprite, (20, 40))
+        self.image = pg.transform.scale(self.sprite, (32, 64))
         self.image.set_colorkey((255, 255, 255))
-        self.rect = pg.Rect(10, 10, 20, 40)
+        self.rect = pg.Rect(10, 10, 32, 64)
         self.xvelocity = 3
         self.yvelocity = 5
-        self.gravity = 1.3  # keep small as it updates every tick
+        self.gravity = 1  # keep small as it updates every tick
         self.isJumping = False
 
     # Moves the player first, then if collided with terrain, enforces collision

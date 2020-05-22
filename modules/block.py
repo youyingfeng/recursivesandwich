@@ -3,7 +3,7 @@ import pygame as pg
 
 class Block(pg.sprite.Sprite):
 
-    BLOCK_SIZE = 16
+    BLOCK_SIZE = 32
 
     def __init__(self, image, x, y):
         super().__init__()
