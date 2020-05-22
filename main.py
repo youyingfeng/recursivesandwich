@@ -2,6 +2,7 @@ import pygame as pg
 from modules.block import Block
 from modules.camera import Camera
 from modules.player import Player
+pg.font.init()  # Initialize fonts
 
 
 # ---------- FUNCTION DEFINITIONS ---------- #
@@ -39,6 +40,9 @@ def add_blocks_to_group(group: pg.sprite.Group, map):
 
 # ---------- GLOBAL VARIABLES ---------- #
 
+# Fonts
+main_font = pg.font.SysFont("comicsans", 50)
+
 # Textures
 grass_img = pg.image.load('assets/textures/grass.png')
 dirt_img = pg.image.load('assets/textures/dirt.png')
@@ -47,45 +51,45 @@ dirt_img = pg.image.load('assets/textures/dirt.png')
 game_map = load_map('assets/maps/map2.txt')
 
 WINDOW_SIZE = (800, 600)
-SURFACE_SIZE = (400, 300)
 
 
-# ---------- INITIALIZATION ---------- #
+def main():
+    pg.init()                                                   # Initialize pygame
+    window = pg.display.set_mode(WINDOW_SIZE)                   # Initialize game window
+    pg.display.set_caption("The Tower", "The Tower")            # Set window caption
+    game_display = pg.Surface(Camera.SURFACE_SIZE)              # Initialize surface for drawing
+    map_rect = pg.Rect(0, 0, len(game_map[0]), len(game_map))   # Initialize Rect representing entire map
+    camera = Camera()                                           # Initialize camera
+    clock = pg.time.Clock()                                     # Initialize clock
+    player = Player()                                           # Initialize player
+    player_sprite_group = pg.sprite.GroupSingle(player)         # Initialize player sprite group
+    terrain_group = pg.sprite.Group()                           # Initialize terrain sprite group
+    add_blocks_to_group(terrain_group, game_map)
+    all_sprites_group = pg.sprite.Group()                       # Initialize all sprites group without player
+    # all_sprites_group.add(player)
+    all_sprites_group.add(terrain_group.sprites())
 
-pg.init()                                                   # Initialize pygame
-window = pg.display.set_mode(WINDOW_SIZE)                   # Initialize game window
-pg.display.set_caption("The Tower", "The Tower")            # Set window caption
-game_display = pg.Surface(SURFACE_SIZE)                     # Initialize surface for drawing
-map_rect = pg.Rect(0, 0, len(game_map[0]), len(game_map))   # Initialize Rect representing entire map
-camera = Camera(SURFACE_SIZE)                               # Initialize camera
-clock = pg.time.Clock()                                     # Initialize clock
+    run = True
+    while run:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                run = False
 
-player = Player()                                           # Initialize player
-player_sprite_group = pg.sprite.GroupSingle(player)         # Initialize player sprite group
+        game_display.fill((146, 255, 255))                                  # Fill game display with light-blue color
+        handle_input(player, terrain_group)                                 # Process keyboard inputs
+        camera.update(player)                                               # Move camera to player's position
+        camera.draw(game_display, all_sprites_group)                        # Draw non-player sprites on game display
+        player.draw(game_display, camera)                                   # Draw player sprite on game display
+        window.blit(pg.transform.scale(game_display, WINDOW_SIZE), (0, 0))  # Renders the display onto the window
+        pg.display.update()                                                 # Updates the window
+        clock.tick(60)                                                      # Limits the game to 60 fps
 
-terrain_group = pg.sprite.Group()                           # Initialize terrain sprite group
-add_blocks_to_group(terrain_group, game_map)
+        # Player death
+        if player.is_dead():
+            main()
 
-all_sprites_group = pg.sprite.Group()                       # Initialize all sprites group
-all_sprites_group.add(player)
-all_sprites_group.add(terrain_group.sprites())
+    pg.quit()   # Quit pygame after terminating main loop
+    quit()      # Terminates python instance
 
 
-# ---------- MAIN GAME LOOP ---------- #
-
-run = True
-while run:
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            run = False
-
-    game_display.fill((146, 255, 255))                                  # Fill game display with light-blue color
-    handle_input(player, terrain_group)                                 # Process keyboard inputs
-    camera.update(player)                                               # Move camera to player's position
-    camera.draw(game_display, all_sprites_group)                        # Draw all sprites on game display
-    window.blit(pg.transform.scale(game_display, WINDOW_SIZE), (0, 0))  # Renders the display onto the window
-    pg.display.update()                                                 # Updates the window
-    clock.tick(60)                                                      # Limits the game to 60 fps
-
-pg.quit()   # Quit pygame after terminating main loop
-quit()      # Terminates python instance
+main()
