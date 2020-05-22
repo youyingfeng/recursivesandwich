@@ -101,8 +101,8 @@ class Player(pg.sprite.Sprite):
     def enforce_boundaries(self, map):
         if self.rect.top < 0:
             self.rect.top = 0
-        elif self.rect.bottom > map.rect.bottom:
-            self.rect.bottom = map.rect.bottom
+        # elif self.rect.bottom > map.rect.bottom:
+        #     self.rect.bottom = map.rect.bottom
         if self.rect.left < 0:
             self.rect.left = 0
         elif self.rect.right > map.rect.right:
