@@ -1,6 +1,11 @@
 import pygame as pg
+from modules.camera import Camera
 
 
+# Global player attributes
+MAX_HEALTH = 100
+
+# Player images
 player_img = pg.image.load('assets/sprites/player.png')
 
 
@@ -16,6 +21,30 @@ class Player(pg.sprite.Sprite):
         self.yvelocity = 5
         self.gravity = 1  # keep small as it updates every tick
         self.isJumping = False
+        self.health = 100 # maximum 100
+
+    # To be called in the camera.draw() method only
+    def draw(self, surface: pg.Surface, camera):
+        surface.blit(self.image, (self.rect.x - camera.rect.x, self.rect.y - camera.rect.y))
+        self.healthbar(surface, camera)
+
+    def healthbar(self, surface: pg.Surface, camera):
+        SCALE = 2
+        X_OFFSET = 10
+        Y_OFFSET = 20
+        THICKNESS = 5
+        pg.draw.rect(surface,
+                     (255, 0, 0), # red
+                     (self.rect.x - camera.rect.x - X_OFFSET,
+                      self.rect.y - camera.rect.y - Y_OFFSET,
+                      self.image.get_width() * SCALE,
+                      THICKNESS))
+        pg.draw.rect(surface,
+                     (0, 255, 0), # green
+                     (self.rect.x - camera.rect.x - X_OFFSET,
+                      self.rect.y - camera.rect.y - Y_OFFSET,
+                      self.image.get_width() * (self.health / MAX_HEALTH) * SCALE,
+                      THICKNESS))
 
     # Moves the player first, then if collided with terrain, enforces collision
     def move(self, left: bool, right: bool, jump: bool, map):
@@ -49,28 +78,25 @@ class Player(pg.sprite.Sprite):
 
         self.enforce_boundaries(map)
 
-    # Draws the player on the specified surface
-    def draw(self, surface: pg.Surface):
-        surface.blit(self.image, (self.rect.x, self.rect.y))
+    # Collisions
+    def enforce_collision_x(self, group: pg.sprite.Group):
+        # Collision methods applied after a movement to make sure that the sprite does not clip.
+        # Methods are a bit inefficient - checks each axis individually.
+        for colliding_sprite in pg.sprite.spritecollide(self, group, False):
+            if colliding_sprite.rect.left < self.rect.left < colliding_sprite.rect.right:
+                self.rect.left = colliding_sprite.rect.right
+            if colliding_sprite.rect.left < self.rect.right < colliding_sprite.rect.right:
+                self.rect.right = colliding_sprite.rect.left
 
-    """ Collision methods applied after a movement to make sure that the sprite does not clip.
-    Methods are a bit inefficient - checks each axis individually """
-
-    def enforce_collision_x(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
-        for colliding_sprite in pg.sprite.spritecollide(sprite, group, False):
-            if colliding_sprite.rect.left < sprite.rect.left < colliding_sprite.rect.right:
-                sprite.rect.left = colliding_sprite.rect.right
-            if colliding_sprite.rect.left < sprite.rect.right < colliding_sprite.rect.right:
-                sprite.rect.right = colliding_sprite.rect.left
-
-    def enforce_collision_y(sprite: pg.sprite.Sprite, group: pg.sprite.Group):
-        all_colliding_sprites = pg.sprite.spritecollide(sprite, group, False)
+    def enforce_collision_y(self, group: pg.sprite.Group):
+        all_colliding_sprites = pg.sprite.spritecollide(self, group, False)
         for colliding_sprite in all_colliding_sprites:
-            if colliding_sprite.rect.top < sprite.rect.top < colliding_sprite.rect.bottom:
-                sprite.rect.top = colliding_sprite.rect.bottom
-            if colliding_sprite.rect.top < sprite.rect.bottom < colliding_sprite.rect.bottom:
-                sprite.rect.bottom = colliding_sprite.rect.top
+            if colliding_sprite.rect.top < self.rect.top < colliding_sprite.rect.bottom:
+                self.rect.top = colliding_sprite.rect.bottom
+            if colliding_sprite.rect.top < self.rect.bottom < colliding_sprite.rect.bottom:
+                self.rect.bottom = colliding_sprite.rect.top
         return len(all_colliding_sprites) > 0
+
 
     def enforce_boundaries(self, map):
         if self.rect.top < 0:
@@ -81,3 +107,8 @@ class Player(pg.sprite.Sprite):
             self.rect.left = 0
         elif self.rect.right > map.rect.right:
             self.rect.right = map.rect.right
+
+    # Checks if player is dead
+    def is_dead(self, map):
+        # Collects all possibilities in which a player can lose a life
+        return self.rect.bottom > map.rect.bottom or self.health < 0
