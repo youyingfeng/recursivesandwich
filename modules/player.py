@@ -11,18 +11,18 @@ class Player(pg.sprite.Sprite):
         self.sprite = player_img.convert()
         self.image = pg.transform.scale(self.sprite, (20, 40))
         self.image.set_colorkey((255, 255, 255))
-        self.rect = pg.Rect(0, 0, 20, 40)
+        self.rect = pg.Rect(10, 10, 20, 40)
         self.xvelocity = 3
         self.yvelocity = 5
         self.gravity = 1.3  # keep small as it updates every tick
         self.isJumping = False
 
     # Moves the player first, then if collided with terrain, enforces collision
-    def move(self, left: bool, right: bool, jump: bool, terrain):
+    def move(self, left: bool, right: bool, jump: bool, map):
         if self.isJumping:  # block further jump inputs but allow left and right
             self.yvelocity += self.gravity
             self.rect.y += self.yvelocity
-            landed = self.enforce_collision_y(terrain)
+            landed = self.enforce_collision_y(map.terrain_group)
 
             if landed:
                 self.isJumping = False
@@ -31,7 +31,7 @@ class Player(pg.sprite.Sprite):
                 self.rect.x -= self.xvelocity
             if right:
                 self.rect.x += self.xvelocity
-            self.enforce_collision_x(terrain)
+            self.enforce_collision_x(map.terrain_group)
 
         else:
             if jump:
@@ -39,13 +39,15 @@ class Player(pg.sprite.Sprite):
                 self.isJumping = True
 
             self.rect.y += self.yvelocity
-            self.enforce_collision_y(terrain)
+            self.enforce_collision_y(map.terrain_group)
 
             if left:
                 self.rect.x -= self.xvelocity
             if right:
                 self.rect.x += self.xvelocity
-            self.enforce_collision_x(terrain)
+            self.enforce_collision_x(map.terrain_group)
+
+        self.enforce_boundaries(map)
 
     # Draws the player on the specified surface
     def draw(self, surface: pg.Surface):
@@ -69,3 +71,13 @@ class Player(pg.sprite.Sprite):
             if colliding_sprite.rect.top < sprite.rect.bottom < colliding_sprite.rect.bottom:
                 sprite.rect.bottom = colliding_sprite.rect.top
         return len(all_colliding_sprites) > 0
+
+    def enforce_boundaries(self, map):
+        if self.rect.top < 0:
+            self.rect.top = 0
+        elif self.rect.bottom > map.rect.bottom:
+            self.rect.bottom = map.rect.bottom
+        if self.rect.left < 0:
+            self.rect.left = 0
+        elif self.rect.right > map.rect.right:
+            self.rect.right = map.rect.right

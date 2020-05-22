@@ -4,16 +4,18 @@ from modules.camera import Camera
 from modules.player import Player
 from modules.map import Map
 
+# TODO: Bound the player and the camera within the map
+
 
 # ---------- FUNCTION DEFINITIONS ---------- #
 
 # Moves player according to user's keyboard inputs
-def handle_input(player, terrain):
+def handle_input(player, map):
     current_keys = pg.key.get_pressed()
     player.move(current_keys[pg.K_LEFT],
                 current_keys[pg.K_RIGHT],
                 current_keys[pg.K_SPACE],
-                terrain)
+                map)
 
 # ---------- GLOBAL VARIABLES ---------- #
 
@@ -36,7 +38,7 @@ game_map = Map('assets/maps/map2.txt')                      # Game Map (as 2D ar
 map_rect = pg.Rect((0, 0), game_map.dimensions)             # Initialize Rect representing entire map
 terrain_group = game_map.terrain_group                      # Initialize terrain sprite group
 
-camera = Camera(SURFACE_SIZE)                               # Initialize camera
+camera = Camera(SURFACE_SIZE, game_map)                               # Initialize camera
 
 clock = pg.time.Clock()                                     # Initialize clock
 
@@ -57,8 +59,8 @@ while run:
             run = False
 
     game_display.fill((146, 255, 255))                                  # Fill game display with light-blue color
-    handle_input(player, terrain_group)                                 # Process keyboard inputs
-    camera.update(player)                                               # Move camera to player's position
+    handle_input(player, game_map)                                      # Process keyboard inputs
+    camera.follow_target(player)                                               # Move camera to player's position
     camera.draw(game_display, all_sprites_group)                        # Draw all sprites on game display
     window.blit(pg.transform.scale(game_display, WINDOW_SIZE), (0, 0))  # Renders the display onto the window
     pg.display.update()                                                 # Updates the window
