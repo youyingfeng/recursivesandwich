@@ -3,6 +3,7 @@ from modules.block import Block
 from modules.camera import Camera
 from modules.player import Player
 from modules.map import Map
+from modules.animations import StaticBackground, ParallaxBackground
 
 pg.font.init()  # Initialize fonts
 
@@ -55,6 +56,11 @@ def main():
     all_sprites_group.add(player)
     all_sprites_group.add(terrain_group.sprites())
 
+    static_background = StaticBackground("assets/textures/Hills Layer 01.png", game_display)
+    parallax_background_1 = ParallaxBackground("assets/textures/Hills Layer 02.png", game_display)
+    parallax_background_2 = ParallaxBackground("assets/textures/Hills Layer 03.png", game_display)
+    parallax_background_3 = ParallaxBackground("assets/textures/Hills Layer 04.png", game_display)
+
 
     # ---------- MAIN GAME LOOP ---------- #
 
@@ -64,12 +70,23 @@ def main():
             if event.type == pg.QUIT:
                 run = False
 
-        game_display.fill((146, 255, 255))                                  # Fill game display with light-blue color
+        # game_display.fill((146, 255, 255))                                # Fill game display with light-blue color
         handle_input(player, game_map)                                      # Process keyboard inputs
         camera.follow_target(player)                                        # Move camera to player's position
+
+
+        parallax_background_1.update(camera, 0.2)
+        parallax_background_2.update(camera, 0.5)
+        parallax_background_3.update(camera, 0.8)
+
+        static_background.draw()
+        parallax_background_1.draw()
+        parallax_background_2.draw()
+        parallax_background_3.draw()
+
         camera.draw(game_display, terrain_group)                            # Draw terrain sprites on game display
 
-        player.draw(game_display, camera)  # Draw player sprite on game display
+        player.draw(game_display, camera)                                   # Draw player sprite on game display
 
         window.blit(pg.transform.scale(game_display, WINDOW_SIZE), (0, 0))  # Renders the display onto the window
         pg.display.update()                                                 # Updates the window

@@ -1,5 +1,5 @@
 import pygame as pg
-from modules.camera import Camera
+from .animations import Spritesheet, Animation
 
 
 # Global player attributes
@@ -14,9 +14,21 @@ class Player(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.sprite = player_img.convert()
-        self.image = pg.transform.scale(self.sprite, (32, 64))
+        self.image = pg.transform.scale(self.sprite, (16, 32))
         self.image.set_colorkey((255, 255, 255))
-        self.rect = pg.Rect(10, 10, 32, 64)
+        # self.spritesheet = Spritesheet("assets/sprites/spritesheet.png")
+        # self.animation = Animation(self.spritesheet.images_at(((0, 0, 47, 60),
+        #                                                   (60, 0, 47, 120),
+        #                                                   (120, 0, 47, 180),
+        #                                                   (0, 47, 94, 60),
+        #                                                   (60, 47, 94, 120),
+        #                                                   (120, 47, 94, 180))))
+        #
+        # self.image = self.animation.get_image()
+
+
+
+        self.rect = pg.Rect(10, 10, 16, 32)
         self.xvelocity = 3
         self.yvelocity = 5
         self.gravity = 1  # keep small as it updates every tick
@@ -26,9 +38,11 @@ class Player(pg.sprite.Sprite):
     # To be called in the camera.draw() method only
     def draw(self, surface: pg.Surface, camera):
         surface.blit(self.image, (self.rect.x - camera.rect.x, self.rect.y - camera.rect.y))
-        self.healthbar(surface, camera)
+        self.draw_healthbar(surface, camera)
+        # self.animation.update()
+        # self.image = self.animation.get_image()
 
-    def healthbar(self, surface: pg.Surface, camera):
+    def draw_healthbar(self, surface: pg.Surface, camera):
         SCALE = 2
         X_OFFSET = 10
         Y_OFFSET = 20

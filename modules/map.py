@@ -5,9 +5,6 @@ from .block import Block
 grass_img = pg.image.load('assets/textures/grass.png')
 dirt_img = pg.image.load('assets/textures/dirt.png')
 
-# Functions
-
-
 # Loads the game map as a 2D array from a .txt file
 def load_map(path: str):
     file = open(path, 'r')
@@ -46,5 +43,14 @@ class Map:
 
     def is_within_map_boundaries(self, sprite: pg.sprite.Sprite) -> bool:
         return self.rect.colliderect(sprite.rect)
+
+
+
+
+
+
+
+
+
 
 
