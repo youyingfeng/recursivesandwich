@@ -2,54 +2,60 @@ import pygame as pg
 from .camera import Camera
 
 class Spritesheet:
-    def __init__(self, file_path):
-        # TODO: wrap in try-catch block
-        self.sheet = pg.image.load(file_path).convert_alpha()
+    def __init__(self, filepath: str, rows: int, columns: int, width=None, height=None):
+        self.spritesheet = pg.image.load(filepath).convert_alpha()
+        self.rows = rows
+        self.columns = columns
+        self.width = width
+        self.height = height
+        if width == None:
+            self.width = int(self.spritesheet.get_width() / columns)
+        if height == None:
+            self.height = int(self.spritesheet.get_height() / rows)
 
-    def get_image_at(self, rectangle, colorkey=None):
-        # Let the sheet span from 0,0 to whatever its bounds.
-        # The rectangle is a rect floating within this span
-        rect = pg.Rect(rectangle)
-        image = pg.Surface(rect.size).convert_alpha()
-        image.blit(self.sheet, (0, 0), rect)
-        if colorkey is not None:
-            if colorkey == -1:
-                colorkey = image.get_at((0, 0))
-            image.set_colorkey(colorkey, pg.RLEACCEL)
-        return image
-
-    # Load a whole bunch of images and return them as a list
-    def images_at(self, rects, colorkey=None):
-        "Loads multiple images, supply a list of coordinates"
-        return [self.get_image_at(rect, colorkey) for rect in rects]
-
-    # Load a whole strip of images
-    def load_strip(self, rect, image_count, colorkey=None):
-        "Loads a strip of images and returns them as a list"
-        tups = [(rect[0] + rect[2] * x, rect[1], rect[2], rect[3])
-                for x in range(image_count)]
-        return self.images_at(tups, colorkey)
+        self.clock = pg.time.Clock()
 
 
-class Animation():
-# Stores a sequence of sprites to be animated.
-    def __init__(self, animation_sequence):
+    def get_image_at_position(self, position: int):
+        # positions are 0-indexed
+        image_row = int(position / self.columns)
+        image_column = position % self.columns
+        surface = pg.Surface((self.width, self.height)).convert_alpha()
+        surface.blit(self.spritesheet, (0, 0), pg.Rect((image_column * self.width,
+                                                        image_row * self.height,
+                                                        (image_column + 1) * self.width,
+                                                        (image_row + 1) * self.height)
+                                                      ))
+        return surface
+
+    def get_images_at(self, *positions: int):
+        # positions goes from left to right, then go down one row.
+        return [self.get_image_at_position(position) for position in positions]
+
+
+
+class Animation:
+    def __init__(self, animation_sequence: list):
         self.animation_sequence = animation_sequence
-        self.current_frame_index = 0
-        self.number_of_frames = len(animation_sequence)
+        self.index = 0
+        self.frame_count = len(animation_sequence)
 
-    def update(self):
-        # temporary - tick based animations - move to next frame everytime this is called.
-        # ideally, should use time based animations - move only after a certain time
-        # This function is called everytime a draw call happens, to update the image within the sprite.
-        if self.current_frame_index == self.number_of_frames - 1:
-            self.current_frame_index = 0
+        self.frames_per_image = 3
+        self.frame_counter = 0
+
+    def get_current_frame(self):
+        return self.animation_sequence[self.index]
+
+    # add an update function to only call get_next_frame based on the time passed
+    def update_image(self):
+        if self.frame_counter >= self.frames_per_image:
+            self.frame_counter = 0
+            self.index += 1
+            self.index = self.index % self.frame_count
+            return True
         else:
-            self.current_frame_index += 1
-        return self.animation_sequence[self.current_frame_index]
-
-    def get_image(self):
-        return self.animation_sequence[self.current_frame_index]
+            self.frame_counter += 1
+            return False
 
 
 # For Background
@@ -71,6 +77,7 @@ class StaticBackground:
 
 
     def draw(self):
+        """Draws the image on the surface"""
         self.surface.blit(self.background, self.BLIT_COORDINATES)
 
 class ParallaxBackground:

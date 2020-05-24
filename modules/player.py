@@ -13,20 +13,11 @@ class Player(pg.sprite.Sprite):
 
     def __init__(self):
         super().__init__()
-        self.sprite = player_img.convert()
-        self.image = pg.transform.scale(self.sprite, (16, 32))
-        self.image.set_colorkey((255, 255, 255))
-        # self.spritesheet = Spritesheet("assets/sprites/spritesheet.png")
-        # self.animation = Animation(self.spritesheet.images_at(((0, 0, 47, 60),
-        #                                                   (60, 0, 47, 120),
-        #                                                   (120, 0, 47, 180),
-        #                                                   (0, 47, 94, 60),
-        #                                                   (60, 47, 94, 120),
-        #                                                   (120, 47, 94, 180))))
-        #
-        # self.image = self.animation.get_image()
+        
+        self.spritesheet = Spritesheet("assets/sprites/spritesheet.png", 2, 3)
+        self.animation = Animation(self.spritesheet.get_images_at(0, 1, 2, 3, 4, 5))
 
-
+        self.image = self.animation.get_current_frame()
 
         self.rect = pg.Rect(10, 10, 16, 32)
         self.xvelocity = 3
@@ -37,10 +28,14 @@ class Player(pg.sprite.Sprite):
 
     # To be called in the camera.draw() method only
     def draw(self, surface: pg.Surface, camera):
+        # updates the current frame of the animation
+        frame_changed = self.animation.update_image()
+        if frame_changed:
+            self.image = self.animation.get_current_frame()
+
         surface.blit(self.image, (self.rect.x - camera.rect.x, self.rect.y - camera.rect.y))
         self.draw_healthbar(surface, camera)
-        # self.animation.update()
-        # self.image = self.animation.get_image()
+
 
     def draw_healthbar(self, surface: pg.Surface, camera):
         SCALE = 2

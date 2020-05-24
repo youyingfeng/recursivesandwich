@@ -21,17 +21,15 @@ def handle_input(player, map):
                 current_keys[pg.K_SPACE],
                 map)
 
+
 # ---------- GLOBAL VARIABLES ---------- #
 
 # Fonts
 main_font = pg.font.SysFont("comicsans", 50)
 
-# Textures
-# grass_img = pg.image.load('assets/textures/grass.png')
-# dirt_img = pg.image.load('assets/textures/dirt.png')
-
 WINDOW_SIZE = (800, 600)
 SURFACE_SIZE = (400, 300)
+
 
 def main():
     # ---------- INITIALIZATION ---------- #
@@ -73,7 +71,6 @@ def main():
         # game_display.fill((146, 255, 255))                                # Fill game display with light-blue color
         handle_input(player, game_map)                                      # Process keyboard inputs
         camera.follow_target(player)                                        # Move camera to player's position
-
 
         parallax_background_1.update(camera, 0.2)
         parallax_background_2.update(camera, 0.5)
