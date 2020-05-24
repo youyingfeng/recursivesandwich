@@ -20,12 +20,13 @@ class Spritesheet:
         # positions are 0-indexed
         image_row = int(position / self.columns)
         image_column = position % self.columns
-        surface = pg.Surface((self.width, self.height)).convert_alpha()
+        surface = pg.Surface((self.width, self.height))
         surface.blit(self.spritesheet, (0, 0), pg.Rect((image_column * self.width,
                                                         image_row * self.height,
                                                         (image_column + 1) * self.width,
                                                         (image_row + 1) * self.height)
                                                       ))
+        surface.set_colorkey((0, 0, 0))
         return surface
 
     def get_images_at(self, *positions: int):
