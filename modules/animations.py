@@ -114,6 +114,20 @@ class ParallaxBackground:
         self.surface.blit(self.background, (self.blit_position - self.BACKGROUND_WIDTH, 0))
 
 
+class ScrollingBackground(ParallaxBackground):
+    def __init__(self, filepath: str, surface: pg.Surface):
+        super().__init__(filepath, surface)
+
+    def update(self, speed: float):
+        # Updates the blit position by a set amount every time this is called
+        # blit_position is now a float to allow slower updates
+        self.blit_position = (self.blit_position - speed) % self.BACKGROUND_WIDTH
+
+    def draw(self):
+        integer_blit_position = int(self.blit_position)
+        self.surface.blit(self.background, (integer_blit_position, 0))
+        self.surface.blit(self.background, (integer_blit_position - self.BACKGROUND_WIDTH, 0))
+
 
 
 

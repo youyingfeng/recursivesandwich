@@ -1,11 +1,7 @@
 import pygame as pg
 
-from modules.camera import Camera
-from modules.player import Player
-from modules.map import Map
-from modules.animations import StaticBackground, ParallaxBackground
 from modules.scenemanager import Scene, SceneManager
-from modules.gamescene import GameScene
+from modules.gamescene import GameScene, TitleScene
 
 
 # ---------- GLOBAL VARIABLES ---------- #
@@ -26,12 +22,13 @@ def main():
 
     clock = pg.time.Clock()                                     # Initialize clock
 
-    manager = SceneManager(GameScene())                         # Initialise scene manager
+    manager = SceneManager(TitleScene())                         # Initialise scene manager
 
     run = True
 
     # ---------- MAIN GAME LOOP ---------- #
     while run:
+        # TODO: probably should shove this inside handle_events()
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 run = False
