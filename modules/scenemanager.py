@@ -1,3 +1,6 @@
+import pygame as pg
+
+
 class Scene:
     # Scenes form the baseline of our game. Example scenes are the splash screen, game screen, pause screen, etc
     # This needs to be extended by all individual scenes
@@ -11,7 +14,7 @@ class Scene:
     def update(self):
         raise NotImplementedError
 
-    def render(self):
+    def render(self, surface: pg.Surface):
         raise NotImplementedError
 
 
@@ -20,6 +23,7 @@ class SceneManager:
     # so you wont end up with a fuckload of objects
     def __init__(self, scene: Scene):
         self.scene = scene
+        self.scene.manager = self
 
     def switch_to_scene(self, scene: Scene):
         self.scene = scene
