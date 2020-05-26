@@ -1,3 +1,9 @@
+## Good reading material  
+http://gameprogrammingpatterns.com/game-loop.html  
+http://gameprogrammingpatterns.com/state.html and pretty much the entire book lmao  
+https://stackoverflow.com/questions/14354171/add-scrolling-to-a-platformer-in-pygame for camera scrolling
+https://stackoverflow.com/questions/14700889/pygame-level-menu-states for state machine  
+
 # Timeline
 Week 1: Base of the game
 - Window and camera
@@ -24,9 +30,3 @@ Week 4: Levels
 - Dystopian image of the Singapore skyline as the player approaches the tower, should be a wide image so that it can be scrolled (with parallax effects).
 - Exterior of the tower, menacing and modern-looking
 - Interior of the tower, with its walls and rotting corpses of dead bodies which failed to survive the Tower's tests
-
-## Good reading material  
-http://gameprogrammingpatterns.com/game-loop.html  
-http://gameprogrammingpatterns.com/state.html  
-https://stackoverflow.com/questions/14354171/add-scrolling-to-a-platformer-in-pygame  
-and pretty much the entire book lmao.  

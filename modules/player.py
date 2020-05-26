@@ -1,22 +1,22 @@
 import pygame as pg
-from modules.camera import Camera
+from .animations import Spritesheet, Animation
 
 
-# Global player attributes
 MAX_HEALTH = 100
 
-# Player images
-player_img = pg.image.load('assets/sprites/player.png')
 
-
+# TODO: Rewrite the entire player class to inherit from an unimplemented entity class
+# Use PEP526 variable annotations to indicate uninitialised variables?
 class Player(pg.sprite.Sprite):
-
     def __init__(self):
         super().__init__()
-        self.sprite = player_img.convert()
-        self.image = pg.transform.scale(self.sprite, (32, 64))
-        self.image.set_colorkey((255, 255, 255))
-        self.rect = pg.Rect(10, 10, 32, 64)
+
+        self.spritesheet = Spritesheet("assets/sprites/Idle (32x32).png", 1, 11)
+        self.animation = Animation(self.spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+
+        self.image = self.animation.get_current_frame()
+
+        self.rect = pg.Rect(10, 10, 21, 27)         # Change the dimensions of this rect to match sprite and hitbox
         self.xvelocity = 3
         self.yvelocity = 5
         self.gravity = 1  # keep small as it updates every tick
@@ -25,10 +25,17 @@ class Player(pg.sprite.Sprite):
 
     # To be called in the camera.draw() method only
     def draw(self, surface: pg.Surface, camera):
-        surface.blit(self.image, (self.rect.x - camera.rect.x, self.rect.y - camera.rect.y))
-        self.healthbar(surface, camera)
+        # updates the current frame of the animation
+        frame_changed = self.animation.update_image()
+        if frame_changed:
+            self.image = self.animation.get_current_frame()
 
-    def healthbar(self, surface: pg.Surface, camera):
+        surface.blit(self.image,
+                     (self.rect.x - camera.rect.x, self.rect.y - camera.rect.y),
+                     pg.Rect(6, 5, 21, 27))     # change the dimensions of this rect if the sprite changes
+        self.draw_healthbar(surface, camera)
+
+    def draw_healthbar(self, surface: pg.Surface, camera):
         SCALE = 2
         X_OFFSET = 10
         Y_OFFSET = 20
@@ -78,6 +85,7 @@ class Player(pg.sprite.Sprite):
 
         self.enforce_boundaries(map)
 
+    # TODO: Incorporate enforce_boundaries logic into enforce_collision to make boundaries function irrelevant
     # Collisions
     def enforce_collision_x(self, group: pg.sprite.Group):
         # Collision methods applied after a movement to make sure that the sprite does not clip.
@@ -96,7 +104,6 @@ class Player(pg.sprite.Sprite):
             if colliding_sprite.rect.top < self.rect.bottom < colliding_sprite.rect.bottom:
                 self.rect.bottom = colliding_sprite.rect.top
         return len(all_colliding_sprites) > 0
-
 
     def enforce_boundaries(self, map):
         if self.rect.top < 0:

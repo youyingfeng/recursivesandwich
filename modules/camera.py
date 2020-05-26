@@ -21,11 +21,14 @@ class Camera:
 
         # TODO: clamp camera to map bounds, this is buggy
 
-
     # Moves this camera's position to the target's position
     def follow_target(self, target: pg.sprite.Sprite):
-        self.rect.x = target.rect.x - int(self.camera_size[0] / 2)
-        self.rect.y = target.rect.y - int(self.camera_size[1] / 2)
+        lerp = 0.1                         # for smooth camera follow
+        new_x = target.rect.x - int(self.camera_size[0] / 2)
+        new_y = target.rect.y - int(self.camera_size[1] / 2)
+
+        self.rect.x += int((new_x - self.rect.x) * lerp)    # gives the camera some play
+        self.rect.y += int((new_y - self.rect.y) * lerp)    # such that it wont follow the player tightly
 
         if self.rect.top < 0:
             self.rect.top = 0
