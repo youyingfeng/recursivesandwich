@@ -21,7 +21,6 @@ class Camera:
 
         # TODO: clamp camera to map bounds, this is buggy
 
-
     # Moves this camera's position to the target's position
     def follow_target(self, target: pg.sprite.Sprite):
         lerp = 0.1                         # for smooth camera follow

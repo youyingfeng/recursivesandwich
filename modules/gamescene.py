@@ -37,10 +37,9 @@ call of the render function.'''
 
 
 class Scene:
+	"""Represents a scene in the program, which is analogous to the state of the game"""
 	def __init__(self):
 		self.manager = SceneManager(self)
-
-		# Initialize game_display surface for drawing
 		self.game_display = pg.Surface(SURFACE_SIZE)
 
 	def handle_events(self, events: list):
@@ -54,7 +53,7 @@ class Scene:
 
 
 class SceneManager:
-	# Every scene saves its SceneManager as an attribute
+	"""Handles scene transitions from one scene to another"""
 	def __init__(self, scene: Scene):
 		self.scene = scene
 		self.scene.manager = self
@@ -65,6 +64,7 @@ class SceneManager:
 
 
 class TitleScene(Scene):
+	"""Represents the title screen"""
 	def __init__(self):
 		super().__init__()
 
@@ -110,6 +110,7 @@ class TitleScene(Scene):
 
 
 class GameScene(Scene):
+	"""Represents the actual game screen"""
 	def __init__(self):
 		super().__init__()
 
@@ -176,13 +177,13 @@ class GameScene(Scene):
 		surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 
 
-
 class GameOverScene(Scene):
+	"""Represents the "Game Over" screen"""
 	def __init__(self):
 		super().__init__()
 
 		# Initialize title
-		self.title = freetype.render("get rekt son", WHITE, None, 0, 0, 32)
+		self.title = freetype.render("GAME OVER", WHITE, None, 0, 0, 32)
 		self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
 
 		# Initialize subtitle

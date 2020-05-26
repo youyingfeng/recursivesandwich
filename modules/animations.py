@@ -2,6 +2,7 @@ import pygame as pg
 from .camera import Camera
 
 class Spritesheet:
+    """Represents a spritesheet object, from which we can extract the individual frames for animation"""
     def __init__(self, filepath: str, rows: int, columns: int, width=None, height=None):
         self.spritesheet = pg.image.load(filepath).convert_alpha()
         self.rows = rows
@@ -15,8 +16,8 @@ class Spritesheet:
 
         self.clock = pg.time.Clock()
 
-
-    def get_image_at_position(self, position: int):
+    def get_image_at_position(self, position: int) -> pg.Surface:
+        """Returns an image representing a single frame of an animation"""
         # positions are 0-indexed
         image_row = int(position / self.columns)
         image_column = position % self.columns
@@ -29,7 +30,8 @@ class Spritesheet:
         surface.set_colorkey((0, 0, 0))
         return surface
 
-    def get_images_at(self, *positions: int):
+    def get_images_at(self, *positions: int) -> list:
+        """Returns a list of frames, representing the frames of the animation"""
         # positions goes from left to right, then go down one row.
         return [self.get_image_at_position(position) for position in positions]
 

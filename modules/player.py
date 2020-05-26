@@ -5,6 +5,8 @@ from .animations import Spritesheet, Animation
 MAX_HEALTH = 100
 
 
+# TODO: Rewrite the entire player class to inherit from an unimplemented entity class
+# Use PEP526 variable annotations to indicate uninitialised variables?
 class Player(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -102,7 +104,6 @@ class Player(pg.sprite.Sprite):
             if colliding_sprite.rect.top < self.rect.bottom < colliding_sprite.rect.bottom:
                 self.rect.bottom = colliding_sprite.rect.top
         return len(all_colliding_sprites) > 0
-
 
     def enforce_boundaries(self, map):
         if self.rect.top < 0:

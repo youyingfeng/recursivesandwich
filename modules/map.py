@@ -5,8 +5,9 @@ from .block import Block
 grass_img = pg.image.load('assets/textures/grass.png')
 dirt_img = pg.image.load('assets/textures/dirt.png')
 
+
 # Loads game_map as a 2D array from a .txt file
-def load_map(path: str):
+def load_map(path: str) -> list:
     file = open(path, 'r')
     data = file.read()
     file.close()
@@ -18,7 +19,7 @@ def load_map(path: str):
 
 
 # Reads a game map and adds Blocks accordingly to the Sprite Group
-def make_terrain_group(map):
+def make_terrain_group(map) -> pg.sprite.Group:
     terrain_group = pg.sprite.RenderPlain()
     for y in range(len(map)):
         for x in range(len(map[0])):
@@ -30,7 +31,7 @@ def make_terrain_group(map):
 
 
 # Returns the dimensions of the map as a tuple
-def get_map_size(map):
+def get_map_size(map) -> tuple:
     return len(map[0]) * Block.BLOCK_SIZE, len(map) * Block.BLOCK_SIZE
 
 
