@@ -2,7 +2,6 @@ import pygame as pg
 from .animations import Spritesheet, Animation
 
 
-# Global player attributes
 MAX_HEALTH = 100
 
 

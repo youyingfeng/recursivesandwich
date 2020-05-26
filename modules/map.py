@@ -5,7 +5,7 @@ from .block import Block
 grass_img = pg.image.load('assets/textures/grass.png')
 dirt_img = pg.image.load('assets/textures/dirt.png')
 
-# Loads the game map as a 2D array from a .txt file
+# Loads game_map as a 2D array from a .txt file
 def load_map(path: str):
     file = open(path, 'r')
     data = file.read()
@@ -29,8 +29,8 @@ def make_terrain_group(map):
     return terrain_group
 
 
+# Returns the dimensions of the map as a tuple
 def get_map_size(map):
-    """Returns the dimensions of the map as a tuple"""
     return len(map[0]) * Block.BLOCK_SIZE, len(map) * Block.BLOCK_SIZE
 
 
@@ -43,14 +43,3 @@ class Map:
 
     def is_within_map_boundaries(self, sprite: pg.sprite.Sprite) -> bool:
         return self.rect.colliderect(sprite.rect)
-
-
-
-
-
-
-
-
-
-
-
