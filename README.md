@@ -25,10 +25,12 @@ We intend to fully implement these features before the following Milestones:
 - Static, Parallax and Scrolling Backgrounds, which inherit from an abstract Background class
 
 ## Milestone 2: Gameplay Elements
+- Allow players to dash while holding a key down.
 - Create an Enemy class which is similar to the Player class but with automatic movement
 - Implement dangerous terrain which decrements the health of the player (eg. spikes, fireballs)
 - Allow player to kill enemies
 - Create a PowerUp class give it special abilities. Implement methods which can only be called when the player is powered-up, making use of boolean flags.
+- Sound effects for jumping, walking, death, damage and killing of enemies
 
 ## Milestone 3: Asset Design
 - Conduct a brainstorming session to finalize our intentions for all the design elements, ensuring that they are able to tell a compelling story.
@@ -36,6 +38,7 @@ We intend to fully implement these features before the following Milestones:
 - Design the look of enemies to be original and menacing
 - Design terrain textures to resemble walls of a tower
 - Make use of photography and photoshop to design background, making it resemble a post-apocalyptic Singapore.
+- Soundscaping and composition of background soundtrack during gameplay
 - Bug fixes and improvements to the efficiency of the code
 
 
