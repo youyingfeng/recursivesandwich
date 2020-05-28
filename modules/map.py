@@ -41,6 +41,3 @@ class Map:
         self.terrain_group = make_terrain_group(game_map)
         self.dimensions = get_map_size(game_map)
         self.rect = pg.Rect((0, 0), self.dimensions)
-
-    def is_within_map_boundaries(self, sprite: pg.sprite.Sprite) -> bool:
-        return self.rect.colliderect(sprite.rect)

@@ -139,18 +139,14 @@ class GameScene(Scene):
 		self.parallax_background_3 = ParallaxBackground(hills_layer_4, self.game_display)
 
 	def handle_events(self, events: list = None):
-		# Move player along game_map if direction keys are pressed
-		current_keys = pg.key.get_pressed()
-		self.player.move(
-			current_keys[pg.K_LEFT],
-			current_keys[pg.K_RIGHT],
-			current_keys[pg.K_SPACE],
-			self.game_map)
+		self.player.handle_input()
 
 	def update(self):
-		# If player dies switch to GameOverScene
-		if self.player.is_dead(self.game_map):
-			self.manager.switch_to_scene(GameOverScene())
+		# # If player dies switch to GameOverScene
+		# if self.player.is_dead(self.game_map):
+		# 	self.manager.switch_to_scene(GameOverScene())
+
+		self.player.update(self.game_map)
 
 		# Move camera to player's position
 		self.camera.follow_target(self.player)
@@ -171,7 +167,7 @@ class GameScene(Scene):
 		self.camera.draw(self.game_display, self.terrain_group)
 
 		# Draw player on game_display wrt camera position
-		self.player.draw(self.game_display, self.camera)
+		self.player.render(self.camera, self.game_display)
 
 		# Blit game_display on window surface
 		surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
