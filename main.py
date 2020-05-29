@@ -17,12 +17,13 @@ def main():
     # Initialize clock
     clock = pg.time.Clock()
 
+    # Game loop runs when this is true
     run = True
 
     # Initialise scene manager with TitleScene
     manager = SceneManager(TitleScene())
 
-    # Main game loop
+    # Game loop
     while run:
         # TODO: probably should shove this inside handle_events()
         for event in pg.event.get():
@@ -33,10 +34,16 @@ def main():
         manager.scene.update()
         manager.scene.render(window)
 
-        pg.display.update()	# Updates the window
-        clock.tick(60)		# Limits the game to 60 fps
+        # Updates the window
+        pg.display.update()
 
+        # Limits the game to 60 fps
+        clock.tick(60)
+
+    # Quit pygame
     pg.quit()
+
+    # Quit program
     quit()
 
 

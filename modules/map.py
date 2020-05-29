@@ -1,6 +1,7 @@
 import pygame as pg
 from .block import Block
 
+
 # Textures
 grass_img = pg.image.load('assets/textures/grass.png')
 dirt_img = pg.image.load('assets/textures/dirt.png')

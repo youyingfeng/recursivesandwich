@@ -3,7 +3,7 @@ import pygame.freetype as ft
 from .map import Map
 from .player import Player
 from .camera import Camera
-from .background import StaticBackground, ParallaxBackground, ScrollingBackground
+from .background import *
 
 
 # Size tuples
@@ -205,11 +205,3 @@ class GameOverScene(Scene):
 
 		# Blit game_display on window surface
 		surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
-
-
-
-
-
-
-
-

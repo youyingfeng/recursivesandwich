@@ -120,21 +120,27 @@ class PhysicsComponent(Component):
 
 
 class AnimationComponent(Component):
-    def __init__(self, animations_list):
+    def __init__(self, animation_sequences, state: PlayerState):
         super().__init__()
-        # ok fuck this lets take in a dictionary
-        self.animations_list = animations_list
-        self.current_animation = self.animations_list[PlayerState.IDLE]
-        self.current_state = None
+        
+        # Save a dictionary of animations
+        self.animation_sequences = animation_sequences
+
+        # Current animation of entity will depend on its current_state
+        self.current_state = state
+        self.current_animation = self.animation_sequences[self.current_state]
+
         self.frame_counter = 0
         self.frames_per_update = 3
         self.current_index = 0
         self.animation_length = len(self.current_animation)
 
     def update(self, entity):
-        if not (entity.state == self.current_state):
+        # If entity has changed its state
+        if (entity.state != self.current_state):
+            # Update current state of animation
             self.current_state = entity.state
-            self.current_animation = self.animations_list[self.current_state]
+            self.current_animation = self.animation_sequences[self.current_state]
             self.frame_counter = 0
             self.current_index = 0
             self.animation_length = len(self.current_animation)
