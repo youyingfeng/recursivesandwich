@@ -82,14 +82,22 @@ class PhysicsComponent(Component):
         entity.rect.y += entity.y_velocity
 
         # Handles collisions along the y axis first
+
+        # Hacky fix
+        isJumping = True
         for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
             if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
                 entity.rect.top = colliding_sprite.rect.bottom
             if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
+                isJumping = False
                 if entity.state == PlayerState.JUMPING:
                     entity.state = PlayerState.IDLE
                 entity.rect.bottom = colliding_sprite.rect.top
                 entity.y_velocity = 0
+
+        # This is a hack to ensure that people fall properly
+        if isJumping:
+            entity.state = PlayerState.JUMPING
 
         entity.rect.x += entity.x_velocity
         # Then handles collisions along the x axis
@@ -149,7 +157,7 @@ class RenderComponent(Component):
     def update(self, entity, camera, surface):
         surface.blit(entity.image,
                      (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
-                     pg.Rect(6, 5, 21, 27))
+                     pg.Rect(5, 5, 22, 27))
 
 
 

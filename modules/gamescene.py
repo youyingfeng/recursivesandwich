@@ -142,9 +142,9 @@ class GameScene(Scene):
 		self.player.handle_input()
 
 	def update(self):
-		# # If player dies switch to GameOverScene
-		# if self.player.is_dead(self.game_map):
-		# 	self.manager.switch_to_scene(GameOverScene())
+
+		if self.player.rect.y > self.game_map.dimensions[1]:
+			self.manager.switch_to_scene(GameOverScene())
 
 		self.player.update(self.game_map)
 
