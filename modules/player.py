@@ -16,7 +16,9 @@ class Player(pg.sprite.Sprite):
         # Physics attributes
         self.x_velocity = 0
         self.y_velocity = 0
-        self.direction = None
+
+        # Direction:
+        self.direction = Direction.RIGHT
 
         self.state = PlayerState.IDLE
 

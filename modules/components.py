@@ -1,5 +1,5 @@
 import pygame as pg
-from .playerstate import PlayerState
+from .playerstate import PlayerState, Direction
 
 """
 Components form the base of our entities.
@@ -29,26 +29,30 @@ class PlayerInputComponent(Component):
         super().__init__()
 
     def update(self, player, *args):
-        print(player.state)
         current_keys = pg.key.get_pressed()
         if player.state == PlayerState.IDLE:
             if current_keys[pg.K_LEFT]:
                 player.state = PlayerState.WALKING
+                player.direction = Direction.LEFT
                 player.x_velocity = -3
 
             if current_keys[pg.K_RIGHT]:
                 player.state = PlayerState.WALKING
+                player.direction = Direction.RIGHT
                 player.x_velocity = 3
 
             if current_keys[pg.K_SPACE]:
                 player.state = PlayerState.JUMPING
                 player.y_velocity = -10
+
         elif player.state == PlayerState.WALKING:
             if current_keys[pg.K_LEFT]:
                 player.x_velocity = -3
+                player.direction = Direction.LEFT
 
             if current_keys[pg.K_RIGHT]:
                 player.x_velocity = 3
+                player.direction = Direction.RIGHT
 
             if not (current_keys[pg.K_LEFT] or current_keys[pg.K_RIGHT]):
                 player.state = PlayerState.IDLE
@@ -61,9 +65,11 @@ class PlayerInputComponent(Component):
         elif player.state == PlayerState.JUMPING:
             if current_keys[pg.K_LEFT]:
                 player.x_velocity = -3
+                player.direction = Direction.LEFT
 
             if current_keys[pg.K_RIGHT]:
                 player.x_velocity = 3
+                player.direction = Direction.RIGHT
 
             if not (current_keys[pg.K_LEFT] or current_keys[pg.K_RIGHT]):
                 player.x_velocity = 0
@@ -161,9 +167,15 @@ class RenderComponent(Component):
         super().__init__()
 
     def update(self, entity, camera, surface):
-        surface.blit(entity.image,
+        # Flip image if Player is moving backward
+        if (entity.direction == Direction.LEFT):
+            rendered_image = pg.transform.flip(entity.image, True, False)
+        else:
+            rendered_image = entity.image
+
+        surface.blit(rendered_image,
                      (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
-                     pg.Rect(5, 5, 22, 27))
+                     pg.Rect(5, 3.5, 22, 30))
 
 
 
