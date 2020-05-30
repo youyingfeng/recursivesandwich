@@ -44,7 +44,6 @@ class PlayerInputComponent(Component):
             if current_keys[pg.K_SPACE]:
                 player.state = PlayerState.JUMPING
                 player.y_velocity = -10
-                print("kappa")
                 player.message("JUMP")
 
         elif player.state == PlayerState.WALKING:
@@ -62,8 +61,7 @@ class PlayerInputComponent(Component):
 
             if current_keys[pg.K_SPACE]:
                 player.state = PlayerState.JUMPING
-                player.y_velocity = 10
-                print("kappa")
+                player.y_velocity = -10
                 player.message("JUMP")
 
         elif player.state == PlayerState.JUMPING:
@@ -88,8 +86,6 @@ class PhysicsComponent(Component):
         # Enforces gravity
         entity.y_velocity += self.gravity
 
-
-
         # Handles collisions along the y axis first
         # Positions the entity at its future position
         entity.rect.y += entity.y_velocity
@@ -100,7 +96,6 @@ class PhysicsComponent(Component):
                 entity.rect.top = colliding_sprite.rect.bottom
             if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
                 isJumping = False
-                #below causes problems
                 if entity.state == PlayerState.JUMPING:
                     entity.state = PlayerState.IDLE
                 entity.rect.bottom = colliding_sprite.rect.top
@@ -117,29 +112,6 @@ class PhysicsComponent(Component):
                 entity.rect.left = colliding_sprite.rect.right
             if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
                 entity.rect.right = colliding_sprite.rect.left
-
-
-
-
-        # entity.rect.y += entity.y_velocity
-        # for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
-        #     if entity.y_velocity > 0:
-        #         entity.rect.bottom = colliding_sprite.rect.top
-        #         if entity.state == PlayerState.JUMPING:
-        #             entity.state = PlayerState.IDLE
-        #     if entity.y_velocity < 0:
-        #         entity.rect.top = colliding_sprite.rect.bottom
-        #
-        # entity.rect.x += entity.x_velocity
-        # for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
-        #     if entity.x_velocity > 0:
-        #         entity.rect.right = colliding_sprite.rect.left
-        #     if entity.x_velocity < 0:
-        #         entity.rect.left = colliding_sprite.rect.right
-
-
-
-
 
         map_width = map.dimensions[0]
         # Then keeps everything within map boundaries
@@ -216,7 +188,3 @@ class SoundComponent(Component):
     def receive(self, message):
         if message == "JUMP":
             self.sounds["JUMP"].play()
-
-
-
-
