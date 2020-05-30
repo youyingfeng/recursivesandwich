@@ -44,6 +44,8 @@ class PlayerInputComponent(Component):
             if current_keys[pg.K_SPACE]:
                 player.state = PlayerState.JUMPING
                 player.y_velocity = -10
+                print("kappa")
+                player.message("JUMP")
 
         elif player.state == PlayerState.WALKING:
             if current_keys[pg.K_LEFT]:
@@ -61,6 +63,8 @@ class PlayerInputComponent(Component):
             if current_keys[pg.K_SPACE]:
                 player.state = PlayerState.JUMPING
                 player.y_velocity = 10
+                print("kappa")
+                player.message("JUMP")
 
         elif player.state == PlayerState.JUMPING:
             if current_keys[pg.K_LEFT]:
@@ -84,18 +88,19 @@ class PhysicsComponent(Component):
         # Enforces gravity
         entity.y_velocity += self.gravity
 
-        # Positions the entity at its future position
-        entity.rect.y += entity.y_velocity
+
 
         # Handles collisions along the y axis first
-
+        # Positions the entity at its future position
+        entity.rect.y += entity.y_velocity
         # Hacky fix
         isJumping = True
         for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
             if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
                 entity.rect.top = colliding_sprite.rect.bottom
-            if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
+            if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom and entity.rect.y < colliding_sprite.rect.top:
                 isJumping = False
+                #below causes problems
                 if entity.state == PlayerState.JUMPING:
                     entity.state = PlayerState.IDLE
                 entity.rect.bottom = colliding_sprite.rect.top
@@ -114,7 +119,7 @@ class PhysicsComponent(Component):
                 entity.rect.right = colliding_sprite.rect.left
 
 
-        ## For some reason, swapping the order will mess up collision. Dont swap it. Always put y first.
+
         map_width = map.dimensions[0]
         # Then keeps everything within map boundaries
         if entity.rect.top < 0:
@@ -176,6 +181,20 @@ class RenderComponent(Component):
         surface.blit(rendered_image,
                      (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
                      pg.Rect(5, 3.5, 22, 30))
+
+
+class SoundComponent(Component):
+    def __init__(self, sounds):
+        super().__init__()
+        self.state = None
+        self.sounds = sounds
+
+    def update(self, *args):
+        pass
+
+    def receive(self, message):
+        if message == "JUMP":
+            self.sounds["JUMP"].play()
 
 
 

@@ -29,19 +29,29 @@ class Player(pg.sprite.Sprite):
 
         # Dictionary of animation sequences (key: PlayerState; value: list of frames)
         animation_sequences = {
-                              PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-                              PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
-                              PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
-                             }
+                               PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+                               PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+                               PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
+                              }
+
+        jump_sound = pg.mixer.Sound("assets/sound/sfx/jump.wav")
+
+        sound_library = {
+                         "JUMP": jump_sound
+                        }
 
         # Components
         self.input_component = PlayerInputComponent()
         self.animation_component = AnimationComponent(animation_sequences, self.state)
         self.physics_component = PhysicsComponent()
+        self.sound_component = SoundComponent(sound_library)
         self.render_component = RenderComponent()
 
         # Current Image
         self.image = self.animation_component.get_current_image()
+
+    def message(self, message):
+        self.sound_component.receive(message)
 
     def handle_input(self):
         self.input_component.update(self)

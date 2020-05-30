@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class PlayerState(Enum):
     IDLE = 0
     WALKING = 1
@@ -7,5 +8,5 @@ class PlayerState(Enum):
 
 
 class Direction(Enum):
-	LEFT = 0
-	RIGHT = 1
+    LEFT = 0
+    RIGHT = 1

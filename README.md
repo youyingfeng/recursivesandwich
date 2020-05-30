@@ -37,7 +37,10 @@ Gemini
 ## Running the game  
 1. Install the latest version of Python
 2. Install the latest version of the Pygame library (from command line/terminal, run `pip install pygame`)
-3. Clone the repository and run main.py using Python
+3. Clone the repository and run main.py using Python  
+
+# Credits
+Resources taken from DaFluffyPotato, JDWasabi and Pixel Frog.
 
 
 # Good reading material  
