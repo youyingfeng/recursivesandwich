@@ -100,9 +100,9 @@ class PhysicsComponent(Component):
                 entity.rect.top = colliding_sprite.rect.bottom
             if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
                 isJumping = False
-                # I dont know why commenting the below line works but it works.
-                # if entity.state == PlayerState.JUMPING:
-                entity.state = PlayerState.IDLE
+                #below causes problems
+                if entity.state == PlayerState.JUMPING:
+                    entity.state = PlayerState.IDLE
                 entity.rect.bottom = colliding_sprite.rect.top
                 entity.y_velocity = 0
 
