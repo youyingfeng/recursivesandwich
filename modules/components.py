@@ -98,11 +98,11 @@ class PhysicsComponent(Component):
         for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
             if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
                 entity.rect.top = colliding_sprite.rect.bottom
-            if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom and entity.rect.y < colliding_sprite.rect.top:
+            if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
                 isJumping = False
-                #below causes problems
-                if entity.state == PlayerState.JUMPING:
-                    entity.state = PlayerState.IDLE
+                # I dont know why commenting the below line works but it works.
+                # if entity.state == PlayerState.JUMPING:
+                entity.state = PlayerState.IDLE
                 entity.rect.bottom = colliding_sprite.rect.top
                 entity.y_velocity = 0
 
@@ -117,6 +117,27 @@ class PhysicsComponent(Component):
                 entity.rect.left = colliding_sprite.rect.right
             if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
                 entity.rect.right = colliding_sprite.rect.left
+
+
+
+
+        # entity.rect.y += entity.y_velocity
+        # for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
+        #     if entity.y_velocity > 0:
+        #         entity.rect.bottom = colliding_sprite.rect.top
+        #         if entity.state == PlayerState.JUMPING:
+        #             entity.state = PlayerState.IDLE
+        #     if entity.y_velocity < 0:
+        #         entity.rect.top = colliding_sprite.rect.bottom
+        #
+        # entity.rect.x += entity.x_velocity
+        # for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
+        #     if entity.x_velocity > 0:
+        #         entity.rect.right = colliding_sprite.rect.left
+        #     if entity.x_velocity < 0:
+        #         entity.rect.left = colliding_sprite.rect.right
+
+
 
 
 
