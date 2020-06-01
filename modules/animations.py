@@ -40,26 +40,4 @@ class Spritesheet:
     def get_images_at(self, *positions: int) -> list:
         # Positions goes from left to right, then go down one row
         return [self.get_image_at_position(position) for position in positions]
-
-
-class Animation:
-    def __init__(self, animation_sequences: list):
-        self.animation_sequences = animation_sequences
-        self.index = 0
-        self.frame_count = len(animation_sequence)
-        self.frames_per_image = 3
-        self.frame_counter = 0
-
-    def get_current_frame(self):
-        return self.animation_sequences[self.index]
-
-    # add an update function to only call get_next_frame based on the time passed
-    def update_image(self):
-        if self.frame_counter >= self.frames_per_image:
-            self.frame_counter = 0
-            self.index += 1
-            self.index = self.index % self.frame_count
-            return True
-        else:
-            self.frame_counter += 1
-            return False
+    

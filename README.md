@@ -40,7 +40,7 @@ Gemini
 3. Clone the repository and run main.py using Python  
 
 # Credits
-Resources taken from DaFluffyPotato, JDWasabi and Pixel Frog.
+Resources taken from Kevin MacLeod, JDWasabi, DaFluffyPotato, edermunizz and Pixel Frog.
 
 
 # Good reading material  

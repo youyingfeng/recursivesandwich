@@ -82,6 +82,11 @@ class TitleScene(Scene):
 		self.text = freetype.render("Press Space to Start", (255, 255, 255))
 		self.text_blit_position = (int((self.game_display.get_width() - self.text[0].get_width()) / 2), 200)
 
+		# Play BGM
+		pg.mixer.music.load("assets/sound/music/Latin Industries.ogg")
+		pg.mixer.music.set_volume(0.2)
+		pg.mixer.music.play(-1)
+
 	def handle_events(self, events: list = None):
 		# If space is pressed switch to GameScene
 		current_keys = pg.key.get_pressed()
@@ -115,7 +120,7 @@ class GameScene(Scene):
 		super().__init__()
 
 		# Game Map (as 2D array)
-		self.game_map = Map('assets/maps/map2.txt')
+		self.game_map = Map("assets/maps/map2.txt")
 
 		# Initialize camera
 		self.camera = Camera(SURFACE_SIZE, self.game_map)
@@ -137,6 +142,11 @@ class GameScene(Scene):
 		self.parallax_background_1 = ParallaxBackground(hills_layer_2, self.game_display)
 		self.parallax_background_2 = ParallaxBackground(hills_layer_3, self.game_display)
 		self.parallax_background_3 = ParallaxBackground(hills_layer_4, self.game_display)
+
+		# Play BGM
+		pg.mixer.music.load("assets/sound/music/Pixel Peeker Polka - faster.ogg")
+		pg.mixer.music.set_volume(0.5)
+		pg.mixer.music.play(-1)
 
 	def handle_events(self, events: list = None):
 		self.player.handle_input()

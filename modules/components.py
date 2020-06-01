@@ -141,7 +141,7 @@ class AnimationComponent(Component):
 
     def update(self, entity):
         # If entity has changed its state
-        if (entity.state != self.current_state):
+        if entity.state != self.current_state:
             # Update current state of animation
             self.current_state = entity.state
             self.current_animation = self.animation_sequences[self.current_state]
@@ -166,7 +166,7 @@ class RenderComponent(Component):
 
     def update(self, entity, camera, surface):
         # Flip image if Player is moving backward
-        if (entity.direction == Direction.LEFT):
+        if entity.direction == Direction.LEFT:
             rendered_image = pg.transform.flip(entity.image, True, False)
         else:
             rendered_image = entity.image
@@ -186,5 +186,16 @@ class SoundComponent(Component):
         pass
 
     def receive(self, message):
-        if message == "JUMP":
+        if message == "WALK":
+            pass
+            # play walking sound in infinite loop
+        elif message == "STOP":
+            pass
+            # stop walking sound playback
+        elif message == "JUMP":
+            # also stop walking sound playback
             self.sounds["JUMP"].play()
+        elif message == "LAND":
+            pass
+            # play landing sound
+

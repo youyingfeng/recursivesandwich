@@ -1,6 +1,6 @@
 import pygame as pg
 
-from .animations import Spritesheet, Animation
+from .animations import Spritesheet
 from .components import *
 
 
@@ -34,7 +34,7 @@ class Player(pg.sprite.Sprite):
                                PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
                               }
 
-        jump_sound = pg.mixer.Sound("assets/sound/sfx/jump.wav")
+        jump_sound = pg.mixer.Sound("assets/sound/sfx/jump.ogg")
 
         sound_library = {
                          "JUMP": jump_sound
@@ -51,6 +51,7 @@ class Player(pg.sprite.Sprite):
         self.image = self.animation_component.get_current_image()
 
     def message(self, message):
+        # Apart from sound, can force animation to receive animations too
         self.sound_component.receive(message)
 
     def handle_input(self):

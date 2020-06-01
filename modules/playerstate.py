@@ -10,3 +10,10 @@ class PlayerState(Enum):
 class Direction(Enum):
     LEFT = 0
     RIGHT = 1
+
+
+class Action(Enum):
+    WALK = 0
+    STOP = 1
+    JUMP = 2
+    LAND = 3
