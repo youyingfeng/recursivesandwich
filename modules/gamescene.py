@@ -1,6 +1,6 @@
 import pygame as pg
 import pygame.freetype as ft
-from .map import Map
+from .level import Level
 from .player import Player
 from .camera import Camera
 from .background import *
@@ -42,7 +42,7 @@ class Scene:
 		self.manager = SceneManager(self)
 		self.game_display = pg.Surface(SURFACE_SIZE)
 
-	def handle_events(self, events: list):
+	def handle_events(self, events: list = None):
 		raise NotImplementedError
 
 	def update(self):
@@ -119,29 +119,23 @@ class GameScene(Scene):
 	def __init__(self):
 		super().__init__()
 
-		# Game Map (as 2D array)
-		self.game_map = Map("assets/maps/map2.txt")
+		# Initialise the level
+		self.level = Level()
 
 		# Initialize camera
-		self.camera = Camera(SURFACE_SIZE, self.game_map)
+		self.camera = Camera(SURFACE_SIZE, self.level.map)
 
 		# Initialize player
 		self.player = Player()
 		self.player_sprite_group = pg.sprite.GroupSingle(self.player)
 
-		# Initialize terrain sprite group
-		self.terrain_group = self.game_map.terrain_group
-
-		# Initialize all sprites group
-		self.all_sprites_group = pg.sprite.Group()
-		self.all_sprites_group.add(self.player)
-		self.all_sprites_group.add(self.terrain_group.sprites())
-
+		# TODO: Delegate background handling to Map, since Maps should know their background
 		# Initialize backgrounds
 		self.static_background = StaticBackground(hills_layer_1, self.game_display)
 		self.parallax_background_1 = ParallaxBackground(hills_layer_2, self.game_display)
 		self.parallax_background_2 = ParallaxBackground(hills_layer_3, self.game_display)
 		self.parallax_background_3 = ParallaxBackground(hills_layer_4, self.game_display)
+
 
 		# Play BGM
 		pg.mixer.music.load("assets/sound/music/Pixel Peeker Polka - faster.ogg")
@@ -152,11 +146,13 @@ class GameScene(Scene):
 		self.player.handle_input()
 
 	def update(self):
-
-		if self.player.rect.y > self.game_map.dimensions[1]:
+		print(self.player.health)
+		if self.player.rect.y > self.level.map.dimensions[1] or self.player.health <= 0:
 			self.manager.switch_to_scene(GameOverScene())
 
-		self.player.update(self.game_map)
+		self.player.update(self.level.map)
+
+		self.level.update(self.player)
 
 		# Move camera to player's position
 		self.camera.follow_target(self.player)
@@ -173,8 +169,8 @@ class GameScene(Scene):
 		self.parallax_background_2.draw()
 		self.parallax_background_3.draw()
 
-		# Draw terrain on game_display wrt camera position
-		self.camera.draw(self.game_display, self.terrain_group)
+		# Draws the map and enemies
+		self.level.render(self.camera, self.game_display)
 
 		# Draw player on game_display wrt camera position
 		self.player.render(self.camera, self.game_display)

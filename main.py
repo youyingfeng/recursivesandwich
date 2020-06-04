@@ -6,8 +6,9 @@ WINDOW_SIZE = (800, 600)
 
 
 def main():
-
+    # preinitialise sound
     pg.mixer.pre_init(44100, 16, 2, 512)
+
     # Initialize pygame
     pg.init()
 
@@ -18,13 +19,13 @@ def main():
     # Initialize clock
     clock = pg.time.Clock()
 
-    # Game loop runs when this is true
-    run = True
-
     # Initialise scene manager with TitleScene
     manager = SceneManager(TitleScene())
 
-    # Game loop
+    # Game loop runs when this is true
+    run = True
+
+    # -------------------- GAME LOOP -------------------- #
     while run:
         # TODO: probably should shove this inside handle_events()
         for event in pg.event.get():
@@ -40,6 +41,7 @@ def main():
 
         # Limits the game to 60 fps
         clock.tick(60)
+    # -------------------- END GAME LOOP -------------------- #
 
     # Quit pygame
     pg.quit()

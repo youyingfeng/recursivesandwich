@@ -4,23 +4,29 @@ from .animations import Spritesheet
 from .components import *
 
 
-MAX_HEALTH = 100
-
-
-class Player(pg.sprite.Sprite):
+class Entity(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
+        self.rect = None                    # Defines the hitbox of the Entity. Must be redefined in the subclass.
+
+        self.x_velocity = 0                 # Velocity along the x-axis
+        self.y_velocity = 0                 # Velocity along the y-axis
+
+        self.direction = Direction.RIGHT    # Direction which the Entity is facing
+        self.state = PlayerState.IDLE       # State of the entity
+
+    def update(self, *args):
+        raise NotImplementedError
+
+
+class Player(Entity):
+    def __init__(self):
+        super().__init__()
+
+        self.health = 100
+
         self.rect = pg.Rect(10, 10, 21, 27)
-
-        # Physics attributes
-        self.x_velocity = 0
-        self.y_velocity = 0
-
-        # Direction:
-        self.direction = Direction.RIGHT
-
-        self.state = PlayerState.IDLE
 
         # Spritesheets
         idle_spritesheet = Spritesheet("assets/sprites/player/Idle.png", 1, 11)
@@ -28,7 +34,7 @@ class Player(pg.sprite.Sprite):
         jump_spritesheet = Spritesheet("assets/sprites/player/Jump.png", 1, 1)
 
         # Dictionary of animation sequences (key: PlayerState; value: list of frames)
-        animation_sequences = {
+        animation_library = {
                                PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
                                PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
                                PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
@@ -42,7 +48,7 @@ class Player(pg.sprite.Sprite):
 
         # Components
         self.input_component = PlayerInputComponent()
-        self.animation_component = AnimationComponent(animation_sequences, self.state)
+        self.animation_component = AnimationComponent(animation_library, self.state)
         self.physics_component = PhysicsComponent()
         self.sound_component = SoundComponent(sound_library)
         self.render_component = RenderComponent()
@@ -63,3 +69,66 @@ class Player(pg.sprite.Sprite):
 
     def render(self, camera, surface):
         self.render_component.update(self, camera, surface)
+
+
+class Enemy(Entity):
+    def __init__(self, type_object, ai_component, physics_component, render_component, starting_position):
+        super().__init__()
+
+        # Define starting position
+        # index 0 is x position, index 1 is y position, index 2 is patrol range
+        self.rect = pg.Rect(starting_position[0], starting_position[1], 21, 27)
+        # define boundaries for patrol
+        self.left_bound = starting_position[0] - starting_position[2]
+        self.right_bound = starting_position[0] + starting_position[2]
+
+        # Components
+        self.input_component = ai_component
+        self.physics_component = physics_component
+        self.render_component = render_component
+
+        # TESTING
+        self.damage_collide_component = DamageCollisionComponent()
+
+        # Animation and sound are taken from a type object
+        self.animation_component = AnimationComponent(type_object.animation_library, self.state)
+        self.sound_component = SoundComponent(type_object.sound_library)
+
+        # Current Image
+        self.image = self.animation_component.get_current_image()
+
+    def message(self, message):
+        pass
+    
+    def update(self, map, player):
+        self.input_component.update(self)
+        self.physics_component.update(self, map)
+        self.damage_collide_component.update(self, player)
+        self.animation_component.update(self)
+
+    def render(self, camera, surface):
+        self.render_component.update(self, camera, surface)
+
+
+class EnemyType:
+    def __init__(self):
+        # ---------- Preprocessing ---------- #
+        # Spritesheets
+        idle_spritesheet = Spritesheet("assets/sprites/player/Idle.png", 1, 11)
+        run_spritesheet = Spritesheet("assets/sprites/player/Run.png", 1, 12)
+        jump_spritesheet = Spritesheet("assets/sprites/player/Jump.png", 1, 1)
+
+        # Sounds
+        jump_sound = pg.mixer.Sound("assets/sound/sfx/jump.ogg")
+
+        # ---------- Declarations ---------- #
+        self.health = 100
+        self.animation_library = {
+            PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+            PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+            PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
+        }
+        self.sound_library = {
+            "JUMP": jump_sound
+        }
+

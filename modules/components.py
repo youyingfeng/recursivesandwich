@@ -24,6 +24,7 @@ class Component:
         raise NotImplementedError
 
 
+# -------------------- PLAYER COMPONENTS -------------------- #
 class PlayerInputComponent(Component):
     def __init__(self):
         super().__init__()
@@ -43,7 +44,7 @@ class PlayerInputComponent(Component):
 
             if current_keys[pg.K_SPACE]:
                 player.state = PlayerState.JUMPING
-                player.y_velocity = -10
+                player.y_velocity = -13
                 player.message("JUMP")
 
         elif player.state == PlayerState.WALKING:
@@ -61,7 +62,7 @@ class PlayerInputComponent(Component):
 
             if current_keys[pg.K_SPACE]:
                 player.state = PlayerState.JUMPING
-                player.y_velocity = -10
+                player.y_velocity = -13
                 player.message("JUMP")
 
         elif player.state == PlayerState.JUMPING:
@@ -198,4 +199,37 @@ class SoundComponent(Component):
         elif message == "LAND":
             pass
             # play landing sound
+
+
+# -------------------- ENEMY COMPONENTS -------------------- #
+class EnemyAIInputComponent(Component):
+    # This is a simple AI component that walks back and forth between two points
+    def __init__(self):
+        super().__init__()
+
+    def update(self, entity, *args):
+        entity.state = PlayerState.WALKING
+        if entity.direction == Direction.LEFT:
+            if entity.rect.x > entity.left_bound:
+                entity.x_velocity = -1
+            else:
+                entity.direction = Direction.RIGHT
+                entity.x_velocity = 1
+        else:
+            if entity.rect.x < entity.right_bound:
+                entity.x_velocity = 1
+            else:
+                entity.direction = Direction.LEFT
+                entity.x_velocity = -1
+
+
+class DamageCollisionComponent(Component):
+    def __init__(self):
+        super().__init__()
+
+    def update(self, entity, player):
+        # sprite can technically be any mob, but here it is the player since mobs will not damage other mobs.
+        if pg.sprite.collide_rect(entity, player):
+            player.health -= 10         # something like this
+
 

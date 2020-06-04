@@ -21,7 +21,7 @@ class Camera:
         self.rect = pg.Rect((0, 0), camera_size)
 
     # Moves this camera's position to the target's position
-    def follow_target(self, target: pg.sprite.Sprite):
+    def follow_target(self, target):
         # Give the camera some lag
         lerp = 0.1
         new_x = target.rect.x - int(self.camera_size[0] / 2)
@@ -37,16 +37,3 @@ class Camera:
             self.rect.left = 0
         elif self.rect.right > self.boundaries.right:
             self.rect.right = self.boundaries.right
-
-    def draw(self, surface, all_sprites_group: pg.sprite.Group):
-        all_sprites = all_sprites_group.sprites()
-
-        # Make list of sprites whose Rects fall within the camera Rect
-        captured_sprites = []
-        for sprite in all_sprites:
-            if self.rect.colliderect(sprite.rect):
-                captured_sprites.append(sprite)
-
-        # Blit these Rects on the game_display
-        for sprite in captured_sprites:
-            surface.blit(sprite.image, (sprite.rect.x - self.rect.x, sprite.rect.y - self.rect.y))
