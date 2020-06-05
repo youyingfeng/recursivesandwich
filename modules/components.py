@@ -199,6 +199,8 @@ class SoundComponent(Component):
         elif message == "LAND":
             pass
             # play landing sound
+        elif message == "HIT":
+            self.sounds["HIT"].play()
 
 
 # -------------------- ENEMY COMPONENTS -------------------- #
@@ -230,6 +232,6 @@ class DamageCollisionComponent(Component):
     def update(self, entity, player):
         # sprite can technically be any mob, but here it is the player since mobs will not damage other mobs.
         if pg.sprite.collide_rect(entity, player):
-            player.health -= 10         # something like this
+            player.take_damage()      # something like this
 
 

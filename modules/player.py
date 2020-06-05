@@ -3,6 +3,12 @@ import pygame as pg
 from .animations import Spritesheet
 from .components import *
 
+# =============================================================== #
+# The Camera class keeps track of the viewport of the game using  #
+# a Rect. The object is always passed to the renderer when        #
+# rendering sprites onto the screen.                              #
+# =============================================================== #
+
 
 class Entity(pg.sprite.Sprite):
     def __init__(self):
@@ -23,10 +29,10 @@ class Entity(pg.sprite.Sprite):
 class Player(Entity):
     def __init__(self):
         super().__init__()
-
         self.health = 100
-
         self.rect = pg.Rect(10, 10, 21, 27)
+
+        self.last_collide_time = 0
 
         # Spritesheets
         idle_spritesheet = Spritesheet("assets/sprites/player/Idle.png", 1, 11)
@@ -41,9 +47,11 @@ class Player(Entity):
                               }
 
         jump_sound = pg.mixer.Sound("assets/sound/sfx/jump.ogg")
+        hit_sound = pg.mixer.Sound("assets/sound/sfx/hitdamage.ogg")
 
         sound_library = {
-                         "JUMP": jump_sound
+                         "JUMP": jump_sound,
+                         "HIT": hit_sound
                         }
 
         # Components
@@ -56,9 +64,27 @@ class Player(Entity):
         # Current Image
         self.image = self.animation_component.get_current_image()
 
+    # ---------- DIRTY METHODS ---------- #
+    # These will be placed here until I can find a way to wrap them in a component nicely
+    def take_damage(self):
+        if self.is_immune():
+            return
+        else:
+            self.health -= 20
+            self.last_collide_time = pg.time.get_ticks()
+            self.message("HIT")
+            self.y_velocity = -2
+
+    def is_immune(self):
+        return self.last_collide_time > pg.time.get_ticks() - 500
+
     def message(self, message):
         # Apart from sound, can force animation to receive animations too
         self.sound_component.receive(message)
+        # self.animation_component.receive(message)
+
+        # if message == "HIT":
+        #     self.frames
 
     def handle_input(self):
         self.input_component.update(self)
@@ -74,6 +100,8 @@ class Player(Entity):
 class Enemy(Entity):
     def __init__(self, type_object, ai_component, physics_component, render_component, starting_position):
         super().__init__()
+
+        self.health = 100
 
         # Define starting position
         # index 0 is x position, index 1 is y position, index 2 is patrol range
@@ -96,6 +124,9 @@ class Enemy(Entity):
 
         # Current Image
         self.image = self.animation_component.get_current_image()
+
+    def take_damage(self):
+        self.health -= 10
 
     def message(self, message):
         pass

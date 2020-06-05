@@ -3,10 +3,10 @@ from .block import Block
 from .components import *
 from .player import *
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# This class contains all high-level classes and methods required #
+# =============================================================== #
+# This file contains all high-level classes and methods required  #
 # in an ordinary game level.                                      #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# =============================================================== #
 
 
 # TODO: Shove this into a new class Tileset with a dict
