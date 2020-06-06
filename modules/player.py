@@ -80,11 +80,8 @@ class Player(Entity):
 
     def message(self, message):
         # Apart from sound, can force animation to receive animations too
+        # But it is too much work to do animation, so we will not do that
         self.sound_component.receive(message)
-        # self.animation_component.receive(message)
-
-        # if message == "HIT":
-        #     self.frames
 
     def handle_input(self):
         self.input_component.update(self)
