@@ -38,13 +38,13 @@ class Player(Entity):
         # Spritesheets
         idle_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-idle.png", 1, 4)
         run_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-run.png", 1, 6)
-        jump_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-jump.png", 1, 4)
+        jump_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-jump.png", 1, 1)
 
         # Animations
         animation_library = {
                             PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3),
                             PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5),
-                            PlayerState.JUMPING: jump_spritesheet.get_images_at(0, 1, 2, 3)
+                            PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
                    	        }
 
         # Sounds
