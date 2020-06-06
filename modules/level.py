@@ -2,6 +2,7 @@ import pygame as pg
 from .block import Block
 from .components import *
 from .player import *
+from .animations import *
 
 
 # =============================================================== #
@@ -11,15 +12,20 @@ from .player import *
 
 
 # TODO: Shove this into a new class Tileset with a dict
-# Textures
+
+# Original tiles
 grass_img = pg.image.load('assets/textures/grass.png')
 dirt_img = pg.image.load('assets/textures/dirt.png')
+
+
+# Dungeon spritesheet
+dungeon = Spritesheet("assets/textures/Dungeon/dungeon_spritesheet.png", 14, 23)
 
 
 class Level:
     def __init__(self):
         # map should contain the dimensions ,the terrain group of sprites, and the list of sprites. (is rect necessary)
-        self.map = Map("assets/maps/map2.txt")
+        self.map = Map("assets/maps/map3.txt")
         # TODO: make enemymanager retrieve enemies from a json file
         self.enemies = EnemyManager()
         self.enemies.add_enemy((700, 100, 50))
@@ -46,15 +52,23 @@ class Map:
         game_map = []
         for row in data:
             game_map.append(list(row))
+
         # -------------------- DECLARATIONS -------------------- #
         self.terrain_group = pg.sprite.RenderPlain()
         # Add blocks into the terrain group according to the map
         for y in range(len(game_map)):
             for x in range(len(game_map[0])):
-                if game_map[y][x] == '1':
-                    self.terrain_group.add(Block(grass_img, x * Block.BLOCK_SIZE, y * Block.BLOCK_SIZE))
-                elif game_map[y][x] == '2':
-                    self.terrain_group.add(Block(dirt_img, x * Block.BLOCK_SIZE, y * Block.BLOCK_SIZE))
+
+                # Refers to the position of the tile on the tileset
+                # A 'x' represents empty space in the map
+                tile_position_str = game_map[y][x]
+                if tile_position_str != "x":
+                    self.terrain_group.add(Block(dungeon.get_image_at_position(int(tile_position_str)), x * Block.BLOCK_SIZE, y * Block.BLOCK_SIZE))
+
+                # if game_map[y][x] == '1':
+                #     self.terrain_group.add(Block(wall_img, x * Block.BLOCK_SIZE, y * Block.BLOCK_SIZE))
+                # elif game_map[y][x] == '2':
+                #     self.terrain_group.add(Block(wall_img, x * Block.BLOCK_SIZE, y * Block.BLOCK_SIZE))
 
         # Stores the dimensions of the map, assuming it is a perfect rectangle
         self.dimensions = (len(game_map[0]) * Block.BLOCK_SIZE, len(game_map) * Block.BLOCK_SIZE)

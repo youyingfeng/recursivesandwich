@@ -8,7 +8,7 @@ which can be extracted for animation.'''
 
 class Spritesheet:
     def __init__(self, filepath: str, rows: int, columns: int, width=None, height=None):
-        self.spritesheet = pg.image.load(filepath).convert_alpha()
+        self.spritesheet = pg.image.load(filepath)
         self.rows = rows
         self.columns = columns
         self.width = width
@@ -18,6 +18,23 @@ class Spritesheet:
         if height == None:
             self.height = int(self.spritesheet.get_height() / rows)
         self.clock = pg.time.Clock()
+
+    # Returns an image representing a single tile from a spritesheet
+    def get_image_at_coordinates(self, row, col):
+        image_row = row
+        image_column = col
+
+        # Create a new transparent Surface
+        surface = pg.Surface((self.width, self.height))
+        surface.set_colorkey((0, 0, 0))
+
+        # Blit frame into the transparent Surface, scaled to Surface size
+        surface.blit(self.spritesheet, (0, 0), 
+            pg.Rect((image_column * self.width,
+                    image_row * self.height,
+                    (image_column + 1) * self.width,
+                    (image_row + 1) * self.height)))
+        return surface
 
     # Returns an image representing a single frame of an animation
     def get_image_at_position(self, position: int) -> pg.Surface:
