@@ -23,10 +23,10 @@ LIGHT_MAGENTA = (158, 99, 95)
 
 
 # Hills background filepaths
-hills_layer_1 = "assets/textures/Hills Layer 01.png"
-hills_layer_2 = "assets/textures/Hills Layer 02.png"
-hills_layer_3 = "assets/textures/Hills Layer 03.png"
-hills_layer_4 = "assets/textures/Hills Layer 04.png"
+hills_layer_1 = "assets/textures/Hills/Hills Layer 01.png"
+hills_layer_2 = "assets/textures/Hills/Hills Layer 02.png"
+hills_layer_3 = "assets/textures/Hills/Hills Layer 03.png"
+hills_layer_4 = "assets/textures/Hills/Hills Layer 04.png"
 
 
 '''Scenes form the baseline of our game. Examples: Splash screen, game screen, pause screen, etc.

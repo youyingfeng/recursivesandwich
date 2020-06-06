@@ -1,19 +1,15 @@
 import pygame as pg
 from .playerstate import PlayerState, Direction
 
-"""
-Components form the base of our entities.
-Here, I have abandoned the idea of inheritance in favour of composition, 
-as we were getting cancerous classes with a lot of dependencies.
-Instead, entities are now defined by the type of components we have.
-The bulk of the processing is now done by the components, 
-and the entities are basically containers for state.
-Some components will also hold state.
 
-This follows the Component design pattern laid out in game programming patterns.
-
-Hopefully this code is reusable for other classes. Physics is defo reusable, as is render.
-"""
+"""Components form the base of our entities. Here, I have abandoned the idea 
+of inheritance in favour of composition, as we were getting cancerous classes 
+with a lot of dependencies. Instead, entities are now defined by the type of 
+components we have. The bulk of the processing is now done by the components, 
+and the entities are basically containers for state. Some components will also 
+hold state. This follows the Component design pattern laid out in game programming 
+patterns. Hopefully this code is reusable for other classes. Physics is defo 
+reusable, as is render."""
 
 
 class Component:
@@ -165,7 +161,7 @@ class RenderComponent(Component):
     def __init__(self):
         super().__init__()
 
-    def update(self, entity, camera, surface):
+    def update(self, entity, camera, surface, blit_rect):
         # Flip image if Player is moving backward
         if entity.direction == Direction.LEFT:
             rendered_image = pg.transform.flip(entity.image, True, False)
@@ -173,8 +169,7 @@ class RenderComponent(Component):
             rendered_image = entity.image
 
         surface.blit(rendered_image,
-                     (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
-                     pg.Rect(5, 3.5, 22, 30))
+                     (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y), blit_rect)
 
 
 class SoundComponent(Component):
