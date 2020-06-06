@@ -99,7 +99,7 @@ class Player(Entity):
         self.animation_component.update(self)
 
     def render(self, camera, surface):
-        self.render_component.update(self, camera, surface, self.blit_rect)
+        self.render_component.update(self, camera, surface)
 
 
 class Enemy(Entity):
@@ -146,7 +146,7 @@ class Enemy(Entity):
         self.animation_component.update(self)
 
     def render(self, camera, surface):
-        self.render_component.update(self, camera, surface, self.blit_rect)
+        self.render_component.update(self, camera, surface)
 
 
 class EnemyType:

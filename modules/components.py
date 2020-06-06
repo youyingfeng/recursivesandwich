@@ -132,7 +132,7 @@ class AnimationComponent(Component):
         self.current_animation = self.animation_sequences[self.current_state]
 
         self.frame_counter = 0
-        self.frames_per_update = 3
+        self.frames_per_update = 5
         self.current_index = 0
         self.animation_length = len(self.current_animation)
 
@@ -161,7 +161,7 @@ class RenderComponent(Component):
     def __init__(self):
         super().__init__()
 
-    def update(self, entity, camera, surface, blit_rect):
+    def update(self, entity, camera, surface):
         # Flip image if Player is moving backward
         if entity.direction == Direction.LEFT:
             rendered_image = pg.transform.flip(entity.image, True, False)
@@ -169,7 +169,8 @@ class RenderComponent(Component):
             rendered_image = entity.image
 
         surface.blit(rendered_image,
-                     (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y), blit_rect)
+                     (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
+                     entity.blit_rect)
 
 
 class SoundComponent(Component):

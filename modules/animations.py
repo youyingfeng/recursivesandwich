@@ -4,6 +4,8 @@ from .camera import Camera
 
 '''A Spritesheet is an image containing all the individual frames of a Sprite,
 which can be extracted for animation.'''
+
+
 class Spritesheet:
     def __init__(self, filepath: str, rows: int, columns: int, width=None, height=None):
         self.spritesheet = pg.image.load(filepath).convert_alpha()
@@ -40,4 +42,3 @@ class Spritesheet:
     def get_images_at(self, *positions: int) -> list:
         # Positions goes from left to right, then go down one row
         return [self.get_image_at_position(position) for position in positions]
-    
