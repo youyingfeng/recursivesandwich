@@ -3,6 +3,7 @@ from .block import Block
 from .components import *
 from .player import *
 
+
 # =============================================================== #
 # This file contains all high-level classes and methods required  #
 # in an ordinary game level.                                      #

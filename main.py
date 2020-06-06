@@ -6,11 +6,11 @@ WINDOW_SIZE = (800, 600)
 
 
 def main():
-    # preinitialise sound
-    pg.mixer.pre_init(44100, 16, 2, 512)
-
     # Initialize pygame
     pg.init()
+
+    # preinitialise sound
+    pg.mixer.pre_init(44100, 16, 2, 512)
 
     # Initialize window
     window = pg.display.set_mode(WINDOW_SIZE)
@@ -32,6 +32,7 @@ def main():
             if event.type == pg.QUIT:
                 run = False
 
+        # Manager handles scene
         manager.scene.handle_events()
         manager.scene.update()
         manager.scene.render(window)
@@ -41,7 +42,7 @@ def main():
 
         # Limits the game to 60 fps
         clock.tick(60)
-    # -------------------- END GAME LOOP -------------------- #
+    # -------------------- END GAME LOOP ---------------- #
 
     # Quit pygame
     pg.quit()
