@@ -5,6 +5,7 @@ class PlayerState(Enum):
     IDLE = 0
     WALKING = 1
     JUMPING = 2
+    DYING = 3
 
 
 class Direction(Enum):

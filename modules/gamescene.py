@@ -147,7 +147,10 @@ class GameScene(Scene):
 
 	def update(self):
 		print(self.player.health)
+
+		# If player dies, switch to GameOver scene
 		if self.player.rect.y > self.level.map.dimensions[1] or self.player.health <= 0:
+			self.player.dead = True
 			self.manager.switch_to_scene(GameOverScene())
 
 		self.player.update(self.level.map)

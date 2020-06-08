@@ -86,7 +86,7 @@ class PhysicsComponent(Component):
         # Handles collisions along the y axis first
         # Positions the entity at its future position
         entity.rect.y += entity.y_velocity
-        # Hacky fix
+
         isJumping = True
         for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
             if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
@@ -97,12 +97,12 @@ class PhysicsComponent(Component):
                     entity.state = PlayerState.IDLE
                 entity.rect.bottom = colliding_sprite.rect.top
                 entity.y_velocity = 0
-
         # This is a hack to ensure that people fall properly
         if isJumping:
             entity.state = PlayerState.JUMPING
 
         entity.rect.x += entity.x_velocity
+
         # Then handles collisions along the x axis
         for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
             if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
@@ -168,9 +168,10 @@ class RenderComponent(Component):
         else:
             rendered_image = entity.image
 
-        surface.blit(rendered_image,
-                     (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
-                     entity.blit_rect)
+        if not entity.dead:
+            surface.blit(rendered_image,
+                             (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
+                             entity.blit_rect)
 
 
 class SoundComponent(Component):
@@ -228,6 +229,15 @@ class DamageCollisionComponent(Component):
     def update(self, entity, player):
         # sprite can technically be any mob, but here it is the player since mobs will not damage other mobs.
         if pg.sprite.collide_rect(entity, player):
-            player.take_damage()      # something like this
+
+            # Killing the enemy via stomping
+            damage_rect = pg.Rect(entity.rect.topleft, (entity.rect.width, 5))     # Thin subrect at enemy's head
+            killing_rect = pg.Rect(player.rect.bottomleft, (player.rect.width, 5))  # Thin subrect at player's feet
+            if damage_rect.colliderect(killing_rect):
+                entity.dead = True
+                print("Player killed an enemy!")
+
+            else:
+                player.take_damage()
 
 

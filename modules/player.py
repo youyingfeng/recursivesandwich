@@ -34,6 +34,7 @@ class Entity(pg.sprite.Sprite):
 class Player(Entity):
     def __init__(self):
         super().__init__()
+        self.dead = False
         self.health = 100
 
         self.rect = pg.Rect(10, 10, 20, 30)
@@ -107,6 +108,7 @@ class Enemy(Entity):
         super().__init__()
 
         self.health = 100
+        self.dead = False
 
         # Define starting position
         # index 0 is x position, index 1 is y position, index 2 is patrol range
@@ -123,7 +125,7 @@ class Enemy(Entity):
         self.physics_component = physics_component
         self.render_component = render_component
 
-        # TESTING
+        # Taking damage
         self.damage_collide_component = DamageCollisionComponent()
 
         # Animation and sound are taken from a type object
@@ -163,7 +165,7 @@ class EnemyType:
         self.animation_library = {
             PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
             PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
-            PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
+            PlayerState.JUMPING: jump_spritesheet.get_images_at(0),
         }
         self.sound_library = {
             "JUMP": jump_sound

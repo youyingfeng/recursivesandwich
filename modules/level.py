@@ -28,7 +28,7 @@ class Level:
         self.map = Map("assets/maps/map3.txt")
         # TODO: make enemymanager retrieve enemies from a json file
         self.enemies = EnemyManager()
-        self.enemies.add_enemy((700, 100, 50))
+        self.enemies.add_enemy((700, 100, 50), (500, 100, 30))
         # make a background manager to manage multiple backgrounds at once. set static scrolling speeds.
         self.background = None
 
@@ -64,11 +64,6 @@ class Map:
                 tile_position_str = game_map[y][x]
                 if tile_position_str != "x":
                     self.terrain_group.add(Block(dungeon.get_image_at_position(int(tile_position_str)), x * Block.BLOCK_SIZE, y * Block.BLOCK_SIZE))
-
-                # if game_map[y][x] == '1':
-                #     self.terrain_group.add(Block(wall_img, x * Block.BLOCK_SIZE, y * Block.BLOCK_SIZE))
-                # elif game_map[y][x] == '2':
-                #     self.terrain_group.add(Block(wall_img, x * Block.BLOCK_SIZE, y * Block.BLOCK_SIZE))
 
         # Stores the dimensions of the map, assuming it is a perfect rectangle
         self.dimensions = (len(game_map[0]) * Block.BLOCK_SIZE, len(game_map) * Block.BLOCK_SIZE)
@@ -106,7 +101,10 @@ class EnemyManager:
 
     def update(self, map, player):
         for entity in self.sprite_list:
-            entity.update(map, player)
+            if entity.dead:
+                entity.kill()
+            else:
+                entity.update(map, player)
 
     def render(self, camera, surface):
         for entity in self.sprite_list:
