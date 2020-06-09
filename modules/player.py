@@ -126,7 +126,7 @@ class Enemy(Entity):
         self.render_component = render_component
 
         # Taking damage
-        self.damage_collide_component = DamageCollisionComponent()
+        self.damage_collide_component = EnemyDamageCollisionComponent()
 
         # Animation and sound are taken from a type object
         self.animation_component = AnimationComponent(type_object.animation_library, self.state)

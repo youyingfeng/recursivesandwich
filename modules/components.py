@@ -222,22 +222,19 @@ class EnemyAIInputComponent(Component):
                 entity.x_velocity = -1
 
 
-class DamageCollisionComponent(Component):
+class EnemyDamageCollisionComponent(Component):
     def __init__(self):
         super().__init__()
 
     def update(self, entity, player):
         # sprite can technically be any mob, but here it is the player since mobs will not damage other mobs.
         if pg.sprite.collide_rect(entity, player):
-
             # Killing the enemy via stomping
             damage_rect = pg.Rect(entity.rect.topleft, (entity.rect.width, 5))     # Thin subrect at enemy's head
             killing_rect = pg.Rect(player.rect.bottomleft, (player.rect.width, 5))  # Thin subrect at player's feet
             if damage_rect.colliderect(killing_rect):
                 entity.dead = True
                 print("Player killed an enemy!")
-
             else:
                 player.take_damage()
-
 

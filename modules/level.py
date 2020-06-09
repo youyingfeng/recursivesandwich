@@ -1,5 +1,5 @@
 import pygame as pg
-from .block import Block
+from .block import Block, HazardousBlock
 from .components import *
 from .player import *
 from .animations import *
@@ -36,6 +36,7 @@ class Level:
 
     def update(self, player):
         self.enemies.update(self.map, player)
+        self.map.update(player)
 
     def render(self, camera, surface):
         self.map.render(camera, surface)
@@ -44,6 +45,7 @@ class Level:
 
 class Map:
     def __init__(self, map_path):
+        self.textureset = TextureSet()
         # -------------------- PREPROCESSING --------------------#
         file = open(map_path, 'r')
         data = file.read()
@@ -55,6 +57,7 @@ class Map:
 
         # -------------------- DECLARATIONS -------------------- #
         self.terrain_group = pg.sprite.RenderPlain()
+        self.hazardous_terrain_group = pg.sprite.Group()
         # Add blocks into the terrain group according to the map
         for y in range(len(game_map)):
             for x in range(len(game_map[0])):
@@ -63,19 +66,29 @@ class Map:
                 # A 'x' represents empty space in the map
                 tile_position_str = game_map[y][x]
                 if tile_position_str != "x":
-                    self.terrain_group.add(Block(dungeon.get_image_at_position(int(tile_position_str)), x * Block.BLOCK_SIZE, y * Block.BLOCK_SIZE))
+                    if tile_position_str == "s":
+                        new_block = HazardousBlock(self.textureset.get_texture_from_code(tile_position_str),
+                                                     x * Block.BLOCK_SIZE,
+                                                     y * Block.BLOCK_SIZE)
+                        self.terrain_group.add(new_block)
+                        self.hazardous_terrain_group.add(new_block)
+
+                    else:
+                        self.terrain_group.add(Block(self.textureset.get_texture_from_code(tile_position_str),
+                                                     x * Block.BLOCK_SIZE,
+                                                     y * Block.BLOCK_SIZE))
 
         # Stores the dimensions of the map, assuming it is a perfect rectangle
         self.dimensions = (len(game_map[0]) * Block.BLOCK_SIZE, len(game_map) * Block.BLOCK_SIZE)
         self.rect = pg.Rect((0,0), self.dimensions)
 
-    def update(self, *args):
-        pass
+    def update(self, player, *args):
+        self.hazardous_terrain_group.update(player)
 
     def render(self, camera, surface):
         for sprite in self.terrain_group:
             if camera.rect.colliderect(sprite.rect):
-                surface.blit(sprite.image, (sprite.rect.x - camera.rect.x, sprite.rect.y - camera.rect.y))
+                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
 
 
 class EnemyManager:
