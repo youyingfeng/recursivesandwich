@@ -1,5 +1,5 @@
 import pygame as pg
-from .block import Block, HazardousBlock
+from .block import *
 from .components import *
 from .player import *
 from .animations import *
@@ -68,8 +68,8 @@ class Map:
                 if tile_position_str != "x":
                     if tile_position_str == "s":
                         new_block = HazardousBlock(self.textureset.get_texture_from_code(tile_position_str),
-                                                     x * Block.BLOCK_SIZE,
-                                                     y * Block.BLOCK_SIZE)
+                                                   x * Block.BLOCK_SIZE,
+                                                   y * Block.BLOCK_SIZE)
                         self.terrain_group.add(new_block)
                         self.hazardous_terrain_group.add(new_block)
 
