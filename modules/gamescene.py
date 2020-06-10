@@ -139,7 +139,6 @@ class GameScene(Scene):
 		self.parallax_background_2 = ParallaxBackground(hills_layer_3, self.game_display)
 		self.parallax_background_3 = ParallaxBackground(hills_layer_4, self.game_display)
 
-
 		# Play BGM
 		pg.mixer.music.load("assets/sound/music/Pixel Peeker Polka - faster.ogg")
 		pg.mixer.music.set_volume(0.5)

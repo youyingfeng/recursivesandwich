@@ -7,10 +7,6 @@ class TerrainType:
 	def __init__(self, image: pg.Surface, block_pos_x=0, block_pos_y=0, block_width=1, block_height=1):
 		# All numbers are relative to the size of a normal block (i.e. must be between 0 and 1, where 1 is the size of
 		# an actual block)
-		# self.block_pos_x = 0		# Left edge of the actual block
-		# self.block_pos_y = 0.4		# Top edge of the actual block
-		# self.block_width = 1		# Width of the actual block
-		# self.block_height = 0.6		# Height of the actual block
 		self.image = image
 		self.block_pos_x = block_pos_x
 		self.block_pos_y = block_pos_y
