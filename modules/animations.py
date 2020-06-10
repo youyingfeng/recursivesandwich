@@ -65,7 +65,7 @@ class Tileset:
     def __init__(self):
         self.spritesheet = pg.image.load("assets/textures/Dungeon/dungeon_spritesheet.png")
 
-    def get_image_at(self, rectangle, colorkey = None) -> pg.Surface:
+    def get_image_at(self, rectangle, colorkey=None) -> pg.Surface:
         "Loads image from x,y,x+offset,y+offset"
         rect = pg.Rect(rectangle)
         image = pg.Surface(rect.size).convert()
