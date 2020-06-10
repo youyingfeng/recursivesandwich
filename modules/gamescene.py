@@ -4,7 +4,7 @@ from .level import Level
 from .player import Player
 from .camera import Camera
 from .background import *
-
+from .headsupdisplay import Healthbar, HeadsUpDisplay
 
 # Size tuples
 WINDOW_SIZE = (800, 600)
@@ -129,6 +129,9 @@ class GameScene(Scene):
 		self.player = Player()
 		self.player_sprite_group = pg.sprite.GroupSingle(self.player)
 
+		# Initialize GUI
+		self.hud = HeadsUpDisplay()
+
 		# TODO: Delegate background handling to Map, since Maps should know their background
 		# Initialize backgrounds
 		self.static_background = StaticBackground(hills_layer_1, self.game_display)
@@ -157,6 +160,8 @@ class GameScene(Scene):
 
 		self.level.update(self.player)
 
+		self.hud.update(self.player)
+
 		# Move camera to player's position
 		self.camera.follow_target(self.player)
 
@@ -164,6 +169,8 @@ class GameScene(Scene):
 		self.parallax_background_1.update(self.camera, 0.2)
 		self.parallax_background_2.update(self.camera, 0.5)
 		self.parallax_background_3.update(self.camera, 0.8)
+
+
 
 	def render(self, surface):
 		# Blit backgrounds on game_display
@@ -177,6 +184,9 @@ class GameScene(Scene):
 
 		# Draw player on game_display wrt camera position
 		self.player.render(self.camera, self.game_display)
+
+		# Draw GUI
+		self.hud.render(self.game_display)
 
 		# Blit game_display on window surface
 		surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
