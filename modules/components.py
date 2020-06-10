@@ -168,10 +168,9 @@ class RenderComponent(Component):
         else:
             rendered_image = entity.image
 
-        if not entity.dead:
-            surface.blit(rendered_image,
-                             (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
-                             entity.blit_rect)
+        surface.blit(rendered_image,
+                     (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
+                     entity.blit_rect)
 
 
 class SoundComponent(Component):
@@ -230,10 +229,15 @@ class EnemyDamageCollisionComponent(Component):
         # sprite can technically be any mob, but here it is the player since mobs will not damage other mobs.
         if pg.sprite.collide_rect(entity, player):
             # Killing the enemy via stomping
-            damage_rect = pg.Rect(entity.rect.topleft, (entity.rect.width, 5))     # Thin subrect at enemy's head
-            killing_rect = pg.Rect(player.rect.bottomleft, (player.rect.width, 5))  # Thin subrect at player's feet
-            if damage_rect.colliderect(killing_rect):
-                entity.dead = True
+            # damage_rect = pg.Rect(entity.rect.topleft, (entity.rect.width, 5))     # Thin subrect at enemy's head
+            # killing_rect = pg.Rect(player.rect.bottomleft, (player.rect.width, 5))  # Thin subrect at player's feet
+            # if damage_rect.colliderect(killing_rect):
+            #     entity.dead = True
+            #     print("Player killed an enemy!")
+            # else:
+            #     player.take_damage()
+            if player.rect.bottom > entity.rect.y and player.y_velocity > 0:
+                entity.take_damage()
                 print("Player killed an enemy!")
             else:
                 player.take_damage()

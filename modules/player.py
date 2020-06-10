@@ -108,7 +108,6 @@ class Enemy(Entity):
         super().__init__()
 
         self.health = 100
-        self.dead = False
 
         # Define starting position
         # index 0 is x position, index 1 is y position, index 2 is patrol range
@@ -136,7 +135,8 @@ class Enemy(Entity):
         self.image = self.animation_component.get_current_image()
 
     def take_damage(self):
-        self.health -= 10
+        # TODO: Properly handle animations for dying
+        self.state = PlayerState.DEAD
 
     def message(self, message):
         pass
@@ -166,6 +166,7 @@ class EnemyType:
             PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
             PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
             PlayerState.JUMPING: jump_spritesheet.get_images_at(0),
+            PlayerState.DEAD: idle_spritesheet.get_images_at(0)
         }
         self.sound_library = {
             "JUMP": jump_sound

@@ -114,8 +114,9 @@ class EnemyManager:
 
     def update(self, map, player):
         for entity in self.sprite_list:
-            if entity.dead:
+            if entity.state == PlayerState.DEAD:
                 entity.kill()
+                self.sprite_list = self.sprite_group.sprites()
             else:
                 entity.update(map, player)
 
