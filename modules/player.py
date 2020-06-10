@@ -1,121 +1,174 @@
 import pygame as pg
-from .animations import Spritesheet, Animation
+
+from .animations import Spritesheet
+from .components import *
+
+# =============================================================== #
+# The Camera class keeps track of the viewport of the game using  #
+# a Rect. The object is always passed to the renderer when        #
+# rendering sprites onto the screen.                              #
+# =============================================================== #
 
 
-MAX_HEALTH = 100
-
-
-# TODO: Rewrite the entire player class to inherit from an unimplemented entity class
-# Use PEP526 variable annotations to indicate uninitialised variables?
-class Player(pg.sprite.Sprite):
+class Entity(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.spritesheet = Spritesheet("assets/sprites/Idle (32x32).png", 1, 11)
-        self.animation = Animation(self.spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+ 		# Defines the hitbox of the Entity. Must be redefined in the subclass.
+        self.rect = None                   
 
-        self.image = self.animation.get_current_frame()
+        # Velocities
+        self.x_velocity = 0              
+        self.y_velocity = 0
 
-        self.rect = pg.Rect(10, 10, 21, 27)         # Change the dimensions of this rect to match sprite and hitbox
-        self.xvelocity = 3
-        self.yvelocity = 5
-        self.gravity = 1  # keep small as it updates every tick
-        self.isJumping = False
-        self.health = 100 # maximum 100
+        # Direction which the Entity is facing
+        self.direction = Direction.RIGHT
 
-    # To be called in the camera.draw() method only
-    def draw(self, surface: pg.Surface, camera):
-        # updates the current frame of the animation
-        frame_changed = self.animation.update_image()
-        if frame_changed:
-            self.image = self.animation.get_current_frame()
+        # State of the entity  
+        self.state = PlayerState.IDLE
 
-        surface.blit(self.image,
-                     (self.rect.x - camera.rect.x, self.rect.y - camera.rect.y),
-                     pg.Rect(6, 5, 21, 27))     # change the dimensions of this rect if the sprite changes
-        self.draw_healthbar(surface, camera)
+    def update(self, *args):
+        raise NotImplementedError
 
-    def draw_healthbar(self, surface: pg.Surface, camera):
-        SCALE = 2
-        X_OFFSET = 10
-        Y_OFFSET = 20
-        THICKNESS = 5
-        pg.draw.rect(surface,
-                     (255, 0, 0), # red
-                     (self.rect.x - camera.rect.x - X_OFFSET,
-                      self.rect.y - camera.rect.y - Y_OFFSET,
-                      self.image.get_width() * SCALE,
-                      THICKNESS))
-        pg.draw.rect(surface,
-                     (0, 255, 0), # green
-                     (self.rect.x - camera.rect.x - X_OFFSET,
-                      self.rect.y - camera.rect.y - Y_OFFSET,
-                      self.image.get_width() * (self.health / MAX_HEALTH) * SCALE,
-                      THICKNESS))
 
-    # Moves the player first, then if collided with terrain, enforces collision
-    def move(self, left: bool, right: bool, jump: bool, map):
-        if self.isJumping:  # block further jump inputs but allow left and right
-            self.yvelocity += self.gravity
-            self.rect.y += self.yvelocity
-            landed = self.enforce_collision_y(map.terrain_group)
+class Player(Entity):
+    def __init__(self):
+        super().__init__()
+        self.dead = False
+        self.health = 100
 
-            if landed:
-                self.isJumping = False
-                self.yvelocity = 5
-            if left:
-                self.rect.x -= self.xvelocity
-            if right:
-                self.rect.x += self.xvelocity
-            self.enforce_collision_x(map.terrain_group)
+        self.rect = pg.Rect(10, 10, 20, 30)
+        self.blit_rect = pg.Rect(15, 3.5, 50, 30)
 
+        self.last_collide_time = 0
+
+        # Spritesheets
+        idle_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-idle.png", 1, 4)
+        run_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-run.png", 1, 6)
+        jump_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-jump.png", 1, 1)
+
+        # Animations
+        animation_library = {
+                            PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3),
+                            PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5),
+                            PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
+                   	        }
+
+        # Sounds
+        jump_sound = pg.mixer.Sound("assets/sound/sfx/jump.ogg")
+        hit_sound = pg.mixer.Sound("assets/sound/sfx/hitdamage.ogg")
+
+        sound_library = {
+                         "JUMP": jump_sound,
+                         "HIT": hit_sound
+                        }
+
+        # Components
+        self.input_component = PlayerInputComponent()
+        self.animation_component = AnimationComponent(animation_library, self.state)
+        self.physics_component = PhysicsComponent()
+        self.sound_component = SoundComponent(sound_library)
+        self.render_component = RenderComponent()
+
+        # Current Image
+        self.image = self.animation_component.get_current_image()
+
+    # ---------- DIRTY METHODS ---------- #
+    # These will be placed here until I can find a way to wrap them in a component nicely
+    def take_damage(self):
+        if self.is_immune():
+            return
         else:
-            if jump:
-                self.yvelocity = -10
-                self.isJumping = True
+            self.health -= 20
+            self.last_collide_time = pg.time.get_ticks()
+            self.message("HIT")
+            self.y_velocity = -2
 
-            self.rect.y += self.yvelocity
-            self.enforce_collision_y(map.terrain_group)
+    def is_immune(self):
+        return self.last_collide_time > pg.time.get_ticks() - 500
 
-            if left:
-                self.rect.x -= self.xvelocity
-            if right:
-                self.rect.x += self.xvelocity
-            self.enforce_collision_x(map.terrain_group)
+    def message(self, message):
+        # Apart from sound, can force animation to receive animations too
+        # But it is too much work to do animation, so we will not do that
+        self.sound_component.receive(message)
 
-        self.enforce_boundaries(map)
+    def handle_input(self):
+        self.input_component.update(self)
 
-    # TODO: Incorporate enforce_boundaries logic into enforce_collision to make boundaries function irrelevant
-    # Collisions
-    def enforce_collision_x(self, group: pg.sprite.Group):
-        # Collision methods applied after a movement to make sure that the sprite does not clip.
-        # Methods are a bit inefficient - checks each axis individually.
-        for colliding_sprite in pg.sprite.spritecollide(self, group, False):
-            if colliding_sprite.rect.left < self.rect.left < colliding_sprite.rect.right:
-                self.rect.left = colliding_sprite.rect.right
-            if colliding_sprite.rect.left < self.rect.right < colliding_sprite.rect.right:
-                self.rect.right = colliding_sprite.rect.left
+    def update(self, map):
+        self.physics_component.update(self, map)
+        self.animation_component.update(self)
 
-    def enforce_collision_y(self, group: pg.sprite.Group):
-        all_colliding_sprites = pg.sprite.spritecollide(self, group, False)
-        for colliding_sprite in all_colliding_sprites:
-            if colliding_sprite.rect.top < self.rect.top < colliding_sprite.rect.bottom:
-                self.rect.top = colliding_sprite.rect.bottom
-            if colliding_sprite.rect.top < self.rect.bottom < colliding_sprite.rect.bottom:
-                self.rect.bottom = colliding_sprite.rect.top
-        return len(all_colliding_sprites) > 0
+    def render(self, camera, surface):
+        self.render_component.update(self, camera, surface)
 
-    def enforce_boundaries(self, map):
-        if self.rect.top < 0:
-            self.rect.top = 0
-        # elif self.rect.bottom > map.rect.bottom:
-        #     self.rect.bottom = map.rect.bottom
-        if self.rect.left < 0:
-            self.rect.left = 0
-        elif self.rect.right > map.rect.right:
-            self.rect.right = map.rect.right
 
-    # Checks if player is dead
-    def is_dead(self, map):
-        # Collects all possibilities in which a player can lose a life
-        return self.rect.bottom > map.rect.bottom or self.health < 0
+class Enemy(Entity):
+    def __init__(self, type_object, ai_component, physics_component, render_component, starting_position):
+        super().__init__()
+
+        self.health = 100
+
+        # Define starting position
+        # index 0 is x position, index 1 is y position, index 2 is patrol range
+        self.rect = pg.Rect(starting_position[0], starting_position[1], 20, 27)
+
+        self.blit_rect = pg.Rect(5, 3.5, 50, 30)
+
+        # Boundaries for patrol
+        self.left_bound = starting_position[0] - starting_position[2]
+        self.right_bound = starting_position[0] + starting_position[2]
+
+        # Components
+        self.input_component = ai_component
+        self.physics_component = physics_component
+        self.render_component = render_component
+
+        # Taking damage
+        self.damage_collide_component = EnemyDamageCollisionComponent()
+
+        # Animation and sound are taken from a type object
+        self.animation_component = AnimationComponent(type_object.animation_library, self.state)
+        self.sound_component = SoundComponent(type_object.sound_library)
+
+        # Current Image
+        self.image = self.animation_component.get_current_image()
+
+    def take_damage(self):
+        # TODO: Properly handle animations for dying
+        self.state = PlayerState.DEAD
+
+    def message(self, message):
+        pass
+    
+    def update(self, map, player):
+        self.input_component.update(self)
+        self.physics_component.update(self, map)
+        self.damage_collide_component.update(self, player)
+        self.animation_component.update(self)
+
+    def render(self, camera, surface):
+        self.render_component.update(self, camera, surface)
+
+
+class EnemyType:
+    def __init__(self):
+        # Spritesheets
+        idle_spritesheet = Spritesheet("assets/sprites/player/Idle.png", 1, 11)
+        run_spritesheet = Spritesheet("assets/sprites/player/Run.png", 1, 12)
+        jump_spritesheet = Spritesheet("assets/sprites/player/Jump.png", 1, 1)
+
+        # Sounds
+        jump_sound = pg.mixer.Sound("assets/sound/sfx/jump.ogg")
+
+        self.health = 100
+        self.animation_library = {
+            PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+            PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+            PlayerState.JUMPING: jump_spritesheet.get_images_at(0),
+            PlayerState.DEAD: idle_spritesheet.get_images_at(0)
+        }
+        self.sound_library = {
+            "JUMP": jump_sound
+        }
+

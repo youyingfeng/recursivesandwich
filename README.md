@@ -1,32 +1,50 @@
-## Good reading material  
+# THE TOWER  
+  
+## Plot
+> In a fictional Singapore, a prospective applicant to the prestigious National University has to challenge the Tower in order to be admitted into the school. Help him overcome the various challenges of the Tower in order to fulfil his dream.
+  
+## Project details
+### Features of the game  
+The game is a 2D, side-scrolling platformer, featuring multiple levels.  
+Each of these levels will have a variety of obstacles to test the player.  
+Such obstacles include hazardous terrain, enemies, and puzzles.  
+
+### Target Audience  
+This is targeted at people who like platformers.
+
+### Tech Stack  
+The game will be coded entirely in Python and SDL using the Pygame library.  
+
+### Level of Achievement  
+Gemini  
+
+### Features implemented so far
+- Player character
+- Environment (rudimentary levels and static/scrolling/parallax backgrounds)
+- Physics (collisions and WIP gravity) 
+- Incomplete animations
+- Title screen and game over screen
+
+### Features to be implemented
+- Hazardous terrain (e.g. spikes, traps)
+- Enemies
+- Interactive terrain objects (e.g. ladders, buttons)
+- Player HUD
+- Sound system
+- Visual effects
+- and more!
+
+## Running the game  
+1. Install the latest version of Python
+2. Install the latest version of the Pygame library (from command line/terminal, run `pip install pygame`)
+3. Clone the repository and run main.py using Python  
+
+# Credits
+Resources taken from Kevin MacLeod, JDWasabi, DaFluffyPotato, edermunizz and Pixel Frog.
+
+
+# Good reading material  
 http://gameprogrammingpatterns.com/game-loop.html  
 http://gameprogrammingpatterns.com/state.html and pretty much the entire book lmao  
 https://stackoverflow.com/questions/14354171/add-scrolling-to-a-platformer-in-pygame for camera scrolling
-https://stackoverflow.com/questions/14700889/pygame-level-menu-states for state machine  
-
-# Timeline
-Week 1: Base of the game
-- Window and camera
-- Collisions between main player and ground
-- Main player (with healthbar, lives, points)
-
-Week 2: Obstacles
-- Spikes, which decreases the health of the player and visually injures him
-- Ghosts of failed students
-- Rolling boulders
-- Crushing walls (in 3D) which attempts to knock the player out of the plane of the game
-Note: Focus only on the functionality of the game for now.
-
-Week 3: Design
-- Refine the looks of the player, obstacles and background
-- Compose soundtrack for the background
-- Add sound effects for movement, damage and atmosphere
-- Create horror and story elements to increase interest in the game
-
-Week 4: Levels
-- Design all the levels of the game, ensuring increasing difficulty
-
-# Visual Elements
-- Dystopian image of the Singapore skyline as the player approaches the tower, should be a wide image so that it can be scrolled (with parallax effects).
-- Exterior of the tower, menacing and modern-looking
-- Interior of the tower, with its walls and rotting corpses of dead bodies which failed to survive the Tower's tests
+https://stackoverflow.com/questions/14700889/pygame-level-menu-states for state machine
