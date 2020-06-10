@@ -14,7 +14,7 @@ class Entity(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
- 		# Defines the hitbox of the Entity. Must be redefined in the subclass.
+        # Defines the hitbox of the Entity. Must be redefined in the subclass.
         self.rect = None                   
 
         # Velocities
@@ -52,7 +52,7 @@ class Player(Entity):
                             PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3),
                             PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5),
                             PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
-                   	        }
+                            }
 
         # Sounds
         jump_sound = pg.mixer.Sound("assets/sound/sfx/jump.ogg")
@@ -75,11 +75,11 @@ class Player(Entity):
 
     # ---------- DIRTY METHODS ---------- #
     # These will be placed here until I can find a way to wrap them in a component nicely
-    def take_damage(self):
+    def take_damage(self, damage):
         if self.is_immune():
             return
         else:
-            self.health -= 20
+            self.health -= damage
             self.last_collide_time = pg.time.get_ticks()
             self.message("HIT")
             self.y_velocity = -2
@@ -134,7 +134,7 @@ class Enemy(Entity):
         # Current Image
         self.image = self.animation_component.get_current_image()
 
-    def take_damage(self):
+    def take_damage(self, damage):
         # TODO: Properly handle animations for dying
         self.state = PlayerState.DEAD
 

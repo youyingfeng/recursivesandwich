@@ -38,7 +38,7 @@ class HazardousBlock(Block):
 	def update(self, entity):
 		if (self.rect.left < entity.rect.left < self.rect.right or self.rect.left < entity.rect.right < self.rect.right)\
 				and self.rect.top == entity.rect.bottom:
-			entity.take_damage()
+			entity.take_damage(20)
 
 
 
