@@ -2,7 +2,7 @@ import pygame as pg
 from .block import *
 from .components import *
 from .player import *
-from .animations import *
+from .spritesheet import *
 
 
 # =============================================================== #

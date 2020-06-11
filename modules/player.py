@@ -1,6 +1,6 @@
 import pygame as pg
 
-from .animations import Spritesheet
+from .spritesheet import Spritesheet
 from .components import *
 
 # =============================================================== #
