@@ -1,17 +1,10 @@
 import pygame as pg
+from .components import *
+from .spritesheet import *
 
 
-# -------------------- Type objects to store hitboxes of different textures -------------------- #
-# This level of complication is really just to make life easier
-class TerrainType:
-	def __init__(self, image: pg.Surface, block_pos_x=0, block_pos_y=0, block_width=1, block_height=1):
-		# All numbers are relative to the size of a normal block (i.e. must be between 0 and 1, where 1 is the size of
-		# an actual block)
-		self.image = image
-		self.block_pos_x = block_pos_x
-		self.block_pos_y = block_pos_y
-		self.block_width = block_width
-		self.block_height = block_height
+# Dungeon spritesheet
+dungeon = Spritesheet("assets/textures/Dungeon/dungeon_spritesheet.png", 14, 23)
 
 
 class Block(pg.sprite.Sprite):
@@ -37,5 +30,25 @@ class HazardousBlock(Block):
 			entity.take_damage(20)
 
 
+class Coin(Block):
+	def __init__(self, type_object, x, y):
+		super().__init__(type_object, x, y)
 
+		coin_animation = dungeon.get_images_at(15, 15, 15, 16, 16, 16, 17, 17, 17, 18, 18, 18)
+		self.animation_component = AnimationComponent(coin_animation)
 
+		self.coin_sound = pg.mixer.Sound("assets/sound/sfx/coin.ogg")
+
+	def update(self, entity):
+		self.animation_component.update(self)
+
+		# Handling collision with player
+		x_collision = (self.rect.left <= entity.rect.left <= self.rect.right or self.rect.left <= entity.rect.right <= self.rect.right)\
+				and (self.rect.top == entity.rect.bottom or self.rect.bottom == entity.rect.top)
+		y_collision = (self.rect.top <= entity.rect.top <= self.rect.bottom or self.rect.top <= entity.rect.bottom <= self.rect.bottom)\
+				and (self.rect.left == entity.rect.right or self.rect.right == entity.rect.left)
+		if y_collision or x_collision:
+			if entity.health < 100:
+				entity.health += 20
+			self.coin_sound.play()
+			self.kill()

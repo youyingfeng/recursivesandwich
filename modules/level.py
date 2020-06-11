@@ -24,7 +24,7 @@ dungeon = Spritesheet("assets/textures/Dungeon/dungeon_spritesheet.png", 14, 23)
 
 class Level:
     def __init__(self):
-        # map should contain the dimensions ,the terrain group of sprites, and the list of sprites. (is rect necessary)
+        # map should contain the dimensions, the terrain group of sprites, and the list of sprites. (is rect necessary)
         self.map = Map("assets/maps/map3.txt")
         # TODO: make enemymanager retrieve enemies from a json file
         self.enemies = EnemyManager()
@@ -58,12 +58,13 @@ class Map:
         # -------------------- DECLARATIONS -------------------- #
         self.terrain_group = pg.sprite.RenderPlain()
         self.hazardous_terrain_group = pg.sprite.Group()
+        self.coin_group = pg.sprite.Group()
         # Add blocks into the terrain group according to the map
         for y in range(len(game_map)):
             for x in range(len(game_map[0])):
 
                 # Refers to the position of the tile on the tileset
-                # A 'x' represents empty space in the map
+                # 'x' represents empty space in the map
                 tile_position_str = game_map[y][x]
                 if tile_position_str != "x":
                     if tile_position_str == "s":
@@ -72,6 +73,13 @@ class Map:
                                                    y * Block.BLOCK_SIZE)
                         self.terrain_group.add(new_block)
                         self.hazardous_terrain_group.add(new_block)
+
+                    elif tile_position_str == "c":
+                        new_coin = Coin(self.textureset.get_texture_from_code(tile_position_str),
+                                                   x * Block.BLOCK_SIZE,
+                                                   y * Block.BLOCK_SIZE)
+                        self.terrain_group.add(new_coin)
+                        self.coin_group.add(new_coin)
 
                     else:
                         self.terrain_group.add(Block(self.textureset.get_texture_from_code(tile_position_str),
@@ -84,6 +92,7 @@ class Map:
 
     def update(self, player, *args):
         self.hazardous_terrain_group.update(player)
+        self.coin_group.update(player)
 
     def render(self, camera, surface):
         for sprite in self.terrain_group:

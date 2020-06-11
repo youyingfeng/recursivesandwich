@@ -1,9 +1,20 @@
-import pygame as pg
-from .block import *
+import pygame as pg 
 
 
 '''A Spritesheet is an image containing all the individual frames of a Sprite,
 which can be extracted for animation.'''
+
+
+# -------------------- Type objects to store hitboxes of different textures -------------------- #
+# This level of complication is really just to make life easier
+class TerrainType:
+    def __init__(self, image: pg.Surface, block_pos_x=0, block_pos_y=0, block_width=1, block_height=1):
+        # All numbers are relative to the size of a normal block (i.e. must be between 0 and 1, where 1 is the size of an actual block)
+        self.image = image
+        self.block_pos_x = block_pos_x
+        self.block_pos_y = block_pos_y
+        self.block_width = block_width
+        self.block_height = block_height
 
 
 class Spritesheet:
@@ -66,7 +77,7 @@ class Tileset:
         self.spritesheet = pg.image.load("assets/textures/Dungeon/dungeon_spritesheet.png")
 
     def get_image_at(self, rectangle, colorkey=None) -> pg.Surface:
-        "Loads image from x,y,x+offset,y+offset"
+        '''Loads image from x,y,x+offset,y+offset'''
         rect = pg.Rect(rectangle)
         image = pg.Surface(rect.size).convert()
         image.blit(self.spritesheet, (0, 0), rect)
@@ -90,13 +101,15 @@ class TextureSet:
         self.textures = {"FLOOR_LEFT_EDGE": TerrainType(tileset.get_image_at(pg.Rect(32, 0, 16, 16))),
                          "FLOOR_CENTER_EDGE": TerrainType(tileset.get_image_at(pg.Rect(48, 0, 16, 16))),
                          "FLOOR_RIGHT_EDGE": TerrainType(tileset.get_image_at(pg.Rect(64, 0, 16, 16))),
-                         "SPIKES_UPRIGHT": TerrainType(tileset.get_image_at(pg.Rect(80, 96, 16, 16)), 0, 0.4, 1, 0.6)
+                         "SPIKES_UPRIGHT": TerrainType(tileset.get_image_at(pg.Rect(80, 96, 16, 16)), 0, 0.4, 1, 0.6),
+                         "COIN": TerrainType(tileset.get_image_at(pg.Rect(240, 0, 16, 16)))
                          }
 
         self.code_to_texture_dictionary = {"2": "FLOOR_LEFT_EDGE",
                                            "3": "FLOOR_CENTER_EDGE",
                                            "4": "FLOOR_RIGHT_EDGE",
-                                           "s": "SPIKES_UPRIGHT"
+                                           "s": "SPIKES_UPRIGHT",
+                                           "c": "COIN"
                                            }
 
     def get_texture_from_code(self, code) -> TerrainType:
