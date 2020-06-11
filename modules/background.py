@@ -72,7 +72,3 @@ class ScrollingBackground(ParallaxBackground):
         integer_blit_position = int(self.blit_position)
         self.surface.blit(self.background, (integer_blit_position, 0))
         self.surface.blit(self.background, (integer_blit_position - self.BACKGROUND_WIDTH, 0))
-
-
-
-

@@ -168,7 +168,6 @@ class GameScene(Scene):
 		self.parallax_background_3.update(self.camera, 0.8)
 
 
-
 	def render(self, surface):
 		# Blit backgrounds on game_display
 		self.static_background.draw()

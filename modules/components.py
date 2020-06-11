@@ -120,7 +120,27 @@ class PhysicsComponent(Component):
             entity.rect.right = map_width
 
 
+# For simple and single animation of terrain, without any state
 class AnimationComponent(Component):
+    def __init__(self, animation_sequence):
+        super().__init__()
+        self.animation_sequence = animation_sequence
+        self.frame_counter = 0
+        self.frames_per_update = 5
+        self.current_index = 0
+        self.animation_length = len(self.animation_sequence)
+
+    def update(self, entity):        
+        if self.frame_counter == 0:
+            # this will probably cause some anim bugs
+            self.current_index = (self.current_index + 1) % self.animation_length
+            entity.image = self.animation_sequence[self.current_index]
+
+    def get_current_image(self):
+        return self.animation_sequence[self.current_index]
+
+
+class PlayerAnimationComponent(Component):
     def __init__(self, animation_sequences, state: PlayerState):
         super().__init__()
         

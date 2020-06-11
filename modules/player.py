@@ -65,7 +65,7 @@ class Player(Entity):
 
         # Components
         self.input_component = PlayerInputComponent()
-        self.animation_component = AnimationComponent(animation_library, self.state)
+        self.animation_component = PlayerAnimationComponent(animation_library, self.state)
         self.physics_component = PhysicsComponent()
         self.sound_component = SoundComponent(sound_library)
         self.render_component = RenderComponent()
@@ -128,7 +128,7 @@ class Enemy(Entity):
         self.damage_collide_component = EnemyDamageCollisionComponent()
 
         # Animation and sound are taken from a type object
-        self.animation_component = AnimationComponent(type_object.animation_library, self.state)
+        self.animation_component = PlayerAnimationComponent(type_object.animation_library, self.state)
         self.sound_component = SoundComponent(type_object.sound_library)
 
         # Current Image
