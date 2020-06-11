@@ -87,16 +87,19 @@ class Tileset:
 class TextureSet:
     def __init__(self):
         tileset = Tileset()
+        temp_texture = pg.Surface((16, 16)).fill(255, 0, 255)
         self.textures = {"FLOOR_LEFT_EDGE": TerrainType(tileset.get_image_at(pg.Rect(32, 0, 16, 16))),
                          "FLOOR_CENTER_EDGE": TerrainType(tileset.get_image_at(pg.Rect(48, 0, 16, 16))),
                          "FLOOR_RIGHT_EDGE": TerrainType(tileset.get_image_at(pg.Rect(64, 0, 16, 16))),
-                         "SPIKES_UPRIGHT": TerrainType(tileset.get_image_at(pg.Rect(80, 96, 16, 16)), 0, 0.4, 1, 0.6)
+                         "SPIKES_UPRIGHT": TerrainType(tileset.get_image_at(pg.Rect(80, 96, 16, 16)), 0, 0.4, 1, 0.6),
+                         "ENTRANCE/EXIT": TerrainType(temp_texture)
                          }
 
         self.code_to_texture_dictionary = {"2": "FLOOR_LEFT_EDGE",
                                            "3": "FLOOR_CENTER_EDGE",
                                            "4": "FLOOR_RIGHT_EDGE",
-                                           "s": "SPIKES_UPRIGHT"
+                                           "s": "SPIKES_UPRIGHT",
+                                           "e": "ENTRANCE/EXIT"
                                            }
 
     def get_texture_from_code(self, code) -> TerrainType:

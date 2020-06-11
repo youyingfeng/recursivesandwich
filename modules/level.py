@@ -22,6 +22,16 @@ dirt_img = pg.image.load('assets/textures/dirt.png')
 dungeon = Spritesheet("assets/textures/Dungeon/dungeon_spritesheet.png", 14, 23)
 
 
+class LevelManager:
+    def __init__(self, level):
+        self.level = level
+        self.level.manager = self
+
+    def switch_to_level(self, level):
+        self.level = level
+        self.level.manager = self
+
+
 class Level:
     def __init__(self):
         # map should contain the dimensions ,the terrain group of sprites, and the list of sprites. (is rect necessary)
@@ -31,6 +41,8 @@ class Level:
         self.enemies.add_enemy((700, 100, 50), (500, 100, 30))
         # make a background manager to manage multiple backgrounds at once. set static scrolling speeds.
         self.background = None
+
+        self.manager = None
 
         # textures should be loaded from a singleton.
 
