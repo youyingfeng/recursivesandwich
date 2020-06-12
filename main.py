@@ -6,11 +6,11 @@ WINDOW_SIZE = (800, 600)
 
 
 def main():
-    # Initialize pygame
-    pg.init()
-
     # preinitialise sound
     pg.mixer.init(44100, 16, 2, 512)
+
+    # Initialize pygame
+    pg.init()
 
     # Initialize window
     window = pg.display.set_mode(WINDOW_SIZE)

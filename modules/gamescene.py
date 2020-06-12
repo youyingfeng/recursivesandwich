@@ -1,10 +1,10 @@
 import pygame as pg
 import pygame.freetype as ft
-from .level import Level
+from .level import *
 from .player import Player
 from .camera import Camera
 from .background import *
-from .headsupdisplay import Healthbar, HeadsUpDisplay
+from .headsupdisplay import HeadsUpDisplay
 
 # Size tuples
 WINDOW_SIZE = (800, 600)
@@ -120,10 +120,13 @@ class GameScene(Scene):
 		super().__init__()
 
 		# Initialise the level
-		self.level = Level()
+		# self.level = Level(Level1Template())
+
+		# Initialise the level manager
+		self.level_manager = LevelManager()
 
 		# Initialize camera
-		self.camera = Camera(SURFACE_SIZE, self.level.map)
+		self.camera = Camera(SURFACE_SIZE, self.level_manager.level.map)
 
 		# Initialize player
 		self.player = Player()
@@ -149,13 +152,12 @@ class GameScene(Scene):
 
 	def update(self):
 		# If player dies, switch to GameOver scene
-		if self.player.rect.y > self.level.map.dimensions[1] or self.player.health <= 0:
-			self.player.dead = True
+		if self.player.state == PlayerState.DEAD:
 			self.manager.switch_to_scene(GameOverScene())
 
-		self.player.update(self.level.map)
+		self.player.update(self.level_manager.level.map)
 
-		self.level.update(self.player)
+		self.level_manager.level.update(self.player)
 
 		self.hud.update(self.player)
 
@@ -176,7 +178,7 @@ class GameScene(Scene):
 		self.parallax_background_3.draw()
 
 		# Draws the map and enemies
-		self.level.render(self.camera, self.game_display)
+		self.level_manager.level.render(self.camera, self.game_display)
 
 		# Draw player on game_display wrt camera position
 		self.player.render(self.camera, self.game_display)
@@ -219,4 +221,18 @@ class GameOverScene(Scene):
 		self.game_display.blit(self.subtitle[0], self.subtitle_blit_position)
 
 		# Blit game_display on window surface
+		surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
+
+
+# Unused, to be worked in
+class LoadingScene(Scene):
+	def __init__(self):
+		super().__init__()
+		# takes in arguments and passes it along to the next GameScene
+
+	def update(self, *args):
+		pass
+
+	def render(self, surface: pg.Surface):
+		self.game_display.fill(BLACK)
 		surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))

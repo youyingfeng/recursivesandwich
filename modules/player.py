@@ -34,7 +34,6 @@ class Entity(pg.sprite.Sprite):
 class Player(Entity):
     def __init__(self):
         super().__init__()
-        self.dead = False
         self.health = 100
 
         self.rect = pg.Rect(10, 10, 20, 30)
@@ -83,6 +82,9 @@ class Player(Entity):
             self.last_collide_time = pg.time.get_ticks()
             self.message("HIT")
             self.y_velocity = -2
+
+        if self.health <= 0:
+            self.state = PlayerState.DEAD
 
     def is_immune(self):
         return self.last_collide_time > pg.time.get_ticks() - 500

@@ -29,14 +29,14 @@ class HazardousBlock(Block):
 				and self.rect.top == entity.rect.bottom:
 			entity.take_damage(20)
 
+
 class GatewayBlock(Block):
 	def __init__(self, type_object, x, y):
 		super().__init__(type_object, x, y)
 
 	def update(self, player, level):
 		if player.rect.collidepoint(self.rect.centerx, self.rect.centery):
-			pass
-			# supposed to initiate a level change
+			level.level_manager.load_next_level(player)
 
 
 # All blocks can really just be surbordinated to this block

@@ -80,6 +80,8 @@ class Tileset:
         '''Loads image from x,y,x+offset,y+offset'''
         rect = pg.Rect(rectangle)
         image = pg.Surface(rect.size).convert()
+
+        # TODO: Convert to subsurface
         image.blit(self.spritesheet, (0, 0), rect)
 
         if colorkey is None:
@@ -98,12 +100,12 @@ class Tileset:
 class TextureSet:
     def __init__(self):
         tileset = Tileset()
-        temp_texture = pg.Surface((16, 16)).fill(255, 0, 255)
+        temp_texture = pg.Surface((16, 16)).fill((255, 0, 255))
         self.textures = {"FLOOR_LEFT_EDGE": TerrainType(tileset.get_image_at(pg.Rect(32, 0, 16, 16))),
                          "FLOOR_CENTER_EDGE": TerrainType(tileset.get_image_at(pg.Rect(48, 0, 16, 16))),
                          "FLOOR_RIGHT_EDGE": TerrainType(tileset.get_image_at(pg.Rect(64, 0, 16, 16))),
                          "SPIKES_UPRIGHT": TerrainType(tileset.get_image_at(pg.Rect(80, 96, 16, 16)), 0, 0.4, 1, 0.6),
-                         "ENTRANCE/EXIT": TerrainType(temp_texture),
+                         "ENTRANCE/EXIT": TerrainType(tileset.get_image_at(pg.Rect(32, 0, 16, 16))),
                          "COIN": TerrainType(tileset.get_image_at(pg.Rect(240, 0, 16, 16)))
                          }
 

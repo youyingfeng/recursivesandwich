@@ -23,32 +23,63 @@ dungeon = Spritesheet("assets/textures/Dungeon/dungeon_spritesheet.png", 14, 23)
 
 
 class LevelManager:
-    def __init__(self, level):
-        self.level = level
-        self.level.manager = self
+    def __init__(self):
+        self.level_template_list = (Level1Template(),
+                                    Level2Template())
+        self.level = Level(self.level_template_list[0])
+        self.level.level_manager = self
+        self.current_index = 0
 
-    def switch_to_level(self, level):
-        self.level = level
-        self.level.manager = self
+    def load_next_level(self, player):
+        self.current_index += 1
+        if self.current_index < len(self.level_template_list):
+            level_template = self.level_template_list[self.current_index]
+            self.level = Level(level_template)
+            self.level.level_manager = self
+            # Move the player to the correct position
+            player.rect.x = level_template.starting_position[0]
+            player.rect.y = level_template.starting_position[1]
+        # TODO: Level terrain not changing properly
+
+    def fade_in(self, surface):
+        pass
+
+
+# --- By right this shit should be stored in a JSON --- #
+class Level1Template:
+    def __init__(self):
+        self.map = Map("assets/maps/map3.txt")
+        self.enemies = EnemyManager()
+        self.enemies.add_enemy((700, 100, 50),
+                               (500, 100, 30))
+        self.starting_position = (100, 200)
+
+
+class Level2Template:
+    def __init__(self):
+        self.map = Map("assets/maps/map2.txt")
+        self.enemies = EnemyManager()
+        self.enemies.add_enemy((700, 100, 50),
+                               (500, 100, 30))
+        self.starting_position = (100, 200)
 
 
 class Level:
-    def __init__(self):
+    def __init__(self, level_template):
         # map should contain the dimensions, the terrain group of sprites, and the list of sprites. (is rect necessary)
-        self.map = Map("assets/maps/map3.txt")
+        self.map = level_template.map
         # TODO: make enemymanager retrieve enemies from a json file
-        self.enemies = EnemyManager()
-        self.enemies.add_enemy((700, 100, 50), (500, 100, 30))
+        self.enemies = level_template.enemies
         # make a background manager to manage multiple backgrounds at once. set static scrolling speeds.
         self.background = None
 
-        self.manager = None
+        self.level_manager = None
 
         # textures should be loaded from a singleton.
 
     def update(self, player):
         self.enemies.update(self.map, player)
-        self.map.update(player)
+        self.map.update(player, self)
 
     def render(self, camera, surface):
         self.map.render(camera, surface)
@@ -71,6 +102,7 @@ class Map:
         self.terrain_group = pg.sprite.RenderPlain()
         self.hazardous_terrain_group = pg.sprite.Group()
         self.coin_group = pg.sprite.Group()
+        self.gateway_group = pg.sprite.GroupSingle()
         # Add blocks into the terrain group according to the map
         for y in range(len(game_map)):
             for x in range(len(game_map[0])):
@@ -90,8 +122,14 @@ class Map:
                         new_coin = Coin(self.textureset.get_texture_from_code(tile_position_str),
                                                    x * Block.BLOCK_SIZE,
                                                    y * Block.BLOCK_SIZE)
-                        self.terrain_group.add(new_coin)
+                        self.terrain_group.add(new_coin) # Delete this
                         self.coin_group.add(new_coin)
+
+                    elif tile_position_str == "e":
+                        new_block = GatewayBlock(self.textureset.get_texture_from_code(tile_position_str),
+                                                   x * Block.BLOCK_SIZE,
+                                                   y * Block.BLOCK_SIZE)
+                        self.gateway_group.add(new_block)
 
                     else:
                         self.terrain_group.add(Block(self.textureset.get_texture_from_code(tile_position_str),
@@ -102,12 +140,17 @@ class Map:
         self.dimensions = (len(game_map[0]) * Block.BLOCK_SIZE, len(game_map) * Block.BLOCK_SIZE)
         self.rect = pg.Rect((0,0), self.dimensions)
 
-    def update(self, player, *args):
+    def update(self, player, level, *args):
         self.hazardous_terrain_group.update(player)
         self.coin_group.update(player)
+        self.gateway_group.update(player, level)
 
     def render(self, camera, surface):
         for sprite in self.terrain_group:
+            if camera.rect.colliderect(sprite.rect):
+                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+
+        for sprite in self.gateway_group:
             if camera.rect.colliderect(sprite.rect):
                 surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
 
