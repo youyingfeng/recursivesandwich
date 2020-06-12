@@ -5,9 +5,8 @@ from .spritesheet import Spritesheet
 from .components import *
 
 # =============================================================== #
-# The Camera class keeps track of the viewport of the game using  #
-# a Rect. The object is always passed to the renderer when        #
-# rendering sprites onto the screen.                              #
+# This module contains all relevant classes required for the      #
+# instantiation of the Player and Enemies.                        #
 # =============================================================== #
 
 
@@ -33,6 +32,7 @@ class Entity(pg.sprite.Sprite):
 
 
 class Player(Entity):
+    """Represents the player character"""
     def __init__(self):
         super().__init__()
         self.health = 100
@@ -76,6 +76,7 @@ class Player(Entity):
     # ---------- DIRTY METHODS ---------- #
     # These will be placed here until I can find a way to wrap them in a component nicely
     def take_damage(self, damage):
+        """Decreases the health of the player by the specified amount"""
         if self.is_immune():
             return
         else:
@@ -112,6 +113,7 @@ class Player(Entity):
 
 
 class Enemy(Entity):
+    """Base class for all enemies"""
     def __init__(self, type_object, ai_component, physics_component, render_component, starting_position):
         super().__init__()
 
@@ -143,6 +145,7 @@ class Enemy(Entity):
         self.image = self.animation_component.get_current_image()
 
     def take_damage(self, damage):
+        """Instantly kills the enemy"""
         # TODO: Properly handle animations for dying
         self.state = PlayerState.DEAD
 
@@ -160,6 +163,8 @@ class Enemy(Entity):
 
 
 class EnemyType:
+    """Template object representing the type of enemy, which is passed into the Enemy constructor to
+        instantiate an Enemy with the corresponding visuals, health and sounds"""
     def __init__(self):
         # Spritesheets
         idle_spritesheet = Spritesheet("assets/sprites/player/Idle.png", 1, 11)

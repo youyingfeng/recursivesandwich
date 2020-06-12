@@ -14,6 +14,7 @@ SURFACE_SIZE = (400, 300)
 
 
 # Freetype font
+# Initialise the FreeType font system
 ft.init()
 freetype = ft.Font("assets/fonts/pixChicago.ttf", 8)
 
@@ -81,7 +82,7 @@ class TitleScene(Scene):
 		self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
 
 		# Initialize instruction text
-		self.text = freetype.render("Press Space to Start", (255, 255, 255))
+		self.text = freetype.render("Press any key to begin", (255, 255, 255))
 		self.text_blit_position = (int((self.game_display.get_width() - self.text[0].get_width()) / 2), 200)
 
 		# Play BGM
@@ -95,10 +96,9 @@ class TitleScene(Scene):
 			if event.type == pg.QUIT:
 				pg.quit()
 				quit()
-		# If space is pressed switch to GameScene
-		current_keys = pg.key.get_pressed()
-		if current_keys[pg.K_SPACE]:
-			self.manager.switch_to_scene(GameScene())
+			elif event.type == pg.KEYDOWN:
+				# On any keypress, start the game
+				self.manager.switch_to_scene(GameScene())
 
 	def update(self):
 		# Update positions of all scrolling backgrounds
@@ -164,17 +164,13 @@ class GameScene(Scene):
 				self.level_manager.load_next_level(self.player, self.camera)
 			elif event.type == GameEvent.GAME_OVER.value:
 				self.manager.switch_to_scene(GameOverScene())
+
+		# Processes the input for the player
 		self.player.handle_input()
 
 	def update(self):
-		# If player dies, switch to GameOver scene
-		# if self.player.state == PlayerState.DEAD:
-		# 	self.manager.switch_to_scene(GameOverScene())
-
 		self.player.update(self.level_manager.level.map)
-
 		self.level_manager.level.update(self.player)
-
 		self.hud.update(self.player)
 
 		# Move camera to player's position

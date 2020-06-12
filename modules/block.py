@@ -4,10 +4,6 @@ from .playerstate import GameEvent
 from .spritesheet import *
 
 
-# Dungeon spritesheet
-dungeon = Spritesheet("assets/textures/Dungeon/dungeon_spritesheet.png", 14, 23)
-
-
 class Block(pg.sprite.Sprite):
 	BLOCK_SIZE = 25
 
@@ -53,6 +49,7 @@ class Coin(Block):
 	def __init__(self, type_object, x, y):
 		super().__init__(type_object, x, y)
 
+		dungeon = Spritesheet("assets/textures/Dungeon/dungeon_spritesheet.png", 14, 23)
 		coin_animation = dungeon.get_images_at(15, 15, 15, 16, 16, 16, 17, 17, 17, 18, 18, 18)
 		self.animation_component = AnimationComponent(coin_animation)
 

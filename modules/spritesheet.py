@@ -1,54 +1,31 @@
-import pygame as pg 
+import pygame as pg
 
-
-'''A Spritesheet is an image containing all the individual frames of a Sprite,
-which can be extracted for animation.'''
-
-
-# -------------------- Type objects to store hitboxes of different textures -------------------- #
-# This level of complication is really just to make life easier
-class TerrainType:
-    def __init__(self, image: pg.Surface, block_pos_x=0, block_pos_y=0, block_width=1, block_height=1):
-        # All numbers are relative to the size of a normal block (i.e. must be between 0 and 1, where 1 is the size of an actual block)
-        self.image = image
-        self.block_pos_x = block_pos_x
-        self.block_pos_y = block_pos_y
-        self.block_width = block_width
-        self.block_height = block_height
+# =============================================================== #
+# This module contains all the necessary utility functions        #
+# required to load textures into the game.                        #
+# The Spritesheet class allows you to load animations (sequences  #
+# of frames) from spritesheets.                                   #
+# The Tileset class allows you to load static textures from a     #
+# spritesheet.                                                    #
+# =============================================================== #
 
 
 class Spritesheet:
+    """Utility class to load animation sequences from a spritesheet"""
     def __init__(self, filepath: str, rows: int, columns: int, width=None, height=None):
         self.spritesheet = pg.image.load(filepath)
         self.rows = rows
         self.columns = columns
         self.width = width
         self.height = height
-        if width == None:
+        if width is None:
             self.width = int(self.spritesheet.get_width() / columns)
-        if height == None:
+        if height is None:
             self.height = int(self.spritesheet.get_height() / rows)
         self.clock = pg.time.Clock()
 
-    # Returns an image representing a single tile from a spritesheet
-    def get_image_at_coordinates(self, row, col):
-        image_row = row
-        image_column = col
-
-        # Create a new transparent Surface
-        surface = pg.Surface((self.width, self.height)).convert()
-        surface.set_colorkey((0, 0, 0))
-
-        # Blit frame into the transparent Surface, scaled to Surface size
-        surface.blit(self.spritesheet, (0, 0), 
-            pg.Rect((image_column * self.width,
-                    image_row * self.height,
-                    (image_column + 1) * self.width,
-                    (image_row + 1) * self.height)))
-        return surface
-
-    # Returns an image representing a single frame of an animation
     def get_image_at_position(self, position: int) -> pg.Surface:
+        """Returns an image at the specified position, representing a single frame of an animation"""
         # Positions are 0-indexed
         image_row = int(position / self.columns)
         image_column = position % self.columns
@@ -58,26 +35,41 @@ class Spritesheet:
         surface.set_colorkey((0, 0, 0))
 
         # Blit frame into the transparent Surface, scaled to Surface size
-        surface.blit(self.spritesheet, (0, 0), 
+        surface.blit(self.spritesheet, (0, 0),
             pg.Rect((image_column * self.width,
                     image_row * self.height,
                     (image_column + 1) * self.width,
                     (image_row + 1) * self.height)))
         return surface
 
-    '''Returns a list of frames within the animation,
-    to be passed into the Animation constructor'''
     def get_images_at(self, *positions: int) -> list:
+        """Returns a sequence of Surfaces representing the specified sequence of frames,
+            which represents an animation sequence"""
         # Positions goes from left to right, then go down one row
         return [self.get_image_at_position(position) for position in positions]
 
 
+# -------------------- Type objects to store hitboxes of different textures -------------------- #
+# This level of complication is really just to make life easier
+class TerrainType:
+    """Stores a texture and its corresponding hitbox dimensions"""
+    def __init__(self, image: pg.Surface, block_pos_x=0, block_pos_y=0, block_width=1, block_height=1):
+        # All numbers are relative to the size of a normal block
+        # (i.e. must be between 0 and 1, where 1 is the size of an actual block)
+        self.image = image
+        self.block_pos_x = block_pos_x
+        self.block_pos_y = block_pos_y
+        self.block_width = block_width
+        self.block_height = block_height
+
+
 class Tileset:
+    """Utility class to load static textures from a spritesheet"""
     def __init__(self):
         self.spritesheet = pg.image.load("assets/textures/Dungeon/dungeon_spritesheet.png")
 
     def get_image_at(self, rectangle, colorkey=None) -> pg.Surface:
-        '''Loads image from x,y,x+offset,y+offset'''
+        """Loads the image at the area specified by the given rectangle"""
         rect = pg.Rect(rectangle)
         image = pg.Surface(rect.size).convert()
 
@@ -94,10 +86,11 @@ class Tileset:
         return image
 
 
-# TODO: Make a textureset manually getting each tile from the right position.
 # This is basically hardcoding, but there is no choice here
 # Can implement reading from JSON to make this more modular
 class TextureSet:
+    """Contains a dictionary of the types of tiles and its corresponding TerrainType objects,
+    and allows for the retrieval for the corresponding TerrainType object of the specified tile type"""
     def __init__(self):
         tileset = Tileset()
         temp_texture = pg.Surface((16, 16)).fill((255, 0, 255))
@@ -118,6 +111,7 @@ class TextureSet:
                                            }
 
     def get_texture_from_code(self, code) -> TerrainType:
+        """Returns the corresponding TerrainType object associated with the specified tile"""
         if code == "x":
             pass
         else:

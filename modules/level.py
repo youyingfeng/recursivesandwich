@@ -1,9 +1,7 @@
 import pygame as pg
 from .block import *
-from .components import *
 from .player import *
 from .spritesheet import *
-
 
 # =============================================================== #
 # This file contains all high-level classes and methods required  #
@@ -11,18 +9,8 @@ from .spritesheet import *
 # =============================================================== #
 
 
-# TODO: Shove this into a new class Tileset with a dict
-
-# Original tiles
-grass_img = pg.image.load('assets/textures/grass.png')
-dirt_img = pg.image.load('assets/textures/dirt.png')
-
-
-# Dungeon spritesheet
-dungeon = Spritesheet("assets/textures/Dungeon/dungeon_spritesheet.png", 14, 23)
-
-
 class LevelManager:
+    """Handles the changing of game levels"""
     def __init__(self):
         self.level_template_list = (Level1Template(),
                                     Level2Template())
@@ -31,6 +19,7 @@ class LevelManager:
         self.current_index = 0
 
     def load_next_level(self, player, camera):
+        """Loads the next level in the list"""
         self.current_index += 1
         if self.current_index < len(self.level_template_list):
             level_template = self.level_template_list[self.current_index]
@@ -91,6 +80,10 @@ class Level:
 
 
 class Map:
+    """
+    In-game representation of the specified map
+    Handles the updating and rendering of the terrain blocks
+    """
     def __init__(self, map_path):
         self.textureset = TextureSet()
         # -------------------- PREPROCESSING --------------------#
