@@ -36,8 +36,6 @@ class Camera:
         self.rect.x += int((new_centerx - self.rect.centerx) * lerp)
         self.rect.y += int((new_centery - self.rect.centery) * lerp * 0.5)
 
-
-
         if self.rect.top < 0:
             self.rect.top = 0
         elif self.rect.bottom > self.boundaries.bottom:
@@ -47,6 +45,15 @@ class Camera:
         elif self.rect.right > self.boundaries.right:
             self.rect.right = self.boundaries.right
 
-    # def snap_to_target(self, target):
-    #     self.rect.x = target.rect.centerx
-    #     self.rect.y = target.rect.centery
+    def snap_to_target(self, target):
+        self.rect.x = target.rect.centerx
+        self.rect.y = target.rect.centery
+
+        if self.rect.top < 0:
+            self.rect.top = 0
+        elif self.rect.bottom > self.boundaries.bottom:
+            self.rect.bottom = self.boundaries.bottom
+        if self.rect.left < 0:
+            self.rect.left = 0
+        elif self.rect.right > self.boundaries.right:
+            self.rect.right = self.boundaries.right

@@ -7,6 +7,8 @@ from .background import *
 from .headsupdisplay import HeadsUpDisplay
 
 # Size tuples
+from .playerstate import GameEvent
+
 WINDOW_SIZE = (800, 600)
 SURFACE_SIZE = (400, 300)
 
@@ -42,7 +44,7 @@ class Scene:
 		self.manager = SceneManager(self)
 		self.game_display = pg.Surface(SURFACE_SIZE)
 
-	def handle_events(self, events: list = None):
+	def handle_events(self):
 		raise NotImplementedError
 
 	def update(self):
@@ -87,7 +89,12 @@ class TitleScene(Scene):
 		pg.mixer.music.set_volume(0.2)
 		pg.mixer.music.play(-1)
 
-	def handle_events(self, events: list = None):
+	def handle_events(self):
+		# Clears the event queue and processes the events
+		for event in pg.event.get():
+			if event.type == pg.QUIT:
+				pg.quit()
+				quit()
 		# If space is pressed switch to GameScene
 		current_keys = pg.key.get_pressed()
 		if current_keys[pg.K_SPACE]:
@@ -147,13 +154,22 @@ class GameScene(Scene):
 		pg.mixer.music.set_volume(0.5)
 		pg.mixer.music.play(-1)
 
-	def handle_events(self, events: list = None):
+	def handle_events(self):
+		# Clears the event queue and processes the events
+		for event in pg.event.get():
+			if event.type == pg.QUIT:
+				pg.quit()
+				quit()
+			elif event.type == GameEvent.SWITCH_LEVEL.value:
+				self.level_manager.load_next_level(self.player, self.camera)
+			elif event.type == GameEvent.GAME_OVER.value:
+				self.manager.switch_to_scene(GameOverScene())
 		self.player.handle_input()
 
 	def update(self):
 		# If player dies, switch to GameOver scene
-		if self.player.state == PlayerState.DEAD:
-			self.manager.switch_to_scene(GameOverScene())
+		# if self.player.state == PlayerState.DEAD:
+		# 	self.manager.switch_to_scene(GameOverScene())
 
 		self.player.update(self.level_manager.level.map)
 
@@ -168,7 +184,6 @@ class GameScene(Scene):
 		self.parallax_background_1.update(self.camera, 0.2)
 		self.parallax_background_2.update(self.camera, 0.5)
 		self.parallax_background_3.update(self.camera, 0.8)
-
 
 	def render(self, surface):
 		# Blit backgrounds on game_display
@@ -203,7 +218,11 @@ class GameOverScene(Scene):
 		self.subtitle = freetype.render("Press F to pay respects", WHITE)
 		self.subtitle_blit_position = (int((self.game_display.get_width() - self.subtitle[0].get_width()) / 2), 200)
 
-	def handle_events(self, events: list = None):
+	def handle_events(self):
+		for event in pg.event.get():
+			if event.type == pg.QUIT:
+				pg.quit()
+				quit()
 		# If f gets pressed switch to GameScene
 		current_keys = pg.key.get_pressed()
 		if current_keys[pg.K_f]:

@@ -1,5 +1,6 @@
 import pygame as pg
 from .components import *
+from .playerstate import GameEvent
 from .spritesheet import *
 
 
@@ -34,9 +35,13 @@ class GatewayBlock(Block):
 	def __init__(self, type_object, x, y):
 		super().__init__(type_object, x, y)
 
-	def update(self, player, level):
+	def update(self, player):
 		if player.rect.collidepoint(self.rect.centerx, self.rect.centery):
-			level.level_manager.load_next_level(player)
+			pg.event.post(
+				pg.event.Event(
+					GameEvent.SWITCH_LEVEL.value
+				)
+			)
 
 
 # All blocks can really just be surbordinated to this block

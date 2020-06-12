@@ -30,16 +30,20 @@ class LevelManager:
         self.level.level_manager = self
         self.current_index = 0
 
-    def load_next_level(self, player):
+    def load_next_level(self, player, camera):
         self.current_index += 1
         if self.current_index < len(self.level_template_list):
             level_template = self.level_template_list[self.current_index]
             self.level = Level(level_template)
             self.level.level_manager = self
+
             # Move the player to the correct position
             player.rect.x = level_template.starting_position[0]
             player.rect.y = level_template.starting_position[1]
-        # TODO: Level terrain not changing properly
+
+            # TODO: Shove this outside since this kinda violates single responsibility
+            # TODO: or make this function handle fadein fadeouts too
+            camera.snap_to_target(player)
 
     def fade_in(self, surface):
         pass
@@ -140,10 +144,10 @@ class Map:
         self.dimensions = (len(game_map[0]) * Block.BLOCK_SIZE, len(game_map) * Block.BLOCK_SIZE)
         self.rect = pg.Rect((0,0), self.dimensions)
 
-    def update(self, player, level, *args):
+    def update(self, player, *args):
         self.hazardous_terrain_group.update(player)
         self.coin_group.update(player)
-        self.gateway_group.update(player, level)
+        self.gateway_group.update(player)
 
     def render(self, camera, surface):
         for sprite in self.terrain_group:

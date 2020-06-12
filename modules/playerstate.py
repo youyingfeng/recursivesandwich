@@ -1,3 +1,4 @@
+import pygame as pg
 from enum import Enum
 
 
@@ -18,3 +19,8 @@ class Action(Enum):
     STOP = 1
     JUMP = 2
     LAND = 3
+
+
+class GameEvent(Enum):
+    SWITCH_LEVEL = pg.USEREVENT + 0
+    GAME_OVER = pg.USEREVENT + 1

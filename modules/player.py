@@ -1,5 +1,6 @@
 import pygame as pg
 
+from .playerstate import GameEvent
 from .spritesheet import Spritesheet
 from .components import *
 
@@ -85,6 +86,11 @@ class Player(Entity):
 
         if self.health <= 0:
             self.state = PlayerState.DEAD
+            pg.event.post(
+                pg.event.Event(
+                    GameEvent.GAME_OVER.value
+                )
+            )
 
     def is_immune(self):
         return self.last_collide_time > pg.time.get_ticks() - 500

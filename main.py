@@ -28,9 +28,9 @@ def main():
     # -------------------- GAME LOOP -------------------- #
     while run:
         # TODO: probably should shove this inside handle_events()
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                run = False
+        # for event in pg.event.get():
+        #     if event.type == pg.QUIT:
+        #         run = False
 
         # Manager handles scene
         manager.scene.handle_events()
