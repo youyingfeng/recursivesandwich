@@ -1,8 +1,13 @@
 import pygame as pg
 from enum import Enum
 
+"""
+* =============================================================== *
+* This module contains various enumerations related to the game.  *
+* =============================================================== *
+"""
 
-class PlayerState(Enum):
+class EntityState(Enum):
     IDLE = 0
     WALKING = 1
     JUMPING = 2

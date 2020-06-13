@@ -1,11 +1,11 @@
 import pygame as pg
 import pygame.freetype as ft
 from .level import *
-from .player import Player
+from .entities import Player
 from .camera import Camera
 from .background import *
 from .headsupdisplay import HeadsUpDisplay
-from .playerstate import GameEvent
+from .entitystate import GameEvent
 
 """
 * =============================================================== *
@@ -16,7 +16,7 @@ from .playerstate import GameEvent
 *		 screen, the Game Over screen, etc.						  *
 * =============================================================== *
 
-USAGES
+SCENES
 -------------------------
 All scenes must support the following methods, which are invoked on every cycle of the game loop:
     handle_events()		->		Processes all events currently waiting in the event queue
@@ -27,6 +27,10 @@ All scenes must support the following methods, which are invoked on every cycle 
     
 Additionally, all scenes will have a manager attribute, which contains a SceneManager object to facilitate 
 transitions between scenes.
+
+SCENE MANAGER
+-------------------------
+- TO BE COMPLETED -
 """
 
 # Size tuples
@@ -120,10 +124,10 @@ class TitleScene(Scene):
 
     def render(self, surface: pg.Surface):
         # Blit backgrounds on game_display
-        self.static_background.draw()
-        self.scrolling_background_1.draw()
-        self.scrolling_background_2.draw()
-        self.scrolling_background_3.draw()
+        self.static_background.render()
+        self.scrolling_background_1.render()
+        self.scrolling_background_2.render()
+        self.scrolling_background_3.render()
 
         # Blit text on game_display
         self.game_display.blit(self.title[0], self.title_blit_position)
@@ -187,16 +191,16 @@ class GameScene(Scene):
         self.camera.follow_target(self.player)
 
         # Update parallax backgrounds wrt camera position
-        self.parallax_background_1.update(self.camera, 0.2)
-        self.parallax_background_2.update(self.camera, 0.5)
-        self.parallax_background_3.update(self.camera, 0.8)
+        self.parallax_background_1.update(0.2, self.camera)
+        self.parallax_background_2.update(0.5, self.camera)
+        self.parallax_background_3.update(0.8, self.camera)
 
     def render(self, surface):
         # Blit backgrounds on game_display
-        self.static_background.draw()
-        self.parallax_background_1.draw()
-        self.parallax_background_2.draw()
-        self.parallax_background_3.draw()
+        self.static_background.render()
+        self.parallax_background_1.render()
+        self.parallax_background_2.render()
+        self.parallax_background_3.render()
 
         # Draws the map and enemies
         self.level_manager.level.render(self.camera, self.game_display)

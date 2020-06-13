@@ -1,17 +1,19 @@
 import pygame as pg
 from .block import *
-from .player import *
+from .entities import *
 from .spritesheet import *
 
 """
-This file contains all high-level classes and methods required in an ordinary game level
-========================================================================================
+* =============================================================== *
+* This module contains all the necessary classes and functions    *
+* required to make a level in the game.                           *
+* =============================================================== *
 
 HOW TO MAKE A NEW LEVEL
 -------------------------
 1.  Make a new LevelTemplate class that has the following public attributes:
-        map: Map                    ->      
-        enemies: EnemyManager       ->      
+        map: Map                    ->      Represents the Map to be loaded into the game
+        enemies: EnemyManager       ->      Represents the enemies to be spawned in the game
         starting_position: tuple    ->      Starting position of the player in the form (x, y)
 2.  Add your new LevelTemplate class to the level_template_list in the LevelManager class
     Do remember to place it in the exact order that you want the level to appear in
@@ -129,7 +131,6 @@ class Map:
                         new_coin = Coin(self.textureset.get_texture_from_code(tile_position_str),
                                                    x * Block.BLOCK_SIZE,
                                                    y * Block.BLOCK_SIZE)
-                        self.terrain_group.add(new_coin) # Delete this
                         self.coin_group.add(new_coin)
 
                     elif tile_position_str == "e":
@@ -154,6 +155,10 @@ class Map:
 
     def render(self, camera, surface):
         for sprite in self.terrain_group:
+            if camera.rect.colliderect(sprite.rect):
+                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+
+        for sprite in self.coin_group:
             if camera.rect.colliderect(sprite.rect):
                 surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
 
@@ -185,7 +190,7 @@ class EnemyManager:
 
     def update(self, map, player):
         for entity in self.sprite_list:
-            if entity.state == PlayerState.DEAD:
+            if entity.state == EntityState.DEAD:
                 entity.kill()
                 self.sprite_list = self.sprite_group.sprites()
             else:

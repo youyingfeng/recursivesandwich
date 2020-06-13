@@ -1,26 +1,29 @@
 import pygame as pg
-import pygame.freetype as ft
 from modules.gamescene import SceneManager, TitleScene
 
-# =============================================================== #
-# This is the entry point into the programme. Running the main()  #
-# method will invoke all modules required to get the game up and  #
-# running.                                                        #
-# =============================================================== #
+"""
+* =============================================================== *
+* This is the entry point into the programme. Running the main()  *
+* method will invoke all modules required to get the game up and  *
+* running.                                                        *
+* =============================================================== *
+"""
 
 
-def main():
+def main() -> None:
+    """Initialises PyGame and invokes all the necessary functions and modules to run the game"""
+
     # Pre-initialise sound
     pg.mixer.init(44100, 16, 2, 512)
 
     # Initialise PyGame
     pg.init()
 
-    # Initialize window
+    # Initialise window
     window = pg.display.set_mode((800, 600))
     pg.display.set_caption("The Tower", "The Tower")
 
-    # Initialize clock
+    # Initialise clock
     clock = pg.time.Clock()
 
     # Initialise scene manager with TitleScene set as the initial scene

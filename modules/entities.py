@@ -1,6 +1,6 @@
 import pygame as pg
 
-from .playerstate import GameEvent
+from .entitystate import GameEvent
 from .spritesheet import Spritesheet
 from .components import *
 
@@ -40,7 +40,7 @@ class Entity(pg.sprite.Sprite):
         self.direction = Direction.RIGHT
 
         # State of the entity  
-        self.state = PlayerState.IDLE
+        self.state = EntityState.IDLE
 
     def update(self, *args):
         raise NotImplementedError
@@ -64,9 +64,9 @@ class Player(Entity):
 
         # Animations
         animation_library = {
-                            PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3),
-                            PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5),
-                            PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
+                            EntityState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3),
+                            EntityState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5),
+                            EntityState.JUMPING: jump_spritesheet.get_images_at(0)
                             }
 
         # Sounds
@@ -101,7 +101,7 @@ class Player(Entity):
             self.y_velocity = -2
 
         if self.health <= 0:
-            self.state = PlayerState.DEAD
+            self.state = EntityState.DEAD
             pg.event.post(
                 pg.event.Event(
                     GameEvent.GAME_OVER.value
@@ -162,7 +162,7 @@ class Enemy(Entity):
     def take_damage(self, damage):
         """Instantly kills the enemy"""
         # TODO: Properly handle animations for dying
-        self.state = PlayerState.DEAD
+        self.state = EntityState.DEAD
 
     def message(self, message):
         pass
@@ -191,10 +191,10 @@ class EnemyType:
 
         self.health = 100
         self.animation_library = {
-            PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-            PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
-            PlayerState.JUMPING: jump_spritesheet.get_images_at(0),
-            PlayerState.DEAD: idle_spritesheet.get_images_at(0)
+            EntityState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+            EntityState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+            EntityState.JUMPING: jump_spritesheet.get_images_at(0),
+            EntityState.DEAD: idle_spritesheet.get_images_at(0)
         }
         self.sound_library = {
             "JUMP": jump_sound

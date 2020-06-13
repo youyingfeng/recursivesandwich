@@ -1,10 +1,12 @@
 import pygame as pg
 
-# =============================================================== #
-# The Camera class keeps track of the viewport of the game using  #
-# a Rect. The camera object is always passed to the renderer when #
-# rendering sprites onto the screen.                              #
-# =============================================================== #
+"""
+* =============================================================== *
+* The Camera class keeps track of the viewport of the game using  *
+* a Rect. The camera object is always passed to the renderer when *
+* rendering sprites onto the screen.                              *
+* =============================================================== *
+"""
 
 
 class Camera:
