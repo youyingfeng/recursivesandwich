@@ -116,6 +116,7 @@ class PhysicsComponent(Component):
         for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
             if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
                 entity.rect.top = colliding_sprite.rect.bottom
+                entity.y_velocity = 0
             if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
                 isJumping = False
                 if entity.state == EntityState.JUMPING:
@@ -126,17 +127,17 @@ class PhysicsComponent(Component):
         if isJumping:
             entity.state = EntityState.JUMPING
 
+        # Then handles collisions along the x axis
         entity.rect.x += entity.x_velocity
 
-        # Then handles collisions along the x axis
         for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
             if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
                 entity.rect.left = colliding_sprite.rect.right
             if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
                 entity.rect.right = colliding_sprite.rect.left
 
-        map_width = map.dimensions[0]
         # Then keeps everything within map boundaries
+        map_width = map.dimensions[0]
         if entity.rect.top < 0:
             entity.rect.top = 0
         if entity.rect.left < 0:

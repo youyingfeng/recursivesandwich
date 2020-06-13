@@ -86,7 +86,7 @@ class Coin(Block):
 		self.coin_sound = pg.mixer.Sound("assets/sound/sfx/coin.ogg")
 
 	def update(self, entity):
-		"""Checks if the player has collided with the coin, healing the player if there is a collision, 
+		"""Checks if the player has collided with the coin, healing the player if there is a collision,
 		and updates the animation of the coin"""
 		if pg.sprite.collide_rect(self, entity):
 			if entity.health < 100:

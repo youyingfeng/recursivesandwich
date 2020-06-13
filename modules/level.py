@@ -55,8 +55,8 @@ class Level1Template:
     def __init__(self):
         self.map = Map("assets/maps/map3.txt")
         self.enemies = EnemyManager()
-        self.enemies.add_enemy((700, 100, 50),
-                               (500, 100, 30))
+        # self.enemies.add_enemy((700, 100, 50),
+        #                        (500, 100, 30))
         self.starting_position = (100, 200)
 
 

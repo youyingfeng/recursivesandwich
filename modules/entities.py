@@ -118,8 +118,16 @@ class Player(Entity):
         self.input_component.update(self)
 
     def update(self, map):
-        self.physics_component.update(self, map)
-        self.animation_component.update(self)
+        if self.rect.top > map.rect.bottom:
+            self.state = EntityState.DEAD
+            pg.event.post(
+                pg.event.Event(
+                    GameEvent.GAME_OVER.value
+                )
+            )
+        else:
+            self.physics_component.update(self, map)
+            self.animation_component.update(self)
 
     def render(self, camera, surface):
         self.render_component.update(self, camera, surface)

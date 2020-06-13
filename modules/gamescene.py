@@ -73,11 +73,18 @@ class Scene:
 class SceneManager:
     """Handles scene transitions from one scene to another"""
     def __init__(self, scene: Scene):
+        # TODO: Implement previous_scene as stack without dictionary
+        self.scene = scene
+        self.scene.manager = self
+        self.previous_scene = None
+
+    def switch_to_scene(self, scene: Scene):
+        self.previous_scene = self.scene
         self.scene = scene
         self.scene.manager = self
 
-    def switch_to_scene(self, scene: Scene):
-        self.scene = scene
+    def go_to_previous_scene(self):
+        self.scene = self.previous_scene
         self.scene.manager = self
 
 
@@ -174,8 +181,13 @@ class GameScene(Scene):
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    pg.mixer.music.pause()
+                    self.manager.switch_to_scene(PauseScene())
             elif event.type == GameEvent.SWITCH_LEVEL.value:
                 self.level_manager.load_next_level(self.player, self.camera)
+                self.manager.switch_to_scene(LoadingScene())
             elif event.type == GameEvent.GAME_OVER.value:
                 self.manager.switch_to_scene(GameOverScene())
 
@@ -235,6 +247,7 @@ class GameOverScene(Scene):
                 pg.quit()
                 quit()
         # If f gets pressed switch to GameScene
+        # TODO: HANDLE THIS BETTER TO ENSURE NO MEMORY BLOAT
         current_keys = pg.key.get_pressed()
         if current_keys[pg.K_f]:
             self.manager.switch_to_scene(GameScene())
@@ -254,16 +267,52 @@ class GameOverScene(Scene):
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 
 
-# Unused, to be worked in
-class LoadingScene(Scene):
+class PauseScene(Scene):
     def __init__(self):
         super().__init__()
+        self.text = freetype.render("Press any key to unpause", (255, 255, 255))
+        self.text_blit_position = (int((self.game_display.get_width() - self.text[0].get_width()) / 2), 200)
 
-    # takes in arguments and passes it along to the next GameScene
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+            elif event.type == pg.KEYDOWN:
+                pg.mixer.music.unpause()
+                # Resume the game by going back to the previous scene
+                self.manager.go_to_previous_scene()
 
     def update(self, *args):
         pass
 
     def render(self, surface: pg.Surface):
         self.game_display.fill(BLACK)
+        self.game_display.blit(self.text[0], self.text_blit_position)
+        surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
+
+
+class LoadingScene(Scene):
+    def __init__(self):
+        super().__init__()
+        self.text = freetype.render("Loading...", (255, 255, 255))
+        self.text_blit_position = (int((self.game_display.get_width() - self.text[0].get_width()) / 2), 200)
+        self.wait_frames = 90
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+
+    def update(self, *args):
+        if self.wait_frames <= 0:
+            self.manager.go_to_previous_scene()
+        else:
+            self.wait_frames -= 1
+
+    def render(self, surface: pg.Surface):
+        self.game_display.fill((0, 0, 0))
+
+        self.game_display.blit(self.text[0], self.text_blit_position)
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
