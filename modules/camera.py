@@ -25,11 +25,6 @@ class Camera:
     def follow_target(self, target):
         # Give the camera some lag
         lerp = 0.1
-        # new_x = target.rect.x - int(self.camera_size[0] / 2)
-        # new_y = target.rect.y - int(self.camera_size[1] / 2)
-        # self.rect.x += int((new_x - self.rect.x) * lerp)
-        # self.rect.y += int((new_y - self.rect.y) * lerp * 0.5)
-
         new_centerx = target.rect.centerx
         new_centery = target.rect.centery
         self.rect.x += int((new_centerx - self.rect.centerx) * lerp)

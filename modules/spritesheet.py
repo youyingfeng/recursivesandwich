@@ -9,6 +9,18 @@ import pygame as pg
 # spritesheet.                                                    #
 # =============================================================== #
 
+"""
+ADDING NEW MEMBERS TO THE TEXTURESET
+--------------------------------------
+1.  Add a new entry to the "textures" dictionary, with the string literal of the terrain type as the key
+    and a TerrainType object containing the texture as the value
+    Optional arguments can also be passed to the TerrainType constructor to specify the hitbox of the object 
+    (this technically allows for larger objects to be instantiated)
+2.  Add a new entry to the "code_to_textures_dictionary", with the string representation of the tile in the 
+    .txt map file as the key, and the string literal of the terrain type as the value
+    
+"""
+
 
 class Spritesheet:
     """Utility class to load animation sequences from a spritesheet"""

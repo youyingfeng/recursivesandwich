@@ -3,10 +3,20 @@ from .block import *
 from .player import *
 from .spritesheet import *
 
-# =============================================================== #
-# This file contains all high-level classes and methods required  #
-# in an ordinary game level.                                      #
-# =============================================================== #
+"""
+This file contains all high-level classes and methods required in an ordinary game level
+========================================================================================
+
+HOW TO MAKE A NEW LEVEL
+-------------------------
+1.  Make a new LevelTemplate class that has the following public attributes:
+        map: Map                    ->      
+        enemies: EnemyManager       ->      
+        starting_position: tuple    ->      Starting position of the player in the form (x, y)
+2.  Add your new LevelTemplate class to the level_template_list in the LevelManager class
+    Do remember to place it in the exact order that you want the level to appear in
+
+"""
 
 
 class LevelManager:

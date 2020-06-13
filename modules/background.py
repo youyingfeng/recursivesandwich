@@ -27,7 +27,7 @@ class StaticBackground(Background):
     def draw(self):
         self.surface.blit(self.background, self.blit_coordinates)
 
-    def update(self):
+    def update(self, *args):
         pass
 
 

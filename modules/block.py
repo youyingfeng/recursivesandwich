@@ -4,6 +4,10 @@ from .playerstate import GameEvent
 from .spritesheet import *
 
 
+"""
+This module holds the representation
+"""
+
 class Block(pg.sprite.Sprite):
 	BLOCK_SIZE = 25
 

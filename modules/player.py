@@ -4,10 +4,25 @@ from .playerstate import GameEvent
 from .spritesheet import Spritesheet
 from .components import *
 
-# =============================================================== #
-# This module contains all relevant classes required for the      #
-# instantiation of the Player and Enemies.                        #
-# =============================================================== #
+
+"""
+* =============================================================== *
+* This module contains all relevant classes required for the      *
+* instantiation of the Player and Enemies.                        *
+* =============================================================== *
+
+HOW TO MAKE A NEW ENEMY VARIANT
+-------------------------
+1.  Make a new EnemyType object with the following public attributes:
+        health: int                 ->      Maximum health of the Enemy
+        animation_library: dict     ->      Dictionary containing the different 
+                                            animation sequences to be played 
+                                            for each state
+        sound_library: dict         ->      Dictionary containing the different
+                                            sounds to be played for each state
+2.  Pass this EnemyType object to the Enemy constructor to instantiate a new variant 
+    of Enemy
+"""
 
 
 class Entity(pg.sprite.Sprite):
