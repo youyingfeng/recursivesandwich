@@ -25,6 +25,11 @@ class Block(pg.sprite.Sprite):
 							int(type_object.block_height * Block.BLOCK_SIZE))
 
 
+# All blocks can really just be surbordinated to this block
+class InteractiveBlock(Block):
+	pass
+
+
 class HazardousBlock(Block):
 	"""Represents a block that damages the player if the player comes into contact with it"""
 	def __init__(self, type_object, x, y):
@@ -52,9 +57,23 @@ class GatewayBlock(Block):
 			)
 
 
-# All blocks can really just be surbordinated to this block
-class InteractiveBlock(Block):
-	pass
+# Has potential for many variations
+class FallingBlock(Block):
+	def __init__(self, type_object, x, y):
+		super().__init__(type_object, x, y)
+		self.falling = False
+		self.vel = 1
+
+	def update(self, player):
+		if (self.rect.top == player.rect.bottom)\
+			and (self.rect.left < player.rect.left < self.rect.right\
+				or self.rect.left < player.rect.right < self.rect.right):
+			self.blit_rect.y += self.vel
+			self.rect.y = self.blit_rect.y
+
+			# This is necessary - or else, player will fluctuate between the IDLE and JUMPING state
+			# causing it to flash
+			player.rect.bottom = self.rect.top
 
 
 class Coin(Block):

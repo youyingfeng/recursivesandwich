@@ -109,8 +109,9 @@ class TextureSet:
                          "FLOOR_CENTER_EDGE": TerrainType(tileset.get_image_at(pg.Rect(48, 0, 16, 16))),
                          "FLOOR_RIGHT_EDGE": TerrainType(tileset.get_image_at(pg.Rect(64, 0, 16, 16))),
                          "SPIKES_UPRIGHT": TerrainType(tileset.get_image_at(pg.Rect(80, 96, 16, 16)), 0, 0.4, 1, 0.6),
-                         "ENTRANCE/EXIT": TerrainType(tileset.get_image_at(pg.Rect(32, 0, 16, 16))),
-                         "COIN": TerrainType(tileset.get_image_at(pg.Rect(240, 0, 16, 16)))
+                         "ENTRANCE/EXIT": TerrainType(tileset.get_image_at(pg.Rect(224, 32, 16, 16))),
+                         "COIN": TerrainType(tileset.get_image_at(pg.Rect(240, 0, 16, 16))),
+                         "FALLING BLOCK": TerrainType(tileset.get_image_at(pg.Rect(96, 0, 16, 16)))
                          }
 
         self.code_to_texture_dictionary = {"2": "FLOOR_LEFT_EDGE",
@@ -118,7 +119,8 @@ class TextureSet:
                                            "4": "FLOOR_RIGHT_EDGE",
                                            "s": "SPIKES_UPRIGHT",
                                            "e": "ENTRANCE/EXIT",
-                                           "c": "COIN"
+                                           "c": "COIN",
+                                           "f": "FALLING BLOCK"
                                            }
 
     def get_texture_from_code(self, code) -> TerrainType:
