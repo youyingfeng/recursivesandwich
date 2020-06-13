@@ -99,6 +99,7 @@ class Map:
         self.terrain_group = pg.sprite.RenderPlain()
         self.hazardous_terrain_group = pg.sprite.Group()
         self.coin_group = pg.sprite.Group()
+        self.falling_group = pg.sprite.Group()
         self.gateway_group = pg.sprite.GroupSingle()
         # Add blocks into the terrain group according to the map
         for y in range(len(game_map)):
@@ -123,10 +124,17 @@ class Map:
                         self.coin_group.add(new_coin)
 
                     elif tile_position_str == "e":
-                        new_block = GatewayBlock(self.textureset.get_texture_from_code(tile_position_str),
+                        new_gateway = GatewayBlock(self.textureset.get_texture_from_code(tile_position_str),
                                                    x * Block.BLOCK_SIZE,
                                                    y * Block.BLOCK_SIZE)
-                        self.gateway_group.add(new_block)
+                        self.gateway_group.add(new_gateway)
+
+                    elif tile_position_str == "f":
+                        new_falling_block = FallingBlock(self.textureset.get_texture_from_code(tile_position_str),
+                                                   x * Block.BLOCK_SIZE,
+                                                   y * Block.BLOCK_SIZE)
+                        self.terrain_group.add(new_falling_block)
+                        self.falling_group.add(new_falling_block)
 
                     else:
                         self.terrain_group.add(Block(self.textureset.get_texture_from_code(tile_position_str),
@@ -141,6 +149,7 @@ class Map:
         self.hazardous_terrain_group.update(player)
         self.coin_group.update(player)
         self.gateway_group.update(player)
+        self.falling_group.update(player)
 
     def render(self, camera, surface):
         for sprite in self.terrain_group:

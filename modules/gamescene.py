@@ -188,11 +188,11 @@ class GameScene(Scene):
 		self.parallax_background_2.draw()
 		self.parallax_background_3.draw()
 
-		# Draws the map and enemies
-		self.level_manager.level.render(self.camera, self.game_display)
-
 		# Draw player on game_display wrt camera position
 		self.player.render(self.camera, self.game_display)
+
+		# Draws the map and enemies
+		self.level_manager.level.render(self.camera, self.game_display)
 
 		# Draw GUI
 		self.hud.render(self.game_display)
