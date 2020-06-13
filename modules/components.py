@@ -1,15 +1,40 @@
 import pygame as pg
-from .playerstate import PlayerState, Direction
+from .entitystate import EntityState, Direction
 
+"""
+* =============================================================== *
+* This module contains Components, which determine the behavior   *
+* of the entity which contains it.                                *
+* Most of these Components are reusable, as they do not contain   *
+* information on state.                                           *
+* The only stateful Component in this module is the component     *
+* controlling animations, as the state of the animation is unique *
+* to each instance of an Entity.                                  *
+* =============================================================== *
 
-"""Components form the base of our entities. Here, I have abandoned the idea 
-of inheritance in favour of composition, as we were getting cancerous classes 
-with a lot of dependencies. Instead, entities are now defined by the type of 
-components we have. The bulk of the processing is now done by the components, 
-and the entities are basically containers for state. Some components will also 
-hold state. This follows the Component design pattern laid out in game programming 
-patterns. Hopefully this code is reusable for other classes. Physics is defo 
-reusable, as is render."""
+RATIONALE
+-------------------------
+Inheritance is a pain when dealing with complex objects, and runs the risk of 
+creating so-called "God objects" - objects which know too much about everything.
+This would result in a tightly-coupled system, which will be a pain to debug. 
+This also produces rather complicated inheritance trees, as objects inherit 
+from one another to determine its behaviour.
+
+To resolve this, we will use composition to determine the behaviour of entities.
+Behaviour code is now delegated to individual components held by the entity.
+
+Entity behaviour is now determined by what components it contains - rather than 
+what the entity is. This eliminates the need for complicated inheritance trees - 
+leaving us with a rather flat and easy-to-understand inheritance structure. This 
+also reduces the level of coupling - the Entity does not need to know how to do 
+Physics, or animate itself, et cetera. All these behaviours will now be handled 
+by resuable components.
+
+In this model, the Entity only needs to know information regarding its state - 
+where it is, what is its velocity, how much health it has left. It does not need 
+to know how to move itself, or how to animate itself. In short, the role of the 
+Entity is to act as a container for state.
+"""
 
 
 class Component:
@@ -27,23 +52,23 @@ class PlayerInputComponent(Component):
 
     def update(self, player, *args):
         current_keys = pg.key.get_pressed()
-        if player.state == PlayerState.IDLE:
+        if player.state == EntityState.IDLE:
             if current_keys[pg.K_LEFT]:
-                player.state = PlayerState.WALKING
+                player.state = EntityState.WALKING
                 player.direction = Direction.LEFT
                 player.x_velocity = -3
 
             if current_keys[pg.K_RIGHT]:
-                player.state = PlayerState.WALKING
+                player.state = EntityState.WALKING
                 player.direction = Direction.RIGHT
                 player.x_velocity = 3
 
             if current_keys[pg.K_SPACE]:
-                player.state = PlayerState.JUMPING
+                player.state = EntityState.JUMPING
                 player.y_velocity = -13
                 player.message("JUMP")
 
-        elif player.state == PlayerState.WALKING:
+        elif player.state == EntityState.WALKING:
             if current_keys[pg.K_LEFT]:
                 player.x_velocity = -3
                 player.direction = Direction.LEFT
@@ -53,15 +78,15 @@ class PlayerInputComponent(Component):
                 player.direction = Direction.RIGHT
 
             if not (current_keys[pg.K_LEFT] or current_keys[pg.K_RIGHT]):
-                player.state = PlayerState.IDLE
+                player.state = EntityState.IDLE
                 player.x_velocity = 0
 
             if current_keys[pg.K_SPACE]:
-                player.state = PlayerState.JUMPING
+                player.state = EntityState.JUMPING
                 player.y_velocity = -13
                 player.message("JUMP")
 
-        elif player.state == PlayerState.JUMPING:
+        elif player.state == EntityState.JUMPING:
             if current_keys[pg.K_LEFT]:
                 player.x_velocity = -3
                 player.direction = Direction.LEFT
@@ -91,27 +116,28 @@ class PhysicsComponent(Component):
         for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
             if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
                 entity.rect.top = colliding_sprite.rect.bottom
+                entity.y_velocity = 0
             if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
                 isJumping = False
-                if entity.state == PlayerState.JUMPING:
-                    entity.state = PlayerState.IDLE
+                if entity.state == EntityState.JUMPING:
+                    entity.state = EntityState.IDLE
                 entity.rect.bottom = colliding_sprite.rect.top
                 entity.y_velocity = 0
         # This is a hack to ensure that people fall properly
         if isJumping:
-            entity.state = PlayerState.JUMPING
-
-        entity.rect.x += entity.x_velocity
+            entity.state = EntityState.JUMPING
 
         # Then handles collisions along the x axis
+        entity.rect.x += entity.x_velocity
+
         for colliding_sprite in pg.sprite.spritecollide(entity, map.terrain_group, False):
             if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
                 entity.rect.left = colliding_sprite.rect.right
             if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
                 entity.rect.right = colliding_sprite.rect.left
 
-        map_width = map.dimensions[0]
         # Then keeps everything within map boundaries
+        map_width = map.dimensions[0]
         if entity.rect.top < 0:
             entity.rect.top = 0
         if entity.rect.left < 0:
@@ -120,8 +146,28 @@ class PhysicsComponent(Component):
             entity.rect.right = map_width
 
 
+# For simple and single animation of terrain, without any state
 class AnimationComponent(Component):
-    def __init__(self, animation_sequences, state: PlayerState):
+    def __init__(self, animation_sequence):
+        super().__init__()
+        self.animation_sequence = animation_sequence
+        self.frame_counter = 0
+        self.frames_per_update = 5
+        self.current_index = 0
+        self.animation_length = len(self.animation_sequence)
+
+    def update(self, entity):        
+        if self.frame_counter == 0:
+            # this will probably cause some anim bugs
+            self.current_index = (self.current_index + 1) % self.animation_length
+            entity.image = self.animation_sequence[self.current_index]
+
+    def get_current_image(self):
+        return self.animation_sequence[self.current_index]
+
+
+class PlayerAnimationComponent(Component):
+    def __init__(self, animation_sequences, state: EntityState):
         super().__init__()
         
         # Save a dictionary of animations
@@ -206,7 +252,7 @@ class EnemyAIInputComponent(Component):
         super().__init__()
 
     def update(self, entity, *args):
-        entity.state = PlayerState.WALKING
+        entity.state = EntityState.WALKING
         if entity.direction == Direction.LEFT:
             if entity.rect.x > entity.left_bound:
                 entity.x_velocity = -1
@@ -232,13 +278,14 @@ class EnemyDamageCollisionComponent(Component):
             # damage_rect = pg.Rect(entity.rect.topleft, (entity.rect.width, 5))     # Thin subrect at enemy's head
             # killing_rect = pg.Rect(player.rect.bottomleft, (player.rect.width, 5))  # Thin subrect at player's feet
             # if damage_rect.colliderect(killing_rect):
-            #     entity.dead = True
+            #     entity.take_damage()
             #     print("Player killed an enemy!")
             # else:
             #     player.take_damage()
-            if player.rect.bottom > entity.rect.y and player.y_velocity > 0:
-                entity.take_damage()
+            if player.rect.bottom < entity.rect.centery and player.y_velocity > 0:
+                entity.take_damage(100)
+                player.take_damage(0)
                 print("Player killed an enemy!")
             else:
-                player.take_damage()
+                player.take_damage(20)
 

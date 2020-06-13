@@ -1,20 +1,33 @@
 import pygame as pg
-
-from .animations import Spritesheet
+from .entitystate import GameEvent
+from .spritesheet import Spritesheet
 from .components import *
 
-# =============================================================== #
-# The Camera class keeps track of the viewport of the game using  #
-# a Rect. The object is always passed to the renderer when        #
-# rendering sprites onto the screen.                              #
-# =============================================================== #
+"""
+* =============================================================== *
+* This module contains all relevant classes required for the      *
+* instantiation of the Player and Enemies.                        *
+* =============================================================== *
+
+HOW TO MAKE A NEW ENEMY VARIANT
+-------------------------
+1.  Make a new EnemyType object with the following public attributes:
+        health: int                 ->      Maximum health of the Enemy
+        animation_library: dict     ->      Dictionary containing the different 
+                                            animation sequences to be played 
+                                            for each state
+        sound_library: dict         ->      Dictionary containing the different
+                                            sounds to be played for each state
+2.  Pass this EnemyType object to the Enemy constructor to instantiate a new variant 
+    of Enemy
+"""
 
 
 class Entity(pg.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
- 		# Defines the hitbox of the Entity. Must be redefined in the subclass.
+        # Defines the hitbox of the Entity. Must be redefined in the subclass.
         self.rect = None                   
 
         # Velocities
@@ -25,16 +38,16 @@ class Entity(pg.sprite.Sprite):
         self.direction = Direction.RIGHT
 
         # State of the entity  
-        self.state = PlayerState.IDLE
+        self.state = EntityState.IDLE
 
     def update(self, *args):
         raise NotImplementedError
 
 
 class Player(Entity):
+    """Represents the player character"""
     def __init__(self):
         super().__init__()
-        self.dead = False
         self.health = 100
 
         self.rect = pg.Rect(10, 10, 20, 30)
@@ -49,10 +62,10 @@ class Player(Entity):
 
         # Animations
         animation_library = {
-                            PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3),
-                            PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5),
-                            PlayerState.JUMPING: jump_spritesheet.get_images_at(0)
-                   	        }
+                            EntityState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3),
+                            EntityState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5),
+                            EntityState.JUMPING: jump_spritesheet.get_images_at(0)
+                            }
 
         # Sounds
         jump_sound = pg.mixer.Sound("assets/sound/sfx/jump.ogg")
@@ -65,7 +78,7 @@ class Player(Entity):
 
         # Components
         self.input_component = PlayerInputComponent()
-        self.animation_component = AnimationComponent(animation_library, self.state)
+        self.animation_component = PlayerAnimationComponent(animation_library, self.state)
         self.physics_component = PhysicsComponent()
         self.sound_component = SoundComponent(sound_library)
         self.render_component = RenderComponent()
@@ -75,14 +88,23 @@ class Player(Entity):
 
     # ---------- DIRTY METHODS ---------- #
     # These will be placed here until I can find a way to wrap them in a component nicely
-    def take_damage(self):
+    def take_damage(self, damage):
+        """Decreases the health of the player by the specified amount"""
         if self.is_immune():
             return
         else:
-            self.health -= 20
+            self.health -= damage
             self.last_collide_time = pg.time.get_ticks()
             self.message("HIT")
             self.y_velocity = -2
+
+        if self.health <= 0:
+            self.state = EntityState.DEAD
+            pg.event.post(
+                pg.event.Event(
+                    GameEvent.GAME_OVER.value
+                )
+            )
 
     def is_immune(self):
         return self.last_collide_time > pg.time.get_ticks() - 500
@@ -96,14 +118,23 @@ class Player(Entity):
         self.input_component.update(self)
 
     def update(self, map):
-        self.physics_component.update(self, map)
-        self.animation_component.update(self)
+        if self.rect.top > map.rect.bottom:
+            self.state = EntityState.DEAD
+            pg.event.post(
+                pg.event.Event(
+                    GameEvent.GAME_OVER.value
+                )
+            )
+        else:
+            self.physics_component.update(self, map)
+            self.animation_component.update(self)
 
     def render(self, camera, surface):
         self.render_component.update(self, camera, surface)
 
 
 class Enemy(Entity):
+    """Base class for all enemies"""
     def __init__(self, type_object, ai_component, physics_component, render_component, starting_position):
         super().__init__()
 
@@ -128,15 +159,16 @@ class Enemy(Entity):
         self.damage_collide_component = EnemyDamageCollisionComponent()
 
         # Animation and sound are taken from a type object
-        self.animation_component = AnimationComponent(type_object.animation_library, self.state)
+        self.animation_component = PlayerAnimationComponent(type_object.animation_library, self.state)
         self.sound_component = SoundComponent(type_object.sound_library)
 
         # Current Image
         self.image = self.animation_component.get_current_image()
 
-    def take_damage(self):
+    def take_damage(self, damage):
+        """Instantly kills the enemy"""
         # TODO: Properly handle animations for dying
-        self.state = PlayerState.DEAD
+        self.state = EntityState.DEAD
 
     def message(self, message):
         pass
@@ -152,6 +184,8 @@ class Enemy(Entity):
 
 
 class EnemyType:
+    """Template object representing the type of enemy, which is passed into the Enemy constructor to
+        instantiate an Enemy with the corresponding visuals, health and sounds"""
     def __init__(self):
         # Spritesheets
         idle_spritesheet = Spritesheet("assets/sprites/player/Idle.png", 1, 11)
@@ -163,10 +197,10 @@ class EnemyType:
 
         self.health = 100
         self.animation_library = {
-            PlayerState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
-            PlayerState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
-            PlayerState.JUMPING: jump_spritesheet.get_images_at(0),
-            PlayerState.DEAD: idle_spritesheet.get_images_at(0)
+            EntityState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10),
+            EntityState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11),
+            EntityState.JUMPING: jump_spritesheet.get_images_at(0),
+            EntityState.DEAD: idle_spritesheet.get_images_at(0)
         }
         self.sound_library = {
             "JUMP": jump_sound

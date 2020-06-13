@@ -1,21 +1,15 @@
 import pygame as pg
+from .components import *
+from .entitystate import GameEvent
+from .spritesheet import *
 
+"""
+* =============================================================== *
+* This module contains Blocks, which are representations of the   *
+* individual tiles of the game map.								  *
+* =============================================================== *
 
-# -------------------- Type objects to store hitboxes of different textures -------------------- #
-# This level of complication is really just to make life easier
-class TerrainType:
-	def __init__(self, image: pg.Surface, block_pos_x=0, block_pos_y=0, block_width=1, block_height=1):
-		# All numbers are relative to the size of a normal block (i.e. must be between 0 and 1, where 1 is the size of
-		# an actual block)
-		# self.block_pos_x = 0		# Left edge of the actual block
-		# self.block_pos_y = 0.4		# Top edge of the actual block
-		# self.block_width = 1		# Width of the actual block
-		# self.block_height = 0.6		# Height of the actual block
-		self.image = image
-		self.block_pos_x = block_pos_x
-		self.block_pos_y = block_pos_y
-		self.block_width = block_width
-		self.block_height = block_height
+"""
 
 
 class Block(pg.sprite.Sprite):
@@ -31,15 +25,73 @@ class Block(pg.sprite.Sprite):
 							int(type_object.block_height * Block.BLOCK_SIZE))
 
 
+# All blocks can really just be surbordinated to this block
+class InteractiveBlock(Block):
+	pass
+
+
 class HazardousBlock(Block):
+	"""Represents a block that damages the player if the player comes into contact with it"""
 	def __init__(self, type_object, x, y):
 		super().__init__(type_object, x, y)
 
 	def update(self, entity):
+		"""Checks for collison between the player and the Hazardous Block, and damages the player upon colliding"""
 		if (self.rect.left < entity.rect.left < self.rect.right or self.rect.left < entity.rect.right < self.rect.right)\
 				and self.rect.top == entity.rect.bottom:
-			entity.take_damage()
+			entity.take_damage(20)
 
 
+class GatewayBlock(Block):
+	"""Represents the endpoint of the level"""
+	def __init__(self, type_object, x, y):
+		super().__init__(type_object, x, y)
+
+	def update(self, player):
+		"""Checks if the player has collided with itself, and initiates a level transition if there is a collision"""
+		if player.rect.collidepoint(self.rect.centerx, self.rect.centery):
+			pg.event.post(
+				pg.event.Event(
+					GameEvent.SWITCH_LEVEL.value
+				)
+			)
 
 
+# Has potential for many variations
+class FallingBlock(Block):
+	def __init__(self, type_object, x, y):
+		super().__init__(type_object, x, y)
+		self.falling = False
+		self.vel = 1
+
+	def update(self, player):
+		if (self.rect.top == player.rect.bottom)\
+			and (self.rect.left < player.rect.left < self.rect.right\
+				or self.rect.left < player.rect.right < self.rect.right):
+			self.blit_rect.y += self.vel
+			self.rect.y = self.blit_rect.y
+
+			# This is necessary - or else, player will fluctuate between the IDLE and JUMPING state
+			# causing it to flash
+			player.rect.bottom = self.rect.top
+
+
+class Coin(Block):
+	"""Represents a coin which heals the player when picked up"""
+	def __init__(self, type_object, x, y):
+		super().__init__(type_object, x, y)
+		dungeon = Spritesheet("assets/textures/Dungeon/dungeon_spritesheet.png", 14, 23)
+		coin_animation = dungeon.get_images_at(15, 15, 15, 16, 16, 16, 17, 17, 17, 18, 18, 18)
+		self.animation_component = AnimationComponent(coin_animation)
+		self.coin_sound = pg.mixer.Sound("assets/sound/sfx/coin.ogg")
+
+	def update(self, entity):
+		"""Checks if the player has collided with the coin, healing the player if there is a collision,
+		and updates the animation of the coin"""
+		if pg.sprite.collide_rect(self, entity):
+			if entity.health < 100:
+				entity.health += 20
+			self.coin_sound.play()
+			self.kill()
+
+		self.animation_component.update(self)
