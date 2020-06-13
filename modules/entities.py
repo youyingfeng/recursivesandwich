@@ -1,9 +1,7 @@
 import pygame as pg
-
 from .entitystate import GameEvent
 from .spritesheet import Spritesheet
 from .components import *
-
 
 """
 * =============================================================== *

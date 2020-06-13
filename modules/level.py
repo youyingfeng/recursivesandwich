@@ -208,5 +208,3 @@ class EnemyManager:
     def render(self, camera, surface):
         for entity in self.sprite_list:
             entity.render(camera, surface)
-
-
