@@ -13,11 +13,11 @@ from modules.gamescene import SceneManager, TitleScene
 def main() -> None:
     """Initialises PyGame and invokes all the necessary functions and modules to run the game"""
 
-    # Pre-initialise sound
-    pg.mixer.init(44100, 16, 2, 512)
-
     # Initialise PyGame
     pg.init()
+
+    # Pre-initialise sound
+    pg.mixer.init(44100, 16, 2, 512)
 
     # Initialise window
     window = pg.display.set_mode((800, 600))
