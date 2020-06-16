@@ -8,19 +8,23 @@ import pygame.freetype as ft
 * =============================================================== *
 """
 
+
 class HeadsUpDisplay:
     """Manages all elements of the HUD"""
     def __init__(self):
+        # self.vignette = Vignette()
         self.healthbar = Healthbar()
         self.fps_counter = FPSCounter()
 
-    def update(self, player):
+    def update(self, player, camera):
         """Updates all the elements of the HUD"""
+        # self.vignette.update(player, camera)
         self.healthbar.update(player)
         self.fps_counter.update()
 
     def render(self, surface):
         """Renders the elements of the HUD onto the specified surface"""
+        # self.vignette.render(surface)
         self.healthbar.render(surface)
         self.fps_counter.render(surface)
 
@@ -64,3 +68,25 @@ class FPSCounter:
     def render(self, surface):
         """Renders the FPS counter at the top-right corner of the specified surface"""
         surface.blit(self.fps[0], (355, 20))
+
+
+class Vignette:
+    """Limits the vision of the player"""
+    # Since this is a post-process
+    def __init__(self):
+        self.image = pg.Surface((400, 300))
+
+    def update(self, player, camera):
+        """Marks a circular area around the player's position on the surface as transparent"""
+        self.image = pg.Surface((400, 300))
+        self.image.fill((20, 20, 20))
+        pg.draw.circle(self.image,
+                       (255, 255, 255),
+                       (player.rect.centerx - camera.rect.x,
+                        player.rect.centery - camera.rect.y),
+                       100)
+        self.image.set_colorkey((255, 255, 255))
+
+    def render(self, surface: pg.Surface):
+        """Renders the vignette onto the screen"""
+        surface.blit(self.image, (0, 0))

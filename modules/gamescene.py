@@ -197,7 +197,7 @@ class GameScene(Scene):
     def update(self):
         self.player.update(self.level_manager.level.map)
         self.level_manager.level.update(self.player)
-        self.hud.update(self.player)
+        self.hud.update(self.player, self.camera)
 
         # Move camera to player's position
         self.camera.follow_target(self.player)
@@ -226,6 +226,35 @@ class GameScene(Scene):
         # Blit game_display on window surface
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 
+    def initialise(self):
+        # Initialise the level manager
+        self.level_manager = LevelManager()
+
+        # Initialize camera
+        self.camera = Camera(SURFACE_SIZE, self.level_manager.level.map)
+
+        # Initialize player
+        self.player = Player()
+        self.player_sprite_group = pg.sprite.GroupSingle(self.player)
+
+        # Initialize GUI
+        self.hud = HeadsUpDisplay()
+
+        # TODO: Delegate background handling to Map, since Maps should know their background
+        # Initialize backgrounds
+        self.static_background = StaticBackground(hills_layer_1, self.game_display)
+        self.parallax_background_1 = ParallaxBackground(hills_layer_2, self.game_display)
+        self.parallax_background_2 = ParallaxBackground(hills_layer_3, self.game_display)
+        self.parallax_background_3 = ParallaxBackground(hills_layer_4, self.game_display)
+
+        # Play BGM
+        pg.mixer.music.load("assets/sound/music/Pixel Peeker Polka - faster.ogg")
+        pg.mixer.music.set_volume(0.5)
+        pg.mixer.music.play(-1)
+
+    def cleanup(self):
+        pass
+
 
 class GameOverScene(Scene):
     """Represents the "Game Over" screen"""
@@ -246,11 +275,9 @@ class GameOverScene(Scene):
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
-        # If f gets pressed switch to GameScene
-        # TODO: HANDLE THIS BETTER TO ENSURE NO MEMORY BLOAT
-        current_keys = pg.key.get_pressed()
-        if current_keys[pg.K_f]:
-            self.manager.switch_to_scene(GameScene())
+            elif event.type == pg.KEYDOWN and event.key == pg.K_f:
+                # TODO: HANDLE THIS BETTER TO ENSURE NO MEMORY BLOAT
+                self.manager.switch_to_scene(GameScene())
 
     def update(self):
         pass
@@ -265,6 +292,25 @@ class GameOverScene(Scene):
 
         # Blit game_display on window surface
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
+
+
+class GameBeatenScene(Scene):
+    def __init__(self):
+        super().__init__()
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+            elif event.type == pg.KEYDOWN:
+                pass
+
+    def update(self, *args):
+        pass
+
+    def render(self, surface: pg.Surface):
+        pass
 
 
 class PauseScene(Scene):
