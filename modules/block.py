@@ -17,7 +17,7 @@ class Block(pg.sprite.Sprite):
 
 	def __init__(self, type_object: TerrainType, x, y):
 		super().__init__()
-		self.image = pg.transform.scale(type_object.image.convert(), (Block.BLOCK_SIZE, Block.BLOCK_SIZE))
+		self.image = pg.transform.scale(type_object.image.convert_alpha(), (Block.BLOCK_SIZE, Block.BLOCK_SIZE))
 		self.blit_rect = pg.Rect(x, y, Block.BLOCK_SIZE, Block.BLOCK_SIZE)
 		self.rect = pg.Rect(x + int(type_object.block_pos_x * Block.BLOCK_SIZE),
 							y + int(type_object.block_pos_y * Block.BLOCK_SIZE),
@@ -74,6 +74,35 @@ class FallingBlock(Block):
 			# This is necessary - or else, player will fluctuate between the IDLE and JUMPING state
 			# causing it to flash
 			player.rect.bottom = self.rect.top
+
+
+class MovingBlock(Block):
+	def __init__(self, type_object, x, y):
+		super().__init__(type_object, x, y)
+		self.vel = 1
+
+	def update(self, player):
+		if (self.rect.top == player.rect.bottom)\
+			and (self.rect.left < player.rect.left < self.rect.right\
+				or self.rect.left < player.rect.right < self.rect.right):
+			if (player.direction == Direction.RIGHT):
+				self.blit_rect.x += self.vel
+				self.rect.x = self.blit_rect.x
+				player.rect.x = self.rect.x
+			if (player.direction == Direction.LEFT):
+				self.blit_rect.x -= self.vel
+				self.rect.x = self.blit_rect.x
+				player.rect.x = self.rect.x
+
+			if pg.key.get_pressed()[pg.K_UP]:
+				self.blit_rect.y -= self.vel
+				self.rect.y = self.blit_rect.y
+				player.rect.bottom = self.rect.top
+			elif pg.key.get_pressed()[pg.K_DOWN]:
+				self.blit_rect.y += self.vel
+				self.rect.y = self.blit_rect.y
+				player.rect.bottom = self.rect.top
+
 
 
 class Coin(Block):
