@@ -50,6 +50,8 @@ class Player(Entity):
         super().__init__()
         self.health = 100
 
+        # self.can_climb = False
+
         self.rect = pg.Rect(10, 10, 20, 30)
         self.blit_rect = pg.Rect(15, 3.5, 50, 30)
 
@@ -59,12 +61,15 @@ class Player(Entity):
         idle_spritesheet = Spritesheet("assets/textures/player/adventurer-idle.png", 1, 4)
         run_spritesheet = Spritesheet("assets/textures/player/adventurer-run.png", 1, 6)
         jump_spritesheet = Spritesheet("assets/textures/player/adventurer-jump.png", 1, 1)
+        climb_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-climb.png", 1, 4)
 
         # Animations
         animation_library = {
                             EntityState.IDLE: idle_spritesheet.get_images_at(0, 1, 2, 3),
                             EntityState.WALKING: run_spritesheet.get_images_at(0, 1, 2, 3, 4, 5),
-                            EntityState.JUMPING: jump_spritesheet.get_images_at(0)
+                            EntityState.JUMPING: jump_spritesheet.get_images_at(0),
+                            EntityState.HANGING: climb_spritesheet.get_images_at(0),
+                            EntityState.CLIMBING: climb_spritesheet.get_images_at(0, 1, 2, 3)
                             }
 
         # Sounds
@@ -174,10 +179,10 @@ class Enemy(Entity):
         pass
     
     def update(self, map, player):
-        self.input_component.update(self)
         self.physics_component.update(self, map)
         self.damage_collide_component.update(self, player)
         self.animation_component.update(self)
+        self.input_component.update(self)
 
     def render(self, camera, surface):
         self.render_component.update(self, camera, surface)

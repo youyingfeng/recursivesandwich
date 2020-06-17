@@ -104,7 +104,6 @@ class MovingBlock(Block):
 				player.rect.bottom = self.rect.top
 
 
-
 class Coin(Block):
 	"""Represents a coin which heals the player when picked up"""
 	def __init__(self, type_object, x, y):
@@ -124,3 +123,22 @@ class Coin(Block):
 			self.kill()
 
 		self.animation_component.update(self)
+
+
+class Ladder(Block):
+	def __init__(self, type_object, x, y):
+		super().__init__(type_object, x, y)
+		self.mid_rect = pg.Rect(self.rect.centerx - 0.5, self.rect.top, 1, self.rect.height)
+
+	def update(self, entity):
+		current_keys = pg.key.get_pressed()
+		entity_mid_rect = pg.Rect(entity.rect.centerx - 0.5, entity.rect.top, 1, entity.rect.height)
+
+		# A limitation that needs to be addressed is:
+		# You cannot enter the HANGING state from JUMPINNG, because it could trigger endless jumping
+		if self.mid_rect.colliderect(entity.rect) and entity.state != EntityState.JUMPING:
+			if current_keys[pg.K_UP] or current_keys[pg.K_DOWN]:
+				entity.state = EntityState.HANGING
+
+
+

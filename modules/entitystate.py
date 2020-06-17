@@ -12,6 +12,8 @@ class EntityState(Enum):
     WALKING = 1
     JUMPING = 2
     DEAD = 3
+    HANGING = 4
+    CLIMBING = 5
 
 
 class Direction(Enum):
