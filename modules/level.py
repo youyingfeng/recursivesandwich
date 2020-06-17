@@ -113,6 +113,7 @@ class Map:
         self.coin_group = pg.sprite.Group()
         self.falling_group = pg.sprite.Group()
         self.moving_group = pg.sprite.Group()
+        self.ladder_group = pg.sprite.Group()
         self.gateway_group = pg.sprite.GroupSingle()
         # Add blocks into the terrain group according to the map
         for y in range(len(game_map)):
@@ -155,6 +156,12 @@ class Map:
                         self.moving_group.add(new_moving_block)
                         self.terrain_group.add(new_moving_block)
 
+                    elif tile_position_str == "l":
+                        new_ladder = Ladder(self.textureset.get_texture_from_code(tile_position_str),
+                                                   x * Block.BLOCK_SIZE,
+                                                   y * Block.BLOCK_SIZE)
+                        self.ladder_group.add(new_ladder)
+
                     else:
                         self.terrain_group.add(Block(self.textureset.get_texture_from_code(tile_position_str),
                                                      x * Block.BLOCK_SIZE,
@@ -170,6 +177,7 @@ class Map:
         self.gateway_group.update(player)
         self.falling_group.update(player)
         self.moving_group.update(player)
+        self.ladder_group.update(player)
 
     def render(self, camera, surface):
         for sprite in self.terrain_group:
@@ -185,6 +193,10 @@ class Map:
                 surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
 
         for sprite in self.gateway_group:
+            if camera.rect.colliderect(sprite.rect):
+                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+
+        for sprite in self.ladder_group:
             if camera.rect.colliderect(sprite.rect):
                 surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
 
