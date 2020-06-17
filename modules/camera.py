@@ -27,10 +27,8 @@ class Camera:
     def follow_target(self, target):
         # Give the camera some lag
         lerp = 0.1
-        new_centerx = target.rect.centerx
-        new_centery = target.rect.centery
-        self.rect.x += int((new_centerx - self.rect.centerx) * lerp)
-        self.rect.y += int((new_centery - self.rect.centery) * lerp * 0.5)
+        self.rect.x += int((target.rect.centerx - self.rect.centerx) * lerp)
+        self.rect.y += int((target.rect.centery - self.rect.centery) * lerp * 0.5)
 
         if self.rect.top < 0:
             self.rect.top = 0
@@ -42,8 +40,8 @@ class Camera:
             self.rect.right = self.boundaries.right
 
     def snap_to_target(self, target):
-        self.rect.x = target.rect.centerx
-        self.rect.y = target.rect.centery
+        self.rect.centerx = target.rect.centerx
+        self.rect.centery = target.rect.centery
 
         if self.rect.top < 0:
             self.rect.top = 0

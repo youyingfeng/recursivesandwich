@@ -109,8 +109,8 @@ class TitleScene(Scene):
         self.text_blit_position = (int((self.game_display.get_width() - self.text[0].get_width()) / 2), 200)
 
         # Play BGM
-        pg.mixer.music.load("assets/sound/music/Latin Industries.ogg")
-        pg.mixer.music.set_volume(0.2)
+        pg.mixer.music.load("assets/sound/music/Debris of the Lost.ogg")
+        pg.mixer.music.set_volume(0.5)
         pg.mixer.music.play(-1)
 
     def handle_events(self):
@@ -171,8 +171,8 @@ class GameScene(Scene):
         self.parallax_background_3 = ParallaxBackground(hills_layer_4, self.game_display)
 
         # Play BGM
-        pg.mixer.music.load("assets/sound/music/Pixel Peeker Polka - faster.ogg")
-        pg.mixer.music.set_volume(0.5)
+        pg.mixer.music.load("assets/sound/music/Deep Dream.ogg")
+        pg.mixer.music.set_volume(0.8)
         pg.mixer.music.play(-1)
 
     def handle_events(self):
