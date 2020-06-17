@@ -76,8 +76,8 @@ class TerrainType:
 
 class Tileset:
     """Utility class to load static textures from a spritesheet"""
-    def __init__(self):
-        self.spritesheet = pg.image.load("assets/textures/Dungeon/dungeon_spritesheet.png")
+    def __init__(self, filepath):
+        self.spritesheet = pg.image.load(filepath)
 
     def get_image_at(self, rectangle, colorkey=None) -> pg.Surface:
         """Loads the image at the area specified by the given rectangle"""
@@ -88,7 +88,7 @@ class Tileset:
         image.blit(self.spritesheet, (0, 0), rect)
 
         if colorkey is None:
-            image.set_colorkey((0, 0, 0))
+            image.set_colorkey((255, 255, 255))
         else:
             if colorkey == -1:
                 colorkey = image.get_at((0,0))
@@ -103,13 +103,13 @@ class TextureSet:
     """Contains a dictionary of the types of tiles and its corresponding TerrainType objects,
     and allows for the retrieval for the corresponding TerrainType object of the specified tile type"""
     def __init__(self):
-        tileset = Tileset()
-        temp_texture = pg.Surface((16, 16)).fill((255, 0, 255))
-        self.textures = {"FLOOR_LEFT_EDGE": TerrainType(tileset.get_image_at(pg.Rect(32, 0, 16, 16))),
-                         "FLOOR_CENTER_EDGE": TerrainType(tileset.get_image_at(pg.Rect(48, 0, 16, 16))),
-                         "FLOOR_RIGHT_EDGE": TerrainType(tileset.get_image_at(pg.Rect(64, 0, 16, 16))),
-                         "SPIKES_UPRIGHT": TerrainType(tileset.get_image_at(pg.Rect(80, 96, 16, 16)), 0, 0.4, 1, 0.6),
-                         "ENTRANCE/EXIT": TerrainType(tileset.get_image_at(pg.Rect(224, 32, 16, 16))),
+        tileset = Tileset("assets/textures/Dungeon/dungeon_spritesheet.png")
+        new_tileset = Tileset("assets/textures/terrain/tileset.png")
+        self.textures = {"FLOOR_LEFT_EDGE": TerrainType(new_tileset.get_image_at(pg.Rect(0, 0, 16, 16))),
+                         "FLOOR_CENTER_EDGE": TerrainType(new_tileset.get_image_at(pg.Rect(16, 0, 16, 16))),
+                         "FLOOR_RIGHT_EDGE": TerrainType(new_tileset.get_image_at(pg.Rect(32, 0, 16, 16))),
+                         "SPIKES_UPRIGHT": TerrainType(new_tileset.get_image_at(pg.Rect(0, 48, 16, 16)), 0, 0.4, 1, 0.6),
+                         "ENTRANCE/EXIT": TerrainType(new_tileset.get_image_at(pg.Rect(0, 0, 16, 16))),
                          "COIN": TerrainType(tileset.get_image_at(pg.Rect(240, 0, 16, 16))),
                          "FALLING BLOCK": TerrainType(tileset.get_image_at(pg.Rect(96, 0, 16, 16))),
                          "MOVING BLOCK": TerrainType(pg.image.load("assets/textures/cloud.png")),
