@@ -56,9 +56,9 @@ class Player(Entity):
         self.last_collide_time = 0
 
         # Spritesheets
-        idle_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-idle.png", 1, 4)
-        run_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-run.png", 1, 6)
-        jump_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-jump.png", 1, 1)
+        idle_spritesheet = Spritesheet("assets/textures/player/adventurer-idle.png", 1, 4)
+        run_spritesheet = Spritesheet("assets/textures/player/adventurer-run.png", 1, 6)
+        jump_spritesheet = Spritesheet("assets/textures/player/adventurer-jump.png", 1, 1)
 
         # Animations
         animation_library = {
