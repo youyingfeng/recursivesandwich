@@ -114,6 +114,7 @@ class Map:
         self.falling_group = pg.sprite.Group()
         self.moving_group = pg.sprite.Group()
         self.ladder_group = pg.sprite.Group()
+        self.pushable_group = pg.sprite.Group()
         self.gateway_group = pg.sprite.GroupSingle()
         # Add blocks into the terrain group according to the map
         for y in range(len(game_map)):
@@ -162,6 +163,13 @@ class Map:
                                                    y * Block.BLOCK_SIZE)
                         self.ladder_group.add(new_ladder)
 
+                    elif tile_position_str == "p":
+                        new_pushable = Pushable(self.textureset.get_texture_from_code(tile_position_str),
+                                                   x * Block.BLOCK_SIZE,
+                                                   y * Block.BLOCK_SIZE)
+                        self.pushable_group.add(new_pushable)
+                        self.terrain_group.add(new_pushable)
+
                     else:
                         self.terrain_group.add(Block(self.textureset.get_texture_from_code(tile_position_str),
                                                      x * Block.BLOCK_SIZE,
@@ -175,11 +183,16 @@ class Map:
         self.hazardous_terrain_group.update(player)
         self.coin_group.update(player)
         self.gateway_group.update(player)
-        self.falling_group.update(player)
+        self.falling_group.update(player, self.pushable_group)
         self.moving_group.update(player)
         self.ladder_group.update(player)
+        self.pushable_group.update(player, self.terrain_group)
 
     def render(self, camera, surface):
+        for sprite in self.ladder_group:
+            if camera.rect.colliderect(sprite.rect):
+                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+
         for sprite in self.terrain_group:
             if camera.rect.colliderect(sprite.rect):
                 surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
@@ -188,15 +201,7 @@ class Map:
             if camera.rect.colliderect(sprite.rect):
                 surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
 
-        for sprite in self.moving_group:
-            if camera.rect.colliderect(sprite.rect):
-                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
-
         for sprite in self.gateway_group:
-            if camera.rect.colliderect(sprite.rect):
-                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
-
-        for sprite in self.ladder_group:
             if camera.rect.colliderect(sprite.rect):
                 surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
 

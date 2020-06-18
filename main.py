@@ -16,9 +16,6 @@ def main() -> None:
     # Pre-initialise sound
     pg.mixer.init(44100, 16, 2, 512)
 
-    # Hope this fixes the issue
-    pg.mixer.init()
-
     # Initialise PyGame
     pg.init()
 

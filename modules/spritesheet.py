@@ -107,7 +107,7 @@ class TextureSet:
         new_tileset = Tileset("assets/textures/environment/static/terrain.png")
         decorations = Tileset("assets/textures/environment/static/decorations.png")
         self.textures = {"SPIKES_UPRIGHT": TerrainType(decorations.get_image_at(pg.Rect(208, 196, 16, 16)), 0, 0.4, 1, 0.6),
-                         "ENTRANCE/EXIT": TerrainType(new_tileset.get_image_at(pg.Rect(0, 0, 16, 16))),
+                         "ENTRANCE/EXIT": TerrainType(new_tileset.get_image_at(pg.Rect(1584, 464, 32, 28)), 0, -0.5, 1, 1.5),
                          "COIN": TerrainType(old_tileset.get_image_at(pg.Rect(240, 0, 16, 16))),
                          "FALLING BLOCK": TerrainType(new_tileset.get_image_at(pg.Rect(208, 672, 32, 32))),
                          "MOVING BLOCK": TerrainType(pg.image.load("assets/textures/cloud.png")),
@@ -117,7 +117,8 @@ class TextureSet:
                          "WALL_LEFT": None,
                          "WALL_RIGHT": None,
                          "CEILING": None,
-                         "FLOOR": TerrainType(new_tileset.get_image_at(pg.Rect(240, 720, 32, 32)))
+                         "FLOOR": TerrainType(new_tileset.get_image_at(pg.Rect(240, 720, 32, 32))),
+                         "PUSHABLE": TerrainType(decorations.get_image_at(pg.Rect(209, 113, 13, 13)))
                          }
 
         self.code_to_texture_dictionary = {"2": "FLOOR",
@@ -128,7 +129,8 @@ class TextureSet:
                                            "c": "COIN",
                                            "f": "FALLING BLOCK",
                                            "m": "MOVING BLOCK",
-                                           "l": "LADDER"
+                                           "l": "LADDER",
+                                           "p": "PUSHABLE"
                                            }
 
     def get_texture_from_code(self, code) -> TerrainType:
