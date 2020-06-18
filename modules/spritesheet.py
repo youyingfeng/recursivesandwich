@@ -88,7 +88,7 @@ class Tileset:
         image.blit(self.spritesheet, (0, 0), rect)
 
         if colorkey is None:
-            image.set_colorkey((255, 255, 255))
+            image.set_colorkey((0, 0, 0))
         else:
             if colorkey == -1:
                 colorkey = image.get_at((0,0))
@@ -103,22 +103,26 @@ class TextureSet:
     """Contains a dictionary of the types of tiles and its corresponding TerrainType objects,
     and allows for the retrieval for the corresponding TerrainType object of the specified tile type"""
     def __init__(self):
-        tileset = Tileset("assets/textures/Dungeon/dungeon_spritesheet.png")
-        new_tileset = Tileset("assets/textures/terrain/tileset.png")
-        self.textures = {"FLOOR_LEFT_EDGE": TerrainType(new_tileset.get_image_at(pg.Rect(0, 0, 16, 16))),
-                         "FLOOR_CENTER_EDGE": TerrainType(new_tileset.get_image_at(pg.Rect(16, 0, 16, 16))),
-                         "FLOOR_RIGHT_EDGE": TerrainType(new_tileset.get_image_at(pg.Rect(32, 0, 16, 16))),
-                         "SPIKES_UPRIGHT": TerrainType(new_tileset.get_image_at(pg.Rect(0, 48, 16, 16)), 0, 0.4, 1, 0.6),
+        old_tileset = Tileset("assets/textures/Dungeon/dungeon_spritesheet.png")
+        new_tileset = Tileset("assets/textures/environment/static/terrain.png")
+        decorations = Tileset("assets/textures/environment/static/decorations.png")
+        self.textures = {"SPIKES_UPRIGHT": TerrainType(decorations.get_image_at(pg.Rect(208, 196, 16, 16)), 0, 0.4, 1, 0.6),
                          "ENTRANCE/EXIT": TerrainType(new_tileset.get_image_at(pg.Rect(0, 0, 16, 16))),
-                         "COIN": TerrainType(tileset.get_image_at(pg.Rect(240, 0, 16, 16))),
-                         "FALLING BLOCK": TerrainType(tileset.get_image_at(pg.Rect(96, 0, 16, 16))),
+                         "COIN": TerrainType(old_tileset.get_image_at(pg.Rect(240, 0, 16, 16))),
+                         "FALLING BLOCK": TerrainType(new_tileset.get_image_at(pg.Rect(208, 672, 32, 32))),
                          "MOVING BLOCK": TerrainType(pg.image.load("assets/textures/cloud.png")),
-                         "LADDER": TerrainType(tileset.get_image_at(pg.Rect(112, 32, 16, 16)))
+                         "LADDER": TerrainType(decorations.get_image_at(pg.Rect(184, 16, 32, 32))),
+                         "CORNER_BOTTOM_LEFT": TerrainType(new_tileset.get_image_at(pg.Rect(160, 720, 32, 32))),
+                         "CORNER_BOTTOM_RIGHT": TerrainType(new_tileset.get_image_at(pg.Rect(512, 720, 32, 32))),
+                         "WALL_LEFT": None,
+                         "WALL_RIGHT": None,
+                         "CEILING": None,
+                         "FLOOR": TerrainType(new_tileset.get_image_at(pg.Rect(240, 720, 32, 32)))
                          }
 
-        self.code_to_texture_dictionary = {"2": "FLOOR_LEFT_EDGE",
-                                           "3": "FLOOR_CENTER_EDGE",
-                                           "4": "FLOOR_RIGHT_EDGE",
+        self.code_to_texture_dictionary = {"2": "FLOOR",
+                                           "3": "FLOOR",
+                                           "4": "FLOOR",
                                            "s": "SPIKES_UPRIGHT",
                                            "e": "ENTRANCE/EXIT",
                                            "c": "COIN",

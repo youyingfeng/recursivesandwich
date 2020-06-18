@@ -18,16 +18,14 @@ class Block(pg.sprite.Sprite):
 	def __init__(self, type_object: TerrainType, x, y):
 		super().__init__()
 		self.image = pg.transform.scale(type_object.image.convert_alpha(), (Block.BLOCK_SIZE, Block.BLOCK_SIZE))
-		self.blit_rect = pg.Rect(x, y, Block.BLOCK_SIZE, Block.BLOCK_SIZE)
+		self.blit_rect = pg.Rect(x + int(type_object.block_pos_x * Block.BLOCK_SIZE),
+							y + int(type_object.block_pos_y * Block.BLOCK_SIZE),
+							int(type_object.block_width * Block.BLOCK_SIZE),
+							int(type_object.block_height * Block.BLOCK_SIZE))
 		self.rect = pg.Rect(x + int(type_object.block_pos_x * Block.BLOCK_SIZE),
 							y + int(type_object.block_pos_y * Block.BLOCK_SIZE),
 							int(type_object.block_width * Block.BLOCK_SIZE),
 							int(type_object.block_height * Block.BLOCK_SIZE))
-
-
-# All blocks can really just be surbordinated to this block
-class InteractiveBlock(Block):
-	pass
 
 
 class HazardousBlock(Block):

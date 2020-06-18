@@ -179,10 +179,10 @@ class Enemy(Entity):
         pass
     
     def update(self, map, player):
+        self.input_component.update(self)
         self.physics_component.update(self, map)
         self.damage_collide_component.update(self, player)
         self.animation_component.update(self)
-        self.input_component.update(self)
 
     def render(self, camera, surface):
         self.render_component.update(self, camera, surface)

@@ -42,17 +42,6 @@ SURFACE_SIZE = (400, 300)
 ft.init()
 freetype = ft.Font("assets/fonts/pixChicago.ttf", 8)
 
-# Colour tuples
-BLACK = (20, 20, 20)
-WHITE = (235, 235, 235)
-LIGHT_MAGENTA = (158, 99, 95)
-
-# Hills background filepaths
-hills_layer_1 = "assets/textures/Hills/Hills Layer 01.png"
-hills_layer_2 = "assets/textures/Hills/Hills Layer 02.png"
-hills_layer_3 = "assets/textures/Hills/Hills Layer 03.png"
-hills_layer_4 = "assets/textures/Hills/Hills Layer 04.png"
-
 
 class Scene:
     """Represents a scene in the program, which is analogous to the state of the game"""
@@ -95,13 +84,12 @@ class TitleScene(Scene):
         super().__init__()
 
         # Backgrounds
-        self.static_background = StaticBackground(hills_layer_1, self.game_display)
-        self.scrolling_background_1 = ScrollingBackground(hills_layer_2, self.game_display)
-        self.scrolling_background_2 = ScrollingBackground(hills_layer_3, self.game_display)
-        self.scrolling_background_3 = ScrollingBackground(hills_layer_4, self.game_display)
+        self.backgrounds = (StaticBackground("assets/textures/background/01_background.png", self.game_display),
+                            StaticBackground("assets/textures/background/03 background B.png", self.game_display),
+                            StaticBackground("assets/textures/background/04 background.png", self.game_display))
 
         # Initialize title text
-        self.title = freetype.render("THE TOWER", LIGHT_MAGENTA, None, 0, 0, 32)
+        self.title = freetype.render("THE TOWER", (60, 25, 25), None, 0, 0, 32)
         self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
 
         # Initialize instruction text
@@ -124,17 +112,12 @@ class TitleScene(Scene):
                 self.manager.switch_to_scene(GameScene())
 
     def update(self):
-        # Update positions of all scrolling backgrounds
-        self.scrolling_background_1.update(0.2)
-        self.scrolling_background_2.update(0.5)
-        self.scrolling_background_3.update(0.8)
+        pass
 
     def render(self, surface: pg.Surface):
         # Blit backgrounds on game_display
-        self.static_background.render()
-        self.scrolling_background_1.render()
-        self.scrolling_background_2.render()
-        self.scrolling_background_3.render()
+        for background in self.backgrounds:
+            background.render()
 
         # Blit text on game_display
         self.game_display.blit(self.title[0], self.title_blit_position)
@@ -165,10 +148,10 @@ class GameScene(Scene):
 
         # TODO: Delegate background handling to Map, since Maps should know their background
         # Initialize backgrounds
-        self.static_background = StaticBackground(hills_layer_1, self.game_display)
-        self.parallax_background_1 = ParallaxBackground(hills_layer_2, self.game_display)
-        self.parallax_background_2 = ParallaxBackground(hills_layer_3, self.game_display)
-        self.parallax_background_3 = ParallaxBackground(hills_layer_4, self.game_display)
+        self.backgrounds = (StaticBackground("assets/textures/background/01_background.png", self.game_display),
+                            StaticBackground("assets/textures/background/03 background B.png", self.game_display),
+                            StaticBackground("assets/textures/background/04 background.png", self.game_display))
+
 
         # Play BGM
         pg.mixer.music.load("assets/sound/music/Deep Dream.ogg")
@@ -202,17 +185,10 @@ class GameScene(Scene):
         # Move camera to player's position
         self.camera.follow_target(self.player)
 
-        # Update parallax backgrounds wrt camera position
-        self.parallax_background_1.update(0.2, self.camera)
-        self.parallax_background_2.update(0.5, self.camera)
-        self.parallax_background_3.update(0.8, self.camera)
-
     def render(self, surface):
         # Blit backgrounds on game_display
-        self.static_background.render()
-        self.parallax_background_1.render()
-        self.parallax_background_2.render()
-        self.parallax_background_3.render()
+        for background in self.backgrounds:
+            background.render()
 
         # Draws the map and enemies
         self.level_manager.level.render(self.camera, self.game_display)
@@ -227,30 +203,7 @@ class GameScene(Scene):
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 
     def initialise(self):
-        # Initialise the level manager
-        self.level_manager = LevelManager()
-
-        # Initialize camera
-        self.camera = Camera(SURFACE_SIZE, self.level_manager.level.map)
-
-        # Initialize player
-        self.player = Player()
-        self.player_sprite_group = pg.sprite.GroupSingle(self.player)
-
-        # Initialize GUI
-        self.hud = HeadsUpDisplay()
-
-        # TODO: Delegate background handling to Map, since Maps should know their background
-        # Initialize backgrounds
-        self.static_background = StaticBackground(hills_layer_1, self.game_display)
-        self.parallax_background_1 = ParallaxBackground(hills_layer_2, self.game_display)
-        self.parallax_background_2 = ParallaxBackground(hills_layer_3, self.game_display)
-        self.parallax_background_3 = ParallaxBackground(hills_layer_4, self.game_display)
-
-        # Play BGM
-        pg.mixer.music.load("assets/sound/music/Pixel Peeker Polka - faster.ogg")
-        pg.mixer.music.set_volume(0.5)
-        pg.mixer.music.play(-1)
+        pass
 
     def cleanup(self):
         pass
@@ -263,11 +216,11 @@ class GameOverScene(Scene):
         super().__init__()
 
         # Initialize title
-        self.title = freetype.render("GAME OVER", WHITE, None, 0, 0, 32)
+        self.title = freetype.render("GAME OVER", (235, 235, 235), None, 0, 0, 32)
         self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
 
         # Initialize subtitle
-        self.subtitle = freetype.render("Press F to pay respects", WHITE)
+        self.subtitle = freetype.render("Press F to pay respects", (235, 235, 235))
         self.subtitle_blit_position = (int((self.game_display.get_width() - self.subtitle[0].get_width()) / 2), 200)
 
     def handle_events(self):
@@ -284,7 +237,7 @@ class GameOverScene(Scene):
 
     def render(self, surface: pg.Surface):
         # Fill game_display with black
-        self.game_display.fill(BLACK)
+        self.game_display.fill((0, 0, 0))
 
         # Blit title and subtitle on game_display
         self.game_display.blit(self.title[0], self.title_blit_position)
@@ -333,7 +286,7 @@ class PauseScene(Scene):
         pass
 
     def render(self, surface: pg.Surface):
-        self.game_display.fill(BLACK)
+        self.game_display.fill((0, 0, 0))
         self.game_display.blit(self.text[0], self.text_blit_position)
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 

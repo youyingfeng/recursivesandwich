@@ -25,12 +25,21 @@ class StaticBackground:
     """Handles the rendering of a static, unmoving background, which does not change with the camera position"""
     def __init__(self, filepath: str, surface: pg.Surface):
         self.surface = surface
-        self.image = pg.image.load(filepath).convert()
-        self.background = pg.transform.scale(self.image,
-                                             (self.image.get_width() *
-                                              int(surface.get_height() / self.image.get_height()),
-                                              surface.get_height()))
-        self.blit_coordinates = ((self.surface.get_width() - self.background.get_width()) / 2, 0)
+        self.image = pg.image.load(filepath).convert_alpha()
+        # scales the image to fill the screen
+        if self.image.get_width() / self.image.get_height() > surface.get_width() / surface.get_height():
+            self.background = pg.transform.scale(self.image,
+                                                 (int(self.image.get_width() *
+                                                  surface.get_height() / self.image.get_height()),
+                                                  surface.get_height()))
+        else:
+            self.background = pg.transform.scale(self.image,
+                                                 (surface.get_width(),
+                                                  int(self.image.get_height() *
+                                                  surface.get_width() / self.image.get_width())))
+
+        self.blit_coordinates = (int((self.surface.get_width() - self.background.get_width()) / 2),
+                                 int((self.surface.get_height() - self.background.get_height()) / 2))
 
     def update(self, *args):
         pass
