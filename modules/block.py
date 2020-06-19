@@ -127,14 +127,14 @@ class Coin(Block):
 
     def __init__(self, type_object, x, y):
         super().__init__(type_object, x, y)
-        dungeon = Spritesheet("assets/textures/Dungeon/dungeon_spritesheet.png", 14, 23)
-        coin_animation = dungeon.get_images_at(15, 15, 15, 16, 16, 16, 17, 17, 17, 18, 18, 18)
+        spritesheet = Spritesheet("assets/textures/environment/animated/ruby.png", 1, 16)
+        coin_animation = spritesheet.get_images_at(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
         self.animation_component = AnimationComponent(coin_animation)
         self.coin_sound = pg.mixer.Sound("assets/sound/sfx/coin.ogg")
 
     def update(self, entity):
         """Checks if the player has collided with the coin, healing the player if there is a collision,
-		and updates the animation of the coin"""
+        and updates the animation of the coin"""
         if pg.sprite.collide_rect(self, entity):
             if entity.health < 100:
                 entity.health += 20

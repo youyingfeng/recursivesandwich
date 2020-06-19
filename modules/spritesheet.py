@@ -103,12 +103,12 @@ class TextureSet:
     """Contains a dictionary of the types of tiles and its corresponding TerrainType objects,
     and allows for the retrieval for the corresponding TerrainType object of the specified tile type"""
     def __init__(self):
-        old_tileset = Tileset("assets/textures/Dungeon/dungeon_spritesheet.png")
+        ruby = Tileset("assets/textures/environment/animated/ruby.png")
         new_tileset = Tileset("assets/textures/environment/static/terrain.png")
         decorations = Tileset("assets/textures/environment/static/decorations.png")
         self.textures = {"SPIKES_UPRIGHT": TerrainType(decorations.get_image_at(pg.Rect(208, 196, 16, 16)), 0, 0.4, 1, 0.6),
                          "ENTRANCE/EXIT": TerrainType(new_tileset.get_image_at(pg.Rect(1584, 464, 32, 28)), 0, -0.5, 1, 1.5),
-                         "COIN": TerrainType(old_tileset.get_image_at(pg.Rect(240, 0, 16, 16))),
+                         "COIN": TerrainType(ruby.get_image_at(pg.Rect(0, 0, 15, 16)), 0, 0, 15/16, 16),
                          "FALLING BLOCK": TerrainType(new_tileset.get_image_at(pg.Rect(208, 672, 32, 32))),
                          "MOVING BLOCK": TerrainType(pg.image.load("assets/textures/cloud.png")),
                          "LADDER": TerrainType(decorations.get_image_at(pg.Rect(184, 16, 32, 32))),
@@ -124,7 +124,7 @@ class TextureSet:
         self.code_to_texture_dictionary = {"f1": "FLOOR",
                                            "SP": "SPIKES_UPRIGHT",
                                            "GW": "ENTRANCE/EXIT",
-                                           "c": "COIN",
+                                           "CN": "COIN",
                                            "FB": "FALLING BLOCK",
                                            "MB": "MOVING BLOCK",
                                            "LB": "LADDER",

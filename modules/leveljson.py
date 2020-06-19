@@ -118,6 +118,11 @@ class Map:
                                                                         x * Block.BLOCK_SIZE,
                                                                         y * Block.BLOCK_SIZE)
                                                            )
+                    elif code == "CN":
+                        self.interactive_objects_group.add(Coin(texture_set.get_texture_from_code(code),
+                                                                x * Block.BLOCK_SIZE,
+                                                                y * Block.BLOCK_SIZE)
+                                                           )
                     else:
                         self.collideable_terrain_group.add(Block(texture_set.get_texture_from_code(code),
                                                                  x * Block.BLOCK_SIZE,

@@ -188,6 +188,7 @@ class AnimationComponent(Component):
         self.animation_length = len(self.animation_sequence)
 
     def update(self, entity):
+        self.frame_counter = (self.frame_counter + 1) % self.frames_per_update
         if self.frame_counter == 0:
             # this will probably cause some anim bugs
             self.current_index = (self.current_index + 1) % self.animation_length
