@@ -121,16 +121,14 @@ class TextureSet:
                          "PUSHABLE": TerrainType(decorations.get_image_at(pg.Rect(209, 113, 13, 13)))
                          }
 
-        self.code_to_texture_dictionary = {"2": "FLOOR",
-                                           "3": "FLOOR",
-                                           "4": "FLOOR",
-                                           "s": "SPIKES_UPRIGHT",
-                                           "e": "ENTRANCE/EXIT",
+        self.code_to_texture_dictionary = {"f1": "FLOOR",
+                                           "SP": "SPIKES_UPRIGHT",
+                                           "GW": "ENTRANCE/EXIT",
                                            "c": "COIN",
-                                           "f": "FALLING BLOCK",
-                                           "m": "MOVING BLOCK",
-                                           "l": "LADDER",
-                                           "p": "PUSHABLE"
+                                           "FB": "FALLING BLOCK",
+                                           "MB": "MOVING BLOCK",
+                                           "LB": "LADDER",
+                                           "PB": "PUSHABLE"
                                            }
 
     def get_texture_from_code(self, code) -> TerrainType:

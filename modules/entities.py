@@ -61,7 +61,7 @@ class Player(Entity):
         idle_spritesheet = Spritesheet("assets/textures/player/adventurer-idle.png", 1, 4)
         run_spritesheet = Spritesheet("assets/textures/player/adventurer-run.png", 1, 6)
         jump_spritesheet = Spritesheet("assets/textures/player/adventurer-jump.png", 1, 1)
-        climb_spritesheet = Spritesheet("assets/sprites/adventurer/adventurer-climb.png", 1, 4)
+        climb_spritesheet = Spritesheet("assets/textures/player/adventurer-climb.png", 1, 4)
 
         # Animations
         animation_library = {
@@ -140,7 +140,14 @@ class Player(Entity):
 
 class Enemy(Entity):
     """Base class for all enemies"""
-    def __init__(self, type_object, ai_component, physics_component, render_component, starting_position):
+    def __init__(self,
+                 type_object,
+                 ai_component,
+                 physics_component,
+                 render_component,
+                 starting_position,
+                 patrol_radius=50
+                 ):
         super().__init__()
 
         self.health = 100
@@ -152,8 +159,8 @@ class Enemy(Entity):
         self.blit_rect = pg.Rect(5, 3.5, 50, 30)
 
         # Boundaries for patrol
-        self.left_bound = starting_position[0] - starting_position[2]
-        self.right_bound = starting_position[0] + starting_position[2]
+        self.left_bound = starting_position[0] - patrol_radius
+        self.right_bound = starting_position[0] + patrol_radius
 
         # Components
         self.input_component = ai_component
@@ -193,9 +200,9 @@ class EnemyType:
         instantiate an Enemy with the corresponding visuals, health and sounds"""
     def __init__(self):
         # Spritesheets
-        idle_spritesheet = Spritesheet("assets/sprites/player/Idle.png", 1, 11)
-        run_spritesheet = Spritesheet("assets/sprites/player/Run.png", 1, 12)
-        jump_spritesheet = Spritesheet("assets/sprites/player/Jump.png", 1, 1)
+        idle_spritesheet = Spritesheet("assets/textures/enemies/Pink Guy/Idle.png", 1, 11)
+        run_spritesheet = Spritesheet("assets/textures/enemies/Pink Guy/Run.png", 1, 12)
+        jump_spritesheet = Spritesheet("assets/textures/enemies/Pink Guy/Jump.png", 1, 1)
 
         # Sounds
         jump_sound = pg.mixer.Sound("assets/sound/sfx/jump.ogg")

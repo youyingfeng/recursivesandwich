@@ -84,7 +84,7 @@ class Level:
 
     def update(self, player):
         self.enemies.update(self.map, player)
-        self.map.update(player, self)
+        self.map.update(player)
 
     def render(self, camera, surface):
         self.map.render(camera, surface)
@@ -125,9 +125,9 @@ class Map:
                 tile_position_str = game_map[y][x]
                 if tile_position_str != "x":
                     if tile_position_str == "s":
-                        new_block = HazardousBlock(self.textureset.get_texture_from_code(tile_position_str),
-                                                   x * Block.BLOCK_SIZE,
-                                                   y * Block.BLOCK_SIZE)
+                        new_block = SpikeBlock(self.textureset.get_texture_from_code(tile_position_str),
+                                               x * Block.BLOCK_SIZE,
+                                               y * Block.BLOCK_SIZE)
                         self.terrain_group.add(new_block)
                         self.hazardous_terrain_group.add(new_block)
 
@@ -158,15 +158,15 @@ class Map:
                         self.terrain_group.add(new_moving_block)
 
                     elif tile_position_str == "l":
-                        new_ladder = Ladder(self.textureset.get_texture_from_code(tile_position_str),
-                                                   x * Block.BLOCK_SIZE,
-                                                   y * Block.BLOCK_SIZE)
+                        new_ladder = LadderBlock(self.textureset.get_texture_from_code(tile_position_str),
+                                                 x * Block.BLOCK_SIZE,
+                                                 y * Block.BLOCK_SIZE)
                         self.ladder_group.add(new_ladder)
 
                     elif tile_position_str == "p":
-                        new_pushable = Pushable(self.textureset.get_texture_from_code(tile_position_str),
-                                                   x * Block.BLOCK_SIZE,
-                                                   y * Block.BLOCK_SIZE)
+                        new_pushable = PushableBlock(self.textureset.get_texture_from_code(tile_position_str),
+                                                     x * Block.BLOCK_SIZE,
+                                                     y * Block.BLOCK_SIZE)
                         self.pushable_group.add(new_pushable)
                         self.terrain_group.add(new_pushable)
 

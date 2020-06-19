@@ -31,3 +31,4 @@ class Action(Enum):
 class GameEvent(Enum):
     SWITCH_LEVEL = pg.USEREVENT + 0
     GAME_OVER = pg.USEREVENT + 1
+    GAME_COMPLETE = pg.USEREVENT + 2

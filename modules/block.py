@@ -31,7 +31,7 @@ class Block(pg.sprite.Sprite):
                             int(type_object.block_height * Block.BLOCK_SIZE))
 
 
-class HazardousBlock(Block):
+class SpikeBlock(Block):
     """Represents a block that damages the player if the player comes into contact with it"""
 
     def __init__(self, type_object, x, y):
@@ -67,7 +67,7 @@ class FallingBlock(Block):
         self.falling = False
         self.vel = 1
 
-    def update(self, player, pushable_group):
+    def update(self, player, *args):
         if (self.rect.top == player.rect.bottom) \
                 and (self.rect.left < player.rect.left < self.rect.right \
                      or self.rect.left < player.rect.right < self.rect.right):
@@ -144,7 +144,7 @@ class Coin(Block):
         self.animation_component.update(self)
 
 
-class Ladder(Block):
+class LadderBlock(Block):
     def __init__(self, type_object, x, y):
         super().__init__(type_object, x, y)
         self.mid_rect = pg.Rect(self.rect.centerx - 0.5, self.rect.top, 1, self.rect.height)
@@ -160,7 +160,7 @@ class Ladder(Block):
                 entity.state = EntityState.HANGING
 
 
-class Pushable(Block):
+class PushableBlock(Block):
     def __init__(self, type_object, x, y):
         super().__init__(type_object, x, y)
         self.y_velocity = 1

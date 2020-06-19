@@ -1,6 +1,6 @@
 import pygame as pg
 import pygame.freetype as ft
-from .level import *
+from .leveljson import *
 from .entities import Player
 from .camera import Camera
 from .background import *
@@ -89,11 +89,11 @@ class TitleScene(Scene):
                             StaticBackground("assets/textures/background/04 background.png", self.game_display))
 
         # Initialize title text
-        self.title = freetype.render("THE TOWER", (60, 25, 25), None, 0, 0, 32)
+        self.title = freetype.render("THE TOWER", (70, 35, 35), None, 0, 0, 32)
         self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
 
         # Initialize instruction text
-        self.text = freetype.render("Press any key to begin", (255, 255, 255))
+        self.text = freetype.render("Press space to begin", (200, 200, 200))
         self.text_blit_position = (int((self.game_display.get_width() - self.text[0].get_width()) / 2), 200)
 
         # Play BGM
@@ -108,8 +108,9 @@ class TitleScene(Scene):
                 pg.quit()
                 quit()
             elif event.type == pg.KEYDOWN:
-                # On any keypress, start the game
-                self.manager.switch_to_scene(GameScene())
+                if event.key == pg.K_SPACE:
+                    # Starts the game
+                    self.manager.switch_to_scene(GameScene())
 
     def update(self):
         pass
@@ -173,6 +174,9 @@ class GameScene(Scene):
                 self.manager.switch_to_scene(LoadingScene())
             elif event.type == GameEvent.GAME_OVER.value:
                 self.manager.switch_to_scene(GameOverScene())
+            elif event.type == GameEvent.GAME_COMPLETE.value:
+                # this is unnecessary
+                self.manager.switch_to_scene(GameBeatenScene())
 
         # Processes the input for the player
         self.player.handle_input()
@@ -250,6 +254,13 @@ class GameOverScene(Scene):
 class GameBeatenScene(Scene):
     def __init__(self):
         super().__init__()
+        # Initialize title
+        self.title = freetype.render("VICTORY", (0, 0, 0), None, 0, 0, 32)
+        self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
+
+        # Initialize subtitle
+        self.subtitle = freetype.render("Press space to quit", (0, 0, 0))
+        self.subtitle_blit_position = (int((self.game_display.get_width() - self.subtitle[0].get_width()) / 2), 200)
 
     def handle_events(self):
         for event in pg.event.get():
@@ -257,13 +268,23 @@ class GameBeatenScene(Scene):
                 pg.quit()
                 quit()
             elif event.type == pg.KEYDOWN:
-                pass
+                if event.key == pg.K_SPACE:
+                    pg.quit()
+                    quit()
 
     def update(self, *args):
         pass
 
     def render(self, surface: pg.Surface):
-        pass
+        # Fill game_display with black
+        self.game_display.fill((235, 235, 235))
+
+        # Blit title and subtitle on game_display
+        self.game_display.blit(self.title[0], self.title_blit_position)
+        self.game_display.blit(self.subtitle[0], self.subtitle_blit_position)
+
+        # Blit game_display on window surface
+        surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 
 
 class PauseScene(Scene):
@@ -303,6 +324,8 @@ class LoadingScene(Scene):
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
+            elif event.type == GameEvent.GAME_COMPLETE.value:
+                self.manager.switch_to_scene(GameBeatenScene())
 
     def update(self, *args):
         if self.wait_frames <= 0:
