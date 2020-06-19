@@ -6,6 +6,28 @@ from modules.entities import EnemyType, Enemy
 from modules.components import *
 from modules.spritesheet import *
 
+"""
+* =============================================================== *
+* This module contains all the necessary classes and functions    *
+* required to make a level in the game.                           *
+* =============================================================== *
+
+HOW TO MAKE A NEW LEVEL
+-------------------------
+1.  Make a new JSON file according to the template given. Number the levels sequentially.
+    JSON files must contain the following fields:
+        enemies             ->          JSON array containing one dict for each enemy placed
+        map                 ->          JSON object (python dict) containing 3 map layers, each represented by  
+                                        a 2-dimensional array
+        starting_position   ->          JSON array containing the starting position of the player
+        
+    Refer to the following link for the conversion tables between JSON and Python objects:
+            https://docs.python.org/3/library/json.html#py-to-json-table
+    
+2.  Update the number_of_levels attribute in LevelManager to reflect the current amount of levels in the game.
+
+"""
+
 
 class LevelManager:
     def __init__(self):
