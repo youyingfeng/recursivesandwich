@@ -151,12 +151,10 @@ class LadderBlock(Block):
 
     def update(self, entity):
         current_keys = pg.key.get_pressed()
-        entity_mid_rect = pg.Rect(entity.rect.centerx - 0.5, entity.rect.top, 1, entity.rect.height)
-
-        # A limitation that needs to be addressed is:
-        # You cannot enter the HANGING state from JUMPINNG, because it could trigger endless jumping
         if self.mid_rect.colliderect(entity.rect) and entity.state != EntityState.JUMPING:
             if current_keys[pg.K_UP] or current_keys[pg.K_DOWN]:
+                # Snap player to middle of ladder when entering HANGING state
+                entity.rect.centerx = self.mid_rect.centerx
                 entity.state = EntityState.HANGING
 
 
