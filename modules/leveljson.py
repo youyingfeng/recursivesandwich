@@ -75,9 +75,10 @@ class Level:
 class Map:
     def __init__(self, map_dict):
         # takes in the entire dict and parses it accordingly
-        self.non_collideable_terrain_group = pg.sprite.Group()      # use layeredupdates group?
-        self.collideable_terrain_group = pg.sprite.Group()
-        self.interactive_objects_group = pg.sprite.Group()
+        self.background_terrain_group = pg.sprite.Group()       # backmost layer
+        self.middle_ground_terrain_group = pg.sprite.Group()    # middle layer
+        self.collideable_terrain_group = pg.sprite.Group()      # front layer
+        self.interactive_objects_group = pg.sprite.Group()      # front layer
 
         texture_set = TextureSet()
 
@@ -87,9 +88,24 @@ class Map:
                 code = background_layer[y][x]
 
                 if code != "  ":
-                    self.non_collideable_terrain_group.add(Block(texture_set.get_texture_from_code(code),
-                                                                 x * Block.BLOCK_SIZE,
-                                                                 y * Block.BLOCK_SIZE))
+                    if code == "1w" or code == "2w":
+                        self.middle_ground_terrain_group.add(Block(texture_set.get_texture_from_code(code),
+                                                                   x * Block.BLOCK_SIZE,
+                                                                   y * Block.BLOCK_SIZE))
+                    else:
+                        self.background_terrain_group.add(Block(texture_set.get_texture_from_code(code),
+                                                                x * Block.BLOCK_SIZE,
+                                                                y * Block.BLOCK_SIZE))
+
+        decorations_layer = map_dict["decorations"]
+        for y in range(len(decorations_layer)):
+            for x in range(len(decorations_layer[0])):
+                code = decorations_layer[y][x]
+
+                if code != "  ":
+                    self.middle_ground_terrain_group.add(Block(texture_set.get_texture_from_code(code),
+                                                               x * Block.BLOCK_SIZE,
+                                                               y * Block.BLOCK_SIZE))
 
         terrain_layer = map_dict["terrain"]
         for y in range(len(terrain_layer)):
@@ -145,7 +161,11 @@ class Map:
         self.interactive_objects_group.update(player)
 
     def render(self, camera, surface):
-        for sprite in self.non_collideable_terrain_group:
+        for sprite in self.background_terrain_group:
+            if camera.rect.colliderect(sprite.rect):
+                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+
+        for sprite in self.middle_ground_terrain_group:
             if camera.rect.colliderect(sprite.rect):
                 surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
 
