@@ -82,7 +82,14 @@ class Map:
         texture_set = TextureSet()
 
         background_layer = map_dict["background"]
-        # TODO: load tiles from the background
+        for y in range(len(background_layer)):
+            for x in range(len(background_layer[0])):
+                code = background_layer[y][x]
+
+                if code != "  ":
+                    self.non_collideable_terrain_group.add(Block(texture_set.get_texture_from_code(code),
+                                                                 x * Block.BLOCK_SIZE,
+                                                                 y * Block.BLOCK_SIZE))
 
         terrain_layer = map_dict["terrain"]
         for y in range(len(terrain_layer)):

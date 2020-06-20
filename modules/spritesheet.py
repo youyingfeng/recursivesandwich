@@ -104,31 +104,60 @@ class TextureSet:
     and allows for the retrieval for the corresponding TerrainType object of the specified tile type"""
     def __init__(self):
         ruby = Tileset("assets/textures/environment/animated/ruby.png")
-        new_tileset = Tileset("assets/textures/environment/static/terrain.png")
+        tileset = Tileset("assets/textures/environment/static/terrain.png")
         decorations = Tileset("assets/textures/environment/static/decorations.png")
         self.textures = {"SPIKES_UPRIGHT": TerrainType(decorations.get_image_at(pg.Rect(208, 196, 16, 16)), 0, 0.4, 1, 0.6),
-                         "ENTRANCE/EXIT": TerrainType(new_tileset.get_image_at(pg.Rect(1584, 464, 32, 28)), 0, -0.5, 1, 1.5),
-                         "COIN": TerrainType(ruby.get_image_at(pg.Rect(0, 0, 15, 16)), 0, 0, 15/16, 16),
-                         "FALLING BLOCK": TerrainType(new_tileset.get_image_at(pg.Rect(208, 672, 32, 32))),
-                         "MOVING BLOCK": TerrainType(pg.image.load("assets/textures/cloud.png")),
+                         "ENTRANCE/EXIT": TerrainType(tileset.get_image_at(pg.Rect(1584, 464, 32, 28)), 0, -0.5, 1, 1.5),
+                         "COIN": TerrainType(ruby.get_image_at(pg.Rect(0, 0, 15, 16)), 0, 0, 15/16, 1),
+                         "FALLING_BLOCK": TerrainType(tileset.get_image_at(pg.Rect(208, 672, 32, 32))),
+                         "MOVING_BLOCK": TerrainType(pg.image.load("assets/textures/cloud.png")),
                          "LADDER": TerrainType(decorations.get_image_at(pg.Rect(184, 16, 32, 32))),
-                         "CORNER_BOTTOM_LEFT": TerrainType(new_tileset.get_image_at(pg.Rect(160, 720, 32, 32))),
-                         "CORNER_BOTTOM_RIGHT": TerrainType(new_tileset.get_image_at(pg.Rect(512, 720, 32, 32))),
-                         "WALL_LEFT": None,
-                         "WALL_RIGHT": None,
-                         "CEILING": None,
-                         "FLOOR": TerrainType(new_tileset.get_image_at(pg.Rect(240, 720, 32, 32))),
-                         "PUSHABLE": TerrainType(decorations.get_image_at(pg.Rect(209, 113, 13, 13)))
+                         "PUSHABLE": TerrainType(decorations.get_image_at(pg.Rect(209, 113, 13, 13))),
+                         "CORNER_BOTTOM_LEFT": TerrainType(tileset.get_image_at(pg.Rect(160, 720, 32, 32))),
+                         "CORNER_BOTTOM_RIGHT": TerrainType(tileset.get_image_at(pg.Rect(512, 720, 32, 32))),
+                         "CORNER_TOP_LEFT_1": TerrainType(tileset.get_image_at(pg.Rect(160, 448, 32, 32))),
+                         "CORNER_TOP_LEFT_2": TerrainType(tileset.get_image_at(pg.Rect(192, 448, 32, 32))),
+                         "CORNER_TOP_LEFT_3": TerrainType(tileset.get_image_at(pg.Rect(160, 480, 32, 32))),
+                         "CORNER_TOP_LEFT_4": TerrainType(tileset.get_image_at(pg.Rect(192, 480, 32, 32))),
+                         "CORNER_TOP_RIGHT_1": TerrainType(tileset.get_image_at(pg.Rect(480, 448, 32, 32))),
+                         "CORNER_TOP_RIGHT_2": TerrainType(tileset.get_image_at(pg.Rect(512, 448, 32, 32))),
+                         "CORNER_TOP_RIGHT_3": TerrainType(tileset.get_image_at(pg.Rect(480, 480, 32, 32))),
+                         "CORNER_TOP_RIGHT_4": TerrainType(tileset.get_image_at(pg.Rect(512, 480, 32, 32))),
+                         "WALL_LEFT": TerrainType(tileset.get_image_at(pg.Rect(160, 672, 32, 32))),
+                         "WALL_RIGHT": TerrainType(tileset.get_image_at(pg.Rect(512, 672, 32, 32))),
+                         "CEILING": TerrainType(tileset.get_image_at(pg.Rect(240, 448, 32, 32))),
+                         "FLOOR": TerrainType(tileset.get_image_at(pg.Rect(240, 720, 32, 32))),
+                         "FILLER": TerrainType(tileset.get_image_at(pg.Rect(48, 544, 32, 32))),
+                         "BG_WALL": TerrainType(tileset.get_image_at(pg.Rect(1328, 472, 32, 32))),
+                         "BG_DOUBLE_WINDOWS": TerrainType(tileset.get_image_at(pg.Rect(1088, 240, 144, 128)), 0, 0, 4.5, 4),
+                         "BG_SINGLE_WINDOW": TerrainType(tileset.get_image_at(pg.Rect(1472, 96, 64, 64)), 0, 0, 2, 2)
                          }
 
         self.code_to_texture_dictionary = {"f1": "FLOOR",
+                                           "l1": "WALL_LEFT",
+                                           "r1": "WALL_RIGHT",
+                                           "c1": "CEILING",
+                                           "xx": "FILLER",
+                                           "bl": "CORNER_BOTTOM_LEFT",
+                                           "br": "CORNER_BOTTOM_RIGHT",
+                                           "k1": "CORNER_TOP_LEFT_1",
+                                           "k2": "CORNER_TOP_LEFT_2",
+                                           "k3": "CORNER_TOP_LEFT_3",
+                                           "k4": "CORNER_TOP_LEFT_4",
+                                           "k5": "CORNER_TOP_RIGHT_1",
+                                           "k6": "CORNER_TOP_RIGHT_2",
+                                           "k7": "CORNER_TOP_RIGHT_3",
+                                           "k8": "CORNER_TOP_RIGHT_4",
                                            "SP": "SPIKES_UPRIGHT",
                                            "GW": "ENTRANCE/EXIT",
                                            "CN": "COIN",
-                                           "FB": "FALLING BLOCK",
-                                           "MB": "MOVING BLOCK",
+                                           "FB": "FALLING_BLOCK",
+                                           "MB": "MOVING_BLOCK",
                                            "LB": "LADDER",
-                                           "PB": "PUSHABLE"
+                                           "PB": "PUSHABLE",
+                                           "wl": "BG_WALL",
+                                           "2w": "BG_DOUBLE_WINDOWS",
+                                           "1w": "BG_SINGLE_WINDOW"
                                            }
 
     def get_texture_from_code(self, code) -> TerrainType:
