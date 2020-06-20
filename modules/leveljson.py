@@ -23,8 +23,20 @@ HOW TO MAKE A NEW LEVEL
         
     Refer to the following link for the conversion tables between JSON and Python objects:
             https://docs.python.org/3/library/json.html#py-to-json-table
+            
+    Important note: the minimum size of the map must be 400 x 300, or 16 by 12 array entries.
     
 2.  Update the number_of_levels attribute in LevelManager to reflect the current amount of levels in the game.
+
+TIPS TO MAKE YOUR LIFE EASIER
+------------------------------
+Below are some editor tricks within PyCharm to edit multiple blocks at once
+    1.  Alt-click to set multiple cursors.
+        This allows you to edit multiple places at once (horizontally and vertically), 
+        and is especially useful for those pesky walls.
+    2.  Find "  " within selection.
+        Makes editing quicker for multiple lines, although you don't have as much control over 
+        where to edit.
 
 """
 
