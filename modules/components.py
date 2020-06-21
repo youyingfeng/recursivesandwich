@@ -304,10 +304,12 @@ class EnemyDamageCollisionComponent(Component):
         super().__init__()
 
     def update(self, entity, player):
-        # sprite can technically be any mob, but here it is the player since mobs will not damage other mobs.
-        if pg.sprite.collide_rect(entity, player):
-            # Killing the enemy via stomping
-            if player.rect.bottom < entity.rect.centery and player.y_velocity > 0:
+        # Peg the enemy's hit_rect to its rect
+        entity.hit_rect.center = entity.rect.center
+
+        # Check if player's rect collides with enemy's hit_rect
+        if entity.hit_rect.colliderect(player.rect):
+            if player.rect.bottom < entity.hit_rect.centery and player.y_velocity > 0:
                 entity.take_damage(100)
                 player.take_damage(0)
                 print("Player killed an enemy!")

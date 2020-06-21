@@ -59,6 +59,10 @@ class Spritesheet:
         # Positions goes from left to right, then go down one row
         return [self.get_image_at_position(position) for position in positions]
 
+    def get_images_and_flip(self, *positions: int) -> list:
+        """Does the same thing as the previous function but all images are flipped"""
+        return [pg.transform.flip(self.get_image_at_position(position), True, False) for position in positions]
+
 
 # -------------------- Type objects to store hitboxes of different textures -------------------- #
 # This level of complication is really just to make life easier

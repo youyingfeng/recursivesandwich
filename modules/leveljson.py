@@ -2,7 +2,7 @@ import pygame as pg
 import json
 
 from modules.block import *
-from modules.entities import EnemyType, Enemy
+from modules.entities import *
 from modules.components import *
 from modules.spritesheet import *
 
@@ -196,7 +196,9 @@ class EnemyManager:
         self.enemies_list = self.enemies.sprites()
 
         # takes in a list of dictionaries representing enemies
-        self.enemy_type = {"Pink Guy": EnemyType()
+        self.enemy_type = {"Pink Guy": PinkGuy(),
+                            "Trash Monster": TrashMonster(),
+                            "Tooth Walker": ToothWalker()
                            }
         self.ai = EnemyAIInputComponent()
         self.physics = PhysicsComponent()

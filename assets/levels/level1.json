@@ -2,7 +2,15 @@
     "enemies": [
         {
             "type": "Pink Guy",
-            "coordinates": [150, 150]
+            "coordinates": [130, 150]
+        },
+        {
+            "type": "Tooth Walker",
+            "coordinates": [170, 150]
+        },
+        {
+            "type": "Trash Monster",
+            "coordinates": [260, 150]
         }
     ],
     "map": {
