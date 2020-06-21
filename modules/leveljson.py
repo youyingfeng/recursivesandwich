@@ -5,6 +5,7 @@ from modules.block import *
 from modules.entities import EnemyType, Enemy
 from modules.components import *
 from modules.spritesheet import *
+from modules.textureset import TextureSet
 
 """
 * =============================================================== *
