@@ -64,7 +64,6 @@ class LevelManager:
         camera.snap_to_target(player)
 
 
-
 class Level:
     def __init__(self, filepath: str):
         # loads the json file from the specified filepath
@@ -101,14 +100,9 @@ class Map:
                 code = background_layer[y][x]
 
                 if code != "  ":
-                    if code == "1w" or code == "2w":
-                        self.middle_ground_terrain_group.add(Block(texture_set.get_texture_from_code(code),
-                                                                   x * Block.BLOCK_SIZE,
-                                                                   y * Block.BLOCK_SIZE))
-                    else:
-                        self.background_terrain_group.add(Block(texture_set.get_texture_from_code(code),
-                                                                x * Block.BLOCK_SIZE,
-                                                                y * Block.BLOCK_SIZE))
+                    self.background_terrain_group.add(Block(texture_set.get_texture_from_code(code),
+                                                            x * Block.BLOCK_SIZE,
+                                                            y * Block.BLOCK_SIZE))
 
         decorations_layer = map_dict["decorations"]
         for y in range(len(decorations_layer)):
@@ -211,20 +205,16 @@ class EnemyManager:
                                    enemy_dict["coordinates"],
                                    50)
                              )
-            print("kappa")
-
-        self.enemies_list = self.enemies.sprites()
 
     def update(self, map, player):
-        for entity in self.enemies_list:
+        for entity in self.enemies:
             if entity.state == EntityState.DEAD:
                 entity.kill()
-                self.enemies_list = self.enemies.sprites()
             else:
                 entity.update(map, player)
 
     def render(self, camera, surface):
-        for entity in self.enemies_list:
+        for entity in self.enemies:
             entity.render(camera, surface)
 
 

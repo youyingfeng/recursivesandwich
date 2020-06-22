@@ -1,5 +1,5 @@
 import pygame as pg
-from dev_modules.editorscene import SceneManager
+from dev_modules.scenes import *
 
 """
 * =============================================================== *
@@ -11,10 +11,7 @@ from dev_modules.editorscene import SceneManager
 
 
 def main() -> None:
-    """Initialises PyGame and invokes all the necessary functions and modules to run the game"""
-
-    # Initialise sound
-    pg.mixer.init(44100, 16, 2, 512)
+    """Initialises PyGame and invokes all the necessary functions and modules to run the map editor"""
 
     # Initialise PyGame
     pg.init()
@@ -27,7 +24,7 @@ def main() -> None:
     clock = pg.time.Clock()
 
     # Initialise scene manager with TitleScene set as the initial scene
-    manager = SceneManager()
+    manager = SceneManager(MapEditorScene("assets/levels/level1.json"))
 
     # Game loop runs when this is true
     run = True
