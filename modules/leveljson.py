@@ -43,9 +43,9 @@ Below are some editor tricks within PyCharm to edit multiple blocks at once
 
 class LevelManager:
     def __init__(self):
-        self.level = Level("assets/levels/sample_level.json")
-        self.current_level = 1
-        self.number_of_levels = 1
+        self.level = Level("assets/levels/level4.json")
+        self.current_level = 4
+        self.number_of_levels = 4
 
     def load_next_level(self, player, camera):
         self.current_level += 1

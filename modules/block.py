@@ -166,7 +166,6 @@ class PushableBlock(Block):
     # A pushable block reacts to gravity, hence it interacts with both the player and terrain group
     # In future, possible to make one superclass for all blocks that are affected by gravity and collides with other blocks
     def update(self, player, terrain_group):
-        print(self.rect.y)
         self.blit_rect.x = self.rect.x
         self.blit_rect.y = self.rect.y
 

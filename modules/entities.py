@@ -170,6 +170,9 @@ class Enemy(Entity):
         # index 0 is x position, index 1 is y position, index 2 is patrol range
         self.rect = pg.Rect(starting_position[0], starting_position[1], self.type.width, self.type.height)
 
+        # blit_rect does not need to vary across enemy types, it just has to be sufficiently large
+        self.blit_rect = pg.Rect(0, 0, 100, 100)
+
         # Reason why I implemented a hitbox is because some enemy types 
         # are thin and require a smaller hit width than others
         self.hit_rect = type_object.hit_rect
@@ -205,7 +208,12 @@ class Enemy(Entity):
             rendered_image = self.image
 
         rendered_image = pg.transform.scale(rendered_image, (self.type.width, self.type.height))
-        surface.blit(rendered_image, self.rect)
+        
+        surface.blit(rendered_image,
+                     (self.rect.x - camera.rect.x, self.rect.y - camera.rect.y),
+                     self.blit_rect)
+
+        # surface.blit(rendered_image, self.rect)
 
 
 class EnemyType:
