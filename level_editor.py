@@ -1,5 +1,6 @@
 import pygame as pg
-from dev_modules.scenes import *
+import pygame.freetype as ft
+from dev_modules.editorscenes import *
 
 """
 * =============================================================== *
@@ -15,6 +16,7 @@ def main() -> None:
 
     # Initialise PyGame
     pg.init()
+    ft.init()
 
     # Initialise window
     window = pg.display.set_mode((1050, 600))
@@ -24,7 +26,7 @@ def main() -> None:
     clock = pg.time.Clock()
 
     # Initialise scene manager with TitleScene set as the initial scene
-    manager = SceneManager(MapEditorScene("assets/levels/level1.json"))
+    manager = SceneManager(MapEditorScene("assets/levels/level4.json"))
 
     # Game loop runs when this is true
     run = True

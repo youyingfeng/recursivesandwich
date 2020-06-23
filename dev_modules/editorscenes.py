@@ -1,7 +1,8 @@
 import pygame as pg
+import pygame.freetype as ft
 
 from dev_modules.events import EditorEvents
-from dev_modules.panels import PalettePanel, MapPanel
+from dev_modules.editorpanels import PalettePanel, MapPanel
 
 
 class Scene:
@@ -97,7 +98,8 @@ class MapEditorScene(Scene):
                 pass
 
     def update(self):
-        pass
+        self.map_panel.update()
+        # pass
 
     def render(self, surface: pg.Surface):
         self.palette_panel.render(self.palette_display)
