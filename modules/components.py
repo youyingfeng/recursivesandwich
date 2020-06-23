@@ -241,14 +241,20 @@ class RenderComponent(Component):
 
     def update(self, entity, camera, surface):
         # Flip image if Player is moving backward
+        # TODO: Get the proper posiiton of the image before flipping
+        rendered_image = entity.image.subsurface(entity.blit_rect)
         if entity.direction == Direction.LEFT:
-            rendered_image = pg.transform.flip(entity.image, True, False)
-        else:
-            rendered_image = entity.image
-
+            rendered_image = pg.transform.flip(rendered_image, True, False)
         surface.blit(rendered_image,
-                     (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
-                     entity.blit_rect)
+                     (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y))
+        # if entity.direction == Direction.LEFT:
+        #     rendered_image = pg.transform.flip(entity.image, True, False)
+        # else:
+        #     rendered_image = entity.image
+        #
+        # surface.blit(rendered_image,
+        #              (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
+        #              entity.blit_rect)
 
 
 class SoundComponent(Component):
@@ -304,12 +310,9 @@ class EnemyDamageCollisionComponent(Component):
         super().__init__()
 
     def update(self, entity, player):
-        # Peg the enemy's hit_rect to its rect
-        entity.hit_rect.center = entity.rect.center
-
-        # Check if player's rect collides with enemy's hit_rect
-        if entity.hit_rect.colliderect(player.rect):
-            if player.rect.bottom < entity.hit_rect.centery and player.y_velocity > 0:
+        # Reverted changes, since rect is used in physics
+        if entity.rect.colliderect(player.rect):
+            if player.rect.bottom < entity.rect.centery and player.y_velocity > 0:
                 entity.take_damage(100)
                 player.take_damage(0)
                 print("Player killed an enemy!")

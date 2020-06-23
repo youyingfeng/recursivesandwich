@@ -63,6 +63,13 @@ class Spritesheet:
         """Does the same thing as the previous function but all images are flipped"""
         return [pg.transform.flip(self.get_image_at_position(position), True, False) for position in positions]
 
+    def scale_images_to_size(self, image_width, image_height):
+        """Scales the entire spritesheet such that the width and height of each image from get_images_at()
+        matches the width and height specified in this function"""
+        self.width = image_width
+        self.height = image_height
+        self.spritesheet = pg.transform.scale(self.spritesheet, (self.width * self.columns, self.height * self.rows))
+
 
 # -------------------- Type objects to store hitboxes of different textures -------------------- #
 # This level of complication is really just to make life easier

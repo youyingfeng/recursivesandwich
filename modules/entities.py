@@ -52,7 +52,8 @@ class Player(Entity):
         super().__init__()
         self.health = 100
         self.rect = pg.Rect(10, 10, 20, 30)
-        self.blit_rect = pg.Rect(15, 3.5, 50, 30)
+        # blit rect x coord changed from 50 to 30
+        self.blit_rect = pg.Rect(15, 3.5, 20, 30)
         self.last_collide_time = 0
 
         # Spritesheets
@@ -88,7 +89,6 @@ class Player(Entity):
 
         # Current Image
         self.image = self.animation_component.get_current_image()
-        self.mask = pg.mask.from_surface(self.image)
 
     # ---------- DIRTY METHODS ---------- #
     # These will be placed here until I can find a way to wrap them in a component nicely
@@ -157,22 +157,23 @@ class Enemy(Entity):
 
         self.input_component = ai_component
         self.physics_component = physics_component
-
-        self.type = type_object
+        self.render_component = render_component
 
         self.damage_collide_component = EnemyDamageCollisionComponent()
 
         # Animation and sound are taken from a type object
-        self.animation_component = PlayerAnimationComponent(self.type.animation_library, self.state)
-        self.sound_component = SoundComponent(self.type.sound_library)
+        self.animation_component = PlayerAnimationComponent(type_object.animation_library, self.state)
+        self.sound_component = SoundComponent(type_object.sound_library)
 
         # Define starting position
         # index 0 is x position, index 1 is y position, index 2 is patrol range
-        self.rect = pg.Rect(starting_position[0], starting_position[1], self.type.width, self.type.height)
+        self.rect = type_object.rect
+        self.rect.x = starting_position[0]
+        self.rect.y = starting_position[1]
+        self.blit_rect = type_object.blit_rect
 
         # Reason why I implemented a hitbox is because some enemy types 
         # are thin and require a smaller hit width than others
-        self.hit_rect = type_object.hit_rect
 
         self.image = self.animation_component.get_current_image()
 
@@ -191,21 +192,7 @@ class Enemy(Entity):
         self.animation_component.update(self)
 
     def render(self, camera, surface):
-        # self.render_component.update(self, camera, surface)
-
-        '''The Enemy should not use the same RenderComponent as the Player,
-        as the camera does not need to follow the Enemy's position.
-        Instead, all Enemies should follow this implementation of render,
-        where the image is flipped according to its direction and scaled
-        according to its EnemyType's width and height attributes.'''
-
-        if self.direction == Direction.LEFT:
-            rendered_image = pg.transform.flip(self.image, True, False)
-        else:
-            rendered_image = self.image
-
-        rendered_image = pg.transform.scale(rendered_image, (self.type.width, self.type.height))
-        surface.blit(rendered_image, self.rect)
+        self.render_component.update(self, camera, surface)
 
 
 class EnemyType:
@@ -226,9 +213,10 @@ class PinkGuy(EnemyType):
         super().__init__()
 
         # Figure out these attributes via inspection every time a new enemy type is implemented
-        self.width = 33
+        self.width = 32
         self.height = 32
-        self.hit_rect = pg.Rect(0, 0, self.width, self.height)
+        self.rect = pg.Rect(0, 0, 32, 32)
+        self.blit_rect = pg.Rect(0, 0, self.width, self.height)
 
         idle_spritesheet = Spritesheet("assets/textures/enemies/Pink Guy/Idle.png", 1, 11)
         run_spritesheet = Spritesheet("assets/textures/enemies/Pink Guy/Run.png", 1, 12)
@@ -244,13 +232,18 @@ class PinkGuy(EnemyType):
 class TrashMonster(EnemyType):
     def __init__(self):
         super().__init__()
-        self.width = 44
-        self.height = 32
-        self.hit_rect = pg.Rect(0, 0, self.width * 0.70, self.height)
+        self.image_width = 44
+        self.image_height = 32
+        self.rect = pg.Rect(0, 0, 35, 32)
+        self.blit_rect = pg.Rect(4, 0, 35, 32)
 
         idle_spritesheet = Spritesheet("assets/textures/enemies/Trash Monster/Trash Monster-Idle.png", 1, 6)
         run_spritesheet = Spritesheet("assets/textures/enemies/Trash Monster/Trash Monster-Run.png", 1, 6)
         jump_spritesheet = Spritesheet("assets/textures/enemies/Trash Monster/Trash Monster-Jump.png", 1, 1)
+
+        idle_spritesheet.scale_images_to_size(self.image_width, self.image_height)
+        run_spritesheet.scale_images_to_size(self.image_width, self.image_height)
+        jump_spritesheet.scale_images_to_size(self.image_width, self.image_height)
 
         self.animation_library = {
             EntityState.IDLE: idle_spritesheet.get_images_and_flip(0, 1, 2, 3, 4, 5),
@@ -263,12 +256,16 @@ class TrashMonster(EnemyType):
 class ToothWalker(EnemyType):
     def __init__(self):
         super().__init__()
-        self.width = 100
-        self.height = 65
-        self.hit_rect = pg.Rect(0, 0, self.width * 0.20, self.height)
+        self.image_width = 100
+        self.image_height = 65
+        self.rect = pg.Rect(0, 0, 30, 65)
+        self.blit_rect = pg.Rect(40, 0, 30, 65)
 
         walk_spritesheet = Spritesheet("assets/textures/enemies/Tooth Walker/tooth walker walk.png", 1, 6)
         dead_spritesheet = Spritesheet("assets/textures/enemies/Tooth Walker/tooth walker dead.png", 1, 1)
+
+        walk_spritesheet.scale_images_to_size(self.image_width, self.image_height)
+        dead_spritesheet.scale_images_to_size(self.image_width, self.image_height)
 
         self.animation_library = {
             EntityState.IDLE: walk_spritesheet.get_images_at(0),
