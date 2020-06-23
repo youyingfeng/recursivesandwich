@@ -43,7 +43,7 @@ Below are some editor tricks within PyCharm to edit multiple blocks at once
 
 class LevelManager:
     def __init__(self):
-        self.level = Level("assets/levels/level1.json")
+        self.level = Level("assets/levels/sample_level.json")
         self.current_level = 1
         self.number_of_levels = 1
 
@@ -127,16 +127,16 @@ class Map:
                 # I'm leaving out cloudy boi as it really does not fit the game
                 if code != "  ":
                     if code == "FB":
-                        new_block = PushableBlock(texture_set.get_texture_from_code(code),
+                        new_block = FallingBlock(texture_set.get_texture_from_code(code),
                                                   x * Block.BLOCK_SIZE,
                                                   y * Block.BLOCK_SIZE)
                         self.interactive_objects_group.add(new_block)
                         self.collideable_terrain_group.add(new_block)
                     elif code == "LB":
-                        self.interactive_objects_group.add(LadderBlock(texture_set.get_texture_from_code(code),
+                        new_block = LadderBlock(texture_set.get_texture_from_code(code),
                                                                        x * Block.BLOCK_SIZE,
                                                                        y * Block.BLOCK_SIZE)
-                                                           )
+                        self.interactive_objects_group.add(new_block)
                     elif code == "PB":
                         new_block = PushableBlock(texture_set.get_texture_from_code(code),
                                                   x * Block.BLOCK_SIZE,
@@ -144,25 +144,26 @@ class Map:
                         self.interactive_objects_group.add(new_block)
                         self.collideable_terrain_group.add(new_block)
                     elif code == "SP":
-                        self.interactive_objects_group.add(SpikeBlock(texture_set.get_texture_from_code(code),
+                        new_block = SpikeBlock(texture_set.get_texture_from_code(code),
                                                                       x * Block.BLOCK_SIZE,
                                                                       y * Block.BLOCK_SIZE)
-                                                           )
+                        self.interactive_objects_group.add(new_block)
+                        self.collideable_terrain_group.add(new_block)
                     elif code == "GW":
                         self.interactive_objects_group.add(GatewayBlock(texture_set.get_texture_from_code(code),
                                                                         x * Block.BLOCK_SIZE,
                                                                         y * Block.BLOCK_SIZE)
                                                            )
                     elif code == "CN":
-                        self.interactive_objects_group.add(Coin(texture_set.get_texture_from_code(code),
+                        new_block = Coin(texture_set.get_texture_from_code(code),
                                                                 x * Block.BLOCK_SIZE,
                                                                 y * Block.BLOCK_SIZE)
-                                                           )
+                        self.interactive_objects_group.add(new_block)
                     else:
-                        self.collideable_terrain_group.add(Block(texture_set.get_texture_from_code(code),
+                        new_block = Block(texture_set.get_texture_from_code(code),
                                                                  x * Block.BLOCK_SIZE,
                                                                  y * Block.BLOCK_SIZE)
-                                                           )
+                        self.collideable_terrain_group.add(new_block)
 
         self.rect = pg.Rect(0,
                             0,
@@ -170,7 +171,7 @@ class Map:
                             len(terrain_layer) * Block.BLOCK_SIZE)
 
     def update(self, player):
-        self.interactive_objects_group.update(player)
+        self.interactive_objects_group.update(player, self.collideable_terrain_group)
 
     def render(self, camera, surface):
         for sprite in self.background_terrain_group:
