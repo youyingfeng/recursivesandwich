@@ -242,6 +242,7 @@ class RenderComponent(Component):
     def update(self, entity, camera, surface):
         # Flip image if Player is moving backward
         # TODO: Get the proper posiiton of the image before flipping
+        print(entity)
         rendered_image = entity.image.subsurface(entity.blit_rect)
         if entity.direction == Direction.LEFT:
             rendered_image = pg.transform.flip(rendered_image, True, False)
