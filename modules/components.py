@@ -178,7 +178,7 @@ class PhysicsComponent(Component):
 
 
 # For simple and single animation of terrain, without any state
-class AnimationComponent(Component):
+class SimpleAnimationComponent(Component):
     def __init__(self, animation_sequence):
         super().__init__()
         self.animation_sequence = animation_sequence

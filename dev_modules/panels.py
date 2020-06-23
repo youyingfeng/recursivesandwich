@@ -3,21 +3,30 @@ import json
 
 from modules.textureset import TextureSet
 from modules.leveljson import *
+from dev_modules.editorlevel import *
 
 
 class MapPanel:
     def __init__(self, filepath):
         self.camera = EditorCamera()
+        self.level = EditorLevel(filepath)
+        self.boundaries = (len(self.level.map.bg_array[0]),
+                           len(self.level.map.bg_array))
 
     def click(self, point):
         # handle events given the click point
         pass
 
     def update(self):
-        pass
+        current_keys = pg.key.get_pressed()
+        self.camera.scroll(current_keys[pg.K_UP],
+                           current_keys[pg.K_DOWN],
+                           current_keys[pg.K_LEFT],
+                           current_keys[pg.K_RIGHT],
+                           self.boundaries)
 
     def render(self, surface):
-        surface.fill((80, 150, 100))
+        self.level.render(self.camera, surface)
 
 
 class PalettePanel:
@@ -40,7 +49,7 @@ class EditorCamera:
     def __init__(self):
         self.rect = pg.Rect(0, 0, 400, 300)
 
-    def scroll(self, up: bool, down: bool, left: bool, right: bool, boundaries: list):
+    def scroll(self, up: bool, down: bool, left: bool, right: bool, boundaries: tuple):
         if up is True:
             self.rect.y -= 5
         if down is True:

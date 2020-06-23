@@ -213,10 +213,10 @@ class PinkGuy(EnemyType):
         super().__init__()
 
         # Figure out these attributes via inspection every time a new enemy type is implemented
-        self.width = 32
-        self.height = 32
-        self.rect = pg.Rect(0, 0, 32, 32)
-        self.blit_rect = pg.Rect(0, 0, self.width, self.height)
+        width = 32
+        height = 32
+        self.rect = pg.Rect(0, 0, width, height)
+        self.blit_rect = pg.Rect(0, 0, width, height)
 
         idle_spritesheet = Spritesheet("assets/textures/enemies/Pink Guy/Idle.png", 1, 11)
         run_spritesheet = Spritesheet("assets/textures/enemies/Pink Guy/Run.png", 1, 12)
@@ -232,8 +232,8 @@ class PinkGuy(EnemyType):
 class TrashMonster(EnemyType):
     def __init__(self):
         super().__init__()
-        self.image_width = 44
-        self.image_height = 32
+        image_width = 44
+        image_height = 32
         self.rect = pg.Rect(0, 0, 35, 32)
         self.blit_rect = pg.Rect(4, 0, 35, 32)
 
@@ -241,9 +241,9 @@ class TrashMonster(EnemyType):
         run_spritesheet = Spritesheet("assets/textures/enemies/Trash Monster/Trash Monster-Run.png", 1, 6)
         jump_spritesheet = Spritesheet("assets/textures/enemies/Trash Monster/Trash Monster-Jump.png", 1, 1)
 
-        idle_spritesheet.scale_images_to_size(self.image_width, self.image_height)
-        run_spritesheet.scale_images_to_size(self.image_width, self.image_height)
-        jump_spritesheet.scale_images_to_size(self.image_width, self.image_height)
+        idle_spritesheet.scale_images_to_size(image_width, image_height)
+        run_spritesheet.scale_images_to_size(image_width, image_height)
+        jump_spritesheet.scale_images_to_size(image_width, image_height)
 
         self.animation_library = {
             EntityState.IDLE: idle_spritesheet.get_images_and_flip(0, 1, 2, 3, 4, 5),
@@ -256,16 +256,16 @@ class TrashMonster(EnemyType):
 class ToothWalker(EnemyType):
     def __init__(self):
         super().__init__()
-        self.image_width = 100
-        self.image_height = 65
+        image_width = 100
+        image_height = 65
         self.rect = pg.Rect(0, 0, 30, 65)
         self.blit_rect = pg.Rect(40, 0, 30, 65)
 
         walk_spritesheet = Spritesheet("assets/textures/enemies/Tooth Walker/tooth walker walk.png", 1, 6)
         dead_spritesheet = Spritesheet("assets/textures/enemies/Tooth Walker/tooth walker dead.png", 1, 1)
 
-        walk_spritesheet.scale_images_to_size(self.image_width, self.image_height)
-        dead_spritesheet.scale_images_to_size(self.image_width, self.image_height)
+        walk_spritesheet.scale_images_to_size(image_width, image_height)
+        dead_spritesheet.scale_images_to_size(image_width, image_height)
 
         self.animation_library = {
             EntityState.IDLE: walk_spritesheet.get_images_at(0),
