@@ -10,8 +10,8 @@ import pygame as pg
 
 
 class Camera:
-    def __init__(self, camera_size, map):
-        self.boundaries = map.rect
+    def __init__(self, camera_size, map_rect):
+        self.boundaries = map_rect
 
         # Rudimentary clamping of camera to map bounds only on the x-axis
         # If the map is smaller than the camera, then rescale the camera size (pretty sure this code is buggy though)
@@ -51,3 +51,6 @@ class Camera:
             self.rect.left = 0
         elif self.rect.right > self.boundaries.right:
             self.rect.right = self.boundaries.right
+
+    def update_boundaries(self, map_rect):
+        self.boundaries = map_rect

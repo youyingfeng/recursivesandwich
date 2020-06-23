@@ -79,7 +79,7 @@ class EditorMap(Map):
 
 class EditorEnemyManager:
     def __init__(self, enemies_list):
-        self.enemies_list = enemies_list
+        self.enemies_list = []
         self.enemy_type = {"Pink Guy": PinkGuy(),
                            "Trash Monster": TrashMonster(),
                            "Tooth Walker": ToothWalker()

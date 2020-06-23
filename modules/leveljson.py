@@ -62,6 +62,7 @@ class LevelManager:
         player.rect.x = self.level.starting_position[0]
         player.rect.y = self.level.starting_position[1]
         camera.snap_to_target(player)
+        camera.update_boundaries(self.level.map.rect)
 
 
 class Level:
@@ -91,6 +92,8 @@ class Map:
         self.middle_ground_terrain_group = pg.sprite.Group()    # middle layer
         self.collideable_terrain_group = pg.sprite.Group()      # front layer
         self.interactive_objects_group = pg.sprite.Group()      # front layer
+
+
 
         texture_set = TextureSet()
 

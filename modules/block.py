@@ -97,7 +97,7 @@ class MovingBlock(Block):
         super().__init__(type_object, x, y)
         self.vel = 1
 
-    def update(self, player, terrain_group):
+    def update(self, player, *args):
         if ((self.rect.top == player.rect.bottom) \
             and (self.rect.left < player.rect.left < self.rect.right \
                  or self.rect.left < player.rect.right < self.rect.right)) \
@@ -131,7 +131,7 @@ class Coin(Block):
         self.animation_component = SimpleAnimationComponent(coin_animation)
         self.coin_sound = pg.mixer.Sound("assets/sound/sfx/coin.ogg")
 
-    def update(self, entity, terrain_group):
+    def update(self, entity, *args):
         """Checks if the player has collided with the coin, healing the player if there is a collision,
         and updates the animation of the coin"""
         if pg.sprite.collide_rect(self, entity):
@@ -148,7 +148,7 @@ class LadderBlock(Block):
         super().__init__(type_object, x, y)
         self.mid_rect = pg.Rect(self.rect.centerx - 0.5, self.rect.top, 1, self.rect.height)
 
-    def update(self, entity, terrain_group):
+    def update(self, entity, *args):
         current_keys = pg.key.get_pressed()
         if self.mid_rect.colliderect(entity.rect) and entity.state != EntityState.JUMPING:
             if current_keys[pg.K_UP] or current_keys[pg.K_DOWN]:

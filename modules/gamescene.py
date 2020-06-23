@@ -138,7 +138,7 @@ class GameScene(Scene):
         self.level_manager = LevelManager()
 
         # Initialize camera
-        self.camera = Camera(SURFACE_SIZE, self.level_manager.level.map)
+        self.camera = Camera(SURFACE_SIZE, self.level_manager.level.map.rect)
 
         # Initialize player
         self.player = Player()
