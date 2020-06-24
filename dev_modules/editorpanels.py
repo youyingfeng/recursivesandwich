@@ -6,7 +6,7 @@ from dev_modules.events import EditorEvents
 from modules.textureset import TextureSet
 from modules.leveljson import *
 from dev_modules.editorlevel import *
-from dev_modules.editorcamera import EditorCamera
+from dev_modules.editorcamera import EditorCamera, PanelCamera
 
 ft.init()
 freetype = ft.Font("assets/fonts/pixChicago.ttf", 8)
@@ -18,13 +18,18 @@ class MapPanel:
         self.level = EditorLevel(filepath)
         self.boundaries = (len(self.level.map.bg_array[0]) * Block.BLOCK_SIZE,
                            len(self.level.map.bg_array) * Block.BLOCK_SIZE)
+        self.current_block_code = "xx"
+        self.add_mode = True            # if this is false, then this is erase mode
+        self.current_layer = 1
 
     def click(self, point):
         # handle events given the click point
         pass
 
-    def update(self):
-        current_keys = pg.key.get_pressed()
+        # have an add at method
+        # and an erase at method
+
+    def update(self, current_keys):
         self.camera.update(current_keys[pg.K_UP],
                            current_keys[pg.K_DOWN],
                            current_keys[pg.K_LEFT],
@@ -46,17 +51,15 @@ class PalettePanel:
         self.texture_selector_sub_panel = TextureSelectorSubPanel()
         self.texture_selector_sub_surface = pg.Surface((125, 240))
 
-        # There is the top text
-
-        # then there are the bottom icons
-        self.buttons_group = pg.sprite.Group()
 
     def click(self, point):
         if point[1] < 60:
             self.load_save_sub_panel.click(point)
+        else:
+            self.texture_selector_sub_panel.click((point[0], point[1] - 60))
 
-    def update(self):
-        pass
+    def update(self, current_keys):
+        self.texture_selector_sub_panel.update(current_keys)
 
     def render(self, surface):
         self.load_save_sub_panel.render(self.load_save_sub_surface)
@@ -110,7 +113,6 @@ class LoadSaveSubPanel:
 
 class TextureSelectorSubPanel:
     def __init__(self):
-        self.camera = EditorCamera()
         textureset = TextureSet()
         next_x = 10
         next_y = 10
@@ -123,11 +125,18 @@ class TextureSelectorSubPanel:
                                                    terraintype))
             next_y += terraintype.block_height * Block.BLOCK_SIZE + 10
 
+        self.camera = PanelCamera(next_y)
+
     def click(self, coordinates):
+        virtual_coordinates = (coordinates[0], coordinates[1] + self.camera.rect.y)
         for button in self.button_array:
-            if button.collidepoint(coordinates):
+            if button.collidepoint(virtual_coordinates):
                 button.on_click()
                 return
+
+    def update(self, current_keys):
+        self.camera.scroll(current_keys[pg.K_w],
+                           current_keys[pg.K_s])
 
     def render(self, surface):
         surface.fill((35, 88, 112))
@@ -157,7 +166,7 @@ class TextureButton:
         pg.event.post(
             pg.event.Event(
                 EditorEvents.BLOCK_SWITCH,
-                self.code
+                {"code": self.code}
             )
         )
 

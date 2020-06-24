@@ -15,7 +15,7 @@ class TextureSet:
             # ------------------------------ INTERACTIVE BLOCKS ------------------------------ #
             "SPIKES_UPRIGHT": TerrainType(decorations.get_image_at(pg.Rect(208, 196, 16, 16)), 0, 0.4, 1, 0.6),
             "ENTRANCE/EXIT": TerrainType(tileset.get_image_at(pg.Rect(1584, 464, 32, 28)), 0, -0.5, 1, 1.5),
-            "COIN": TerrainType(ruby.get_image_at(pg.Rect(0, 0, 15, 16)), 0, 0, 15/16, 1),
+            "COIN": TerrainType(ruby.get_image_at(pg.Rect(0, 0, 15, 16)), 0.2, 0.2, 0.6, 0.6),
             "FALLING_BLOCK": TerrainType(tileset.get_image_at(pg.Rect(208, 672, 32, 32))),
             "MOVING_BLOCK": TerrainType(tileset.get_image_at(pg.Rect(1424, 656, 32, 32))),
             "LADDER": TerrainType(decorations.get_image_at(pg.Rect(184, 16, 32, 32))),

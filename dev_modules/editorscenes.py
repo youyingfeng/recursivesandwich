@@ -95,10 +95,35 @@ class MapEditorScene(Scene):
                     point[0] -= 125
                     self.map_panel.click(point)
             elif event.type == EditorEvents.BLOCK_SWITCH:
-                pass
+                print(event.code)
+                self.map_panel.current_block_code = event.code
+            elif event.type == pg.KEYDOWN:
+                if event.mod & pg.KMOD_SHIFT:
+                    # Enables and disables display of the corresponding layers
+                    if event.key == pg.K_1:
+                        self.map_panel.level.map.bg_on = not self.map_panel.level.map.bg_on
+                    elif event.key == pg.K_2:
+                        self.map_panel.level.map.decorations_on = not self.map_panel.level.map.decorations_on
+                    elif event.key == pg.K_3:
+                        self.map_panel.level.map.terrain_on = not self.map_panel.level.map.terrain_on
+                    elif event.key == pg.K_4:
+                        self.map_panel.level.draw_enemies = not self.map_panel.level.draw_enemies
+                else:
+                    # Sets the current active layer
+                    if event.key == pg.K_1:
+                        self.map_panel.current_layer = 1
+                    elif event.key == pg.K_2:
+                        self.map_panel.current_layer = 2
+                    elif event.key == pg.K_3:
+                        self.map_panel.current_layer = 3
+                    elif event.key == pg.K_4:
+                        self.map_panel.current_layer = 4
 
     def update(self):
-        self.map_panel.update()
+        current_keys = pg.key.get_pressed()
+        self.palette_panel.update(current_keys)
+        self.map_panel.update(current_keys)
+
         # pass
 
     def render(self, surface: pg.Surface):
