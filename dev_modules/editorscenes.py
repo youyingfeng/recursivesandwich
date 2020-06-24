@@ -1,9 +1,13 @@
 import pygame as pg
 import pygame.freetype as ft
+import json
 
 from dev_modules.events import EditorEvents
 from dev_modules.editorpanels import PalettePanel, MapPanel
 
+ft.init()
+freetype = ft.Font("assets/fonts/pixChicago.ttf", 12)
+freetype.antialiased = False
 
 class Scene:
     """Represents a scene in the program, which is analogous to the state of the game"""
@@ -41,37 +45,6 @@ class SceneManager:
         self.scene.manager = self
 
 
-class MapLoaderScene(Scene):
-    def __init__(self):
-        super().__init__()
-        self.filepath = "assets/levels/"
-        self.focus = True
-
-    def handle_events(self):
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                pg.quit()
-                quit()
-            elif event.type == pg.MOUSEBUTTONDOWN:
-                pass
-            elif self.focus is True:
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_RETURN:
-                        self.manager.switch_to_scene(MapEditorScene(self.filepath))
-                    elif event.key == pg.K_BACKSPACE:
-                        # array slicing is safe from null pointers
-                        self.filepath = self.filepath[:-1]
-                    else:
-                        self.filepath += event.unicode
-
-    def update(self):
-        pass
-
-    def render(self, surface):
-        surface.fill((100, 100, 100))
-        # blit the text onto the surface
-
-
 class MapEditorScene(Scene):
     def __init__(self, filepath):
         super().__init__()
@@ -87,6 +60,13 @@ class MapEditorScene(Scene):
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
+            elif event.type == EditorEvents.BLOCK_SWITCH:
+                print(event.code)
+                self.map_panel.current_code = event.code
+            elif event.type == EditorEvents.LOAD_FILE:
+                self.manager.switch_to_scene(MapLoadScene())
+            elif event.type == EditorEvents.SAVE_FILE:
+                self.manager.switch_to_scene(MapSaveScene(self.map_panel.level))
             elif event.type == pg.MOUSEBUTTONDOWN:
                 point = [event.pos[0] / 2, event.pos[1] / 2]
                 if point[0] < 125:
@@ -94,9 +74,6 @@ class MapEditorScene(Scene):
                 else:
                     point[0] -= 125
                     self.map_panel.click(point)
-            elif event.type == EditorEvents.BLOCK_SWITCH:
-                print(event.code)
-                self.map_panel.current_code = event.code
             elif event.type == pg.KEYDOWN:
                 if event.mod & pg.KMOD_SHIFT:
                     # Enables and disables display of the corresponding layers
@@ -138,3 +115,108 @@ class MapEditorScene(Scene):
         self.game_display.blit(self.map_display, (125, 0))
 
         surface.blit(pg.transform.scale(self.game_display, (1050, 600)), (0, 0))
+
+
+class MapLoadScene(Scene):
+    def __init__(self):
+        super().__init__()
+        self.filepath = "assets/levels/"
+        self.load_text = freetype.render("Load the file from the following path:", (235, 235, 235))
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    self.manager.switch_to_scene(MapEditorScene(self.filepath))
+                elif event.key == pg.K_ESCAPE:
+                    self.manager.go_to_previous_scene()
+                elif event.key == pg.K_BACKSPACE:
+                    # array slicing is safe from null pointers
+                    self.filepath = self.filepath[:-1]
+                else:
+                    self.filepath += event.unicode
+
+    def update(self):
+        pass
+
+    def render(self, surface):
+        # for visuals only
+        self.game_display = self.manager.previous_scene.game_display
+
+        gui_window = pg.Surface((400, 100))
+        gui_window.fill((42, 82, 92))
+        filepath_display = freetype.render(self.filepath, (235, 235, 235))
+
+        self.game_display.blit(gui_window,
+                               (int((self.game_display.get_width() - gui_window.get_width()) / 2),
+                                int((self.game_display.get_height() - gui_window.get_height()) / 2)))
+
+        self.game_display.blit(filepath_display[0],
+                               (int((self.game_display.get_width() - filepath_display[0].get_width()) / 2),
+                                int((self.game_display.get_height() - filepath_display[0].get_height()) / 2) + 18))
+
+        self.game_display.blit(self.load_text[0],
+                               (int((self.game_display.get_width() - self.load_text[0].get_width()) / 2),
+                                int((self.game_display.get_height() - self.load_text[0].get_height()) / 2) - 18))
+
+        surface.blit(pg.transform.scale(self.game_display, (1050, 600)), (0, 0))
+
+
+class MapSaveScene(Scene):
+    def __init__(self, level):
+        super().__init__()
+        self.filepath = "assets/levels/"
+        self.save_text = freetype.render("Saves the file the following path:", (235, 235, 235))
+        self.level = level
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_RETURN:
+                    # makes the dict
+                    level_dict = self.level.serialise_to_dict()
+                    # writes the file
+                    with open(self.filepath, 'w') as outfile:
+                        json.dump(level_dict, outfile, indent=4)
+
+                    self.manager.go_to_previous_scene()
+                elif event.key == pg.K_ESCAPE:
+                    self.manager.go_to_previous_scene()
+                elif event.key == pg.K_BACKSPACE:
+                    # array slicing is safe from null pointers
+                    self.filepath = self.filepath[:-1]
+                else:
+                    self.filepath += event.unicode
+
+    def update(self):
+        pass
+
+    def render(self, surface):
+        # for visuals only
+        self.game_display = self.manager.previous_scene.game_display
+
+        gui_window = pg.Surface((400, 100))
+        gui_window.fill((42, 82, 92))
+        filepath_display = freetype.render(self.filepath, (235, 235, 235))
+
+        self.game_display.blit(gui_window,
+                               (int((self.game_display.get_width() - gui_window.get_width()) / 2),
+                                int((self.game_display.get_height() - gui_window.get_height()) / 2)))
+
+        self.game_display.blit(filepath_display[0],
+                               (int((self.game_display.get_width() - filepath_display[0].get_width()) / 2),
+                                int((self.game_display.get_height() - filepath_display[0].get_height()) / 2) + 18))
+
+        self.game_display.blit(self.save_text[0],
+                               (int((self.game_display.get_width() - self.save_text[0].get_width()) / 2),
+                                int((self.game_display.get_height() - self.save_text[0].get_height()) / 2) - 18))
+
+        surface.blit(pg.transform.scale(self.game_display, (1050, 600)), (0, 0))
+
+

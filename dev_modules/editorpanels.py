@@ -71,7 +71,6 @@ class PalettePanel:
         self.texture_selector_sub_panel = TextureSelectorSubPanel()
         self.texture_selector_sub_surface = pg.Surface((125, 240))
 
-
     def click(self, point):
         if point[1] < 60:
             self.load_save_sub_panel.click(point)
@@ -118,11 +117,23 @@ class LoadSaveSubPanel:
 
     def click(self, coordinates):
         if self.load_rect.collidepoint(coordinates):
-            print("kek")
+            pg.event.post(
+                pg.event.Event(
+                    EditorEvents.LOAD_FILE,
+                )
+            )
         elif self.save_rect.collidepoint(coordinates):
-            print("kekkle")
+            pg.event.post(
+                pg.event.Event(
+                    EditorEvents.SAVE_FILE,
+                )
+            )
         elif self.new_rect.collidepoint(coordinates):
-            print("kappa")
+            pg.event.post(
+                pg.event.Event(
+                    EditorEvents.NEW_FILE,
+                )
+            )
 
     def render(self, surface):
         surface.fill((35, 88, 112))

@@ -38,6 +38,20 @@ class EditorLevel:
         else:
             self.enemies.delete(coordinates)
 
+    def serialise_to_dict(self):
+        starting_position = self.player.rect.topleft
+        map = {
+            "background": self.map.bg_array,
+            "decorations": self.map.decorations_array,
+            "terrain": self.map.terrain_array
+        }
+        enemies = self.enemies.serialise_to_list()
+
+        return {"enemies": enemies,
+                "map": map,
+                "starting_position": starting_position
+                }
+
     def render(self, camera, surface):
         self.map.render(camera, surface)
         if self.draw_entities is True:
@@ -119,6 +133,7 @@ class EditorMap(Map):
         if layer == 1:
             self.bg_array[row][col] = "  "
             for sprite in self.background_terrain_group:
+                # Must click the starting locationn of the object before it can be deleted
                 if sprite.rect.collidepoint(coordinates):
                     sprite.kill()
                     break
@@ -174,7 +189,8 @@ class EditorEnemyManager:
                            }
 
         for enemy_dict in enemies_list:
-            self.enemies_list.append(EditorEnemy(self.enemy_type[enemy_dict["type"]],
+            self.enemies_list.append(EditorEnemy(enemy_dict["type"],
+                                                 self.enemy_type[enemy_dict["type"]],
                                                  enemy_dict["coordinates"]))
 
     def add(self, coordinates, code):
@@ -185,6 +201,15 @@ class EditorEnemyManager:
         for enemy in self.enemies_list:
             if enemy.rect.collidepoint(coordinates):
                 self.enemies_list.remove(enemy)
+
+    def serialise_to_list(self):
+        output_list = []
+        for enemy in self.enemies_list:
+            output_list.append({"type": enemy.code,
+                                "coordinates": [enemy.rect.x, enemy.rect.y]
+                                }
+                               )
+        return output_list
 
     def render(self, camera, surface):
         for enemy in self.enemies_list:
@@ -208,7 +233,8 @@ class EditorPlayer:
 
 
 class EditorEnemy:
-    def __init__(self, type_object, coordinates):
+    def __init__(self, code, type_object, coordinates):
+        self.code = code
         self.image = type_object.animation_library[EntityState.IDLE][0]
         self.rect = type_object.rect
         self.blit_rect = type_object.blit_rect
@@ -220,4 +246,3 @@ class EditorEnemy:
             surface.blit(self.image,
                          (self.rect.x - camera.rect.x, self.rect.y - camera.rect.y),
                          self.blit_rect)
-
