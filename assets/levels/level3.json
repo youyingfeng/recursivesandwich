@@ -1,5 +1,10 @@
 {
-    "enemies": [],
+    "enemies": [
+        {
+            "type": "Tooth Walker",
+            "coordinates": [180, 130]
+        }
+    ],
     "map": {
         "background": [
             ["xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx"],
@@ -16,7 +21,7 @@
             ["  ", "wl", "wl", "wl", "wl", "wl", "wl", "wl", "wl", "wl", "wl", "wl", "wl", "wl", "wl", "  "],
             ["  ", "wl", "wl", "bw", "wl", "bw", "wl", "bw", "wl", "1w", "wl", "wl", "wl", "wl", "wl", "  "],
             ["  ", "wl", "wl", "wl", "wl", "wl", "wl", "wl", "wl", "wb", "wl", "wl", "wl", "wl", "wl", "  "],
-            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
+            ["  ", "  ", "  ", "  ", "  ", "  ", "  ", "wl", "wl", "  ", "  ", "  ", "  ", "  ", "  ", "  "],
             ["xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx"],
             ["xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx", "xx"]
         ],

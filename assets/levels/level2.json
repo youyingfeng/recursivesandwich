@@ -2,11 +2,7 @@
     "enemies": [
         {
             "type": "Trash Monster",
-            "coordinates": [180, 150]
-        },
-        {
-            "type": "Trash Monster",
-            "coordinates": [230, 150]
+            "coordinates": [250, 150]
         }
     ],
     "map": {
