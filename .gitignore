@@ -1,0 +1,4 @@
+**/.DS_Store
+modules/__pycache__/
+dev_modules/__pycache__/
+.idea/
