@@ -10,6 +10,7 @@ from dev_modules.editorcamera import EditorCamera, PanelCamera
 
 ft.init()
 freetype = ft.Font("assets/fonts/pixChicago.ttf", 8)
+freetype.antialiased = False
 
 
 class MapPanel:
@@ -18,16 +19,24 @@ class MapPanel:
         self.level = EditorLevel(filepath)
         self.boundaries = (len(self.level.map.bg_array[0]) * Block.BLOCK_SIZE,
                            len(self.level.map.bg_array) * Block.BLOCK_SIZE)
-        self.current_block_code = "xx"
+        self.current_code = "xx"            # Can be an enemy code or a block code
         self.add_mode = True            # if this is false, then this is erase mode
         self.current_layer = 1
 
-    def click(self, point):
-        # handle events given the click point
-        pass
+        self.layer_to_string_repr = {1: "background",
+                                     2: "decorations",
+                                     3: "terrain",
+                                     4: "entities"
+                                     }
 
-        # have an add at method
-        # and an erase at method
+    def click(self, coordinates):
+        virtual_coordinates = (coordinates[0] + self.camera.rect.x,
+                               coordinates[1] + self.camera.rect.y)
+        # handle events given the click point
+        if self.add_mode is True:
+            self.level.add(virtual_coordinates, self.current_layer, self.current_code)
+        else:
+            self.level.delete(virtual_coordinates, self.current_layer)
 
     def update(self, current_keys):
         self.camera.update(current_keys[pg.K_UP],
@@ -39,6 +48,17 @@ class MapPanel:
     def render(self, surface):
         surface.fill((100, 100, 100))
         self.level.render(self.camera, surface)
+
+        current_code_display = freetype.render("current code: " + self.current_code, (235, 235, 235))
+        layer_display = freetype.render("layer: " + self.layer_to_string_repr[self.current_layer],
+                                        (235, 235, 235))
+        add_mode_display = freetype.render("mode: add" if self.add_mode else "mode: delete",
+                                           (235, 235, 235))
+
+        # blit status bar
+        surface.blit(current_code_display[0], (5, 5))
+        surface.blit(layer_display[0], (150, 5))
+        surface.blit(add_mode_display[0], (300, 5))
 
 
 class PalettePanel:

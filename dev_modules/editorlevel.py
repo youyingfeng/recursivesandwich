@@ -18,18 +18,30 @@ class EditorLevel:
         self.player = EditorPlayer(starting_position)
 
         # TOGGLES
-        self.draw_player = True
-        self.draw_enemies = True
+        self.draw_entities = True
 
-    def update(self, *args):
-        pass
+    def add(self, coordinates, layer, code):
+        # validation only
+        if len(code) == 2:
+            if layer != 4:
+                self.map.add(coordinates, layer, code)
+
+        else:
+            if code == "Player":
+                pass
+            elif layer == 4:
+                self.enemies.add(coordinates, code)
+
+    def delete(self, coordinates, layer):
+        if layer != 4:
+            self.map.delete(coordinates, layer)
+        else:
+            self.enemies.delete(coordinates)
 
     def render(self, camera, surface):
         self.map.render(camera, surface)
-        if self.draw_player is True:
+        if self.draw_entities is True:
             self.player.render(camera, surface)
-
-        if self.draw_enemies is True:
             self.enemies.render(camera, surface)
 
 
@@ -45,12 +57,87 @@ class EditorMap(Map):
         self.decorations_on = True
         self.terrain_on = True
 
+        self.texture_set = TextureSet()
+
         # basically layer 0 is bg, layer 1 is decorations, and layer 2 is terrain array.
         # bg controls the bg terrain group, deco controls the mg terrain group, and terrain controls the
         # collideable and interactive terrain groups
 
-    def update(self, *args):
-        pass
+    def add(self, coordinates, layer, code: str):
+        # input has already been validated
+        row = int(coordinates[1] / Block.BLOCK_SIZE)
+        col = int(coordinates[0] / Block.BLOCK_SIZE)
+
+        if layer == 1:
+            self.bg_array[row][col] = code
+            # kill the sprite
+            for sprite in self.background_terrain_group:
+                if sprite.rect.collidepoint(coordinates):
+                    sprite.kill()
+                    break
+            # then add the new sprite in
+            if code != "  ":
+                self.background_terrain_group.add(Block(self.texture_set.get_texture_from_code(code),
+                                                        col * Block.BLOCK_SIZE,
+                                                        row * Block.BLOCK_SIZE))
+        elif layer == 2:
+            self.decorations_array[row][col] = code
+            for sprite in self.middle_ground_terrain_group:
+                if sprite.rect.collidepoint(coordinates):
+                    sprite.kill()
+                    break
+
+            if code != "  ":
+                self.middle_ground_terrain_group.add(Block(self.texture_set.get_texture_from_code(code),
+                                                           col * Block.BLOCK_SIZE,
+                                                           row * Block.BLOCK_SIZE))
+        elif layer == 3:
+            self.terrain_array[row][col] = code
+            for sprite in self.collideable_terrain_group:
+                if sprite.rect.collidepoint(coordinates):
+                    sprite.kill()
+                    break
+            for sprite in self.interactive_objects_group:
+                if sprite.rect.collidepoint(coordinates):
+                    sprite.kill()
+                    break
+
+            if code != "  ":
+                # By right the group you add into doesnt matter here bc you cant update anyway lmao get rekt
+                # so ill just add them all to collideable terrain
+                # ffs you serialise from the array anyway
+                new_block = Block(self.texture_set.get_texture_from_code(code),
+                                  col * Block.BLOCK_SIZE,
+                                  row * Block.BLOCK_SIZE)
+                self.collideable_terrain_group.add(new_block)
+
+    def delete(self, coordinates, layer):
+        # replace both array and group
+        row = int(coordinates[1] / Block.BLOCK_SIZE)
+        col = int(coordinates[0] / Block.BLOCK_SIZE)
+
+        if layer == 1:
+            self.bg_array[row][col] = "  "
+            for sprite in self.background_terrain_group:
+                if sprite.rect.collidepoint(coordinates):
+                    sprite.kill()
+                    break
+        elif layer == 2:
+            self.decorations_array[row][col] = "  "
+            for sprite in self.middle_ground_terrain_group:
+                if sprite.rect.collidepoint(coordinates):
+                    sprite.kill()
+                    break
+        elif layer == 3:
+            self.terrain_array[row][col] = "  "
+            for sprite in self.collideable_terrain_group:
+                if sprite.rect.collidepoint(coordinates):
+                    sprite.kill()
+                    break
+            for sprite in self.interactive_objects_group:
+                if sprite.rect.collidepoint(coordinates):
+                    sprite.kill()
+                    break
 
     def render(self, camera, surface):
         if self.bg_on:
@@ -79,6 +166,7 @@ class EditorMap(Map):
 
 class EditorEnemyManager:
     def __init__(self, enemies_list):
+        # serialise from this list
         self.enemies_list = []
         self.enemy_type = {"Pink Guy": PinkGuy(),
                            "Trash Monster": TrashMonster(),
@@ -88,6 +176,15 @@ class EditorEnemyManager:
         for enemy_dict in enemies_list:
             self.enemies_list.append(EditorEnemy(self.enemy_type[enemy_dict["type"]],
                                                  enemy_dict["coordinates"]))
+
+    def add(self, coordinates, code):
+        self.enemies_list.append(EditorEnemy(self.enemy_type[code],
+                                             coordinates))
+
+    def delete(self, coordinates):
+        for enemy in self.enemies_list:
+            if enemy.rect.collidepoint(coordinates):
+                self.enemies_list.remove(enemy)
 
     def render(self, camera, surface):
         for enemy in self.enemies_list:

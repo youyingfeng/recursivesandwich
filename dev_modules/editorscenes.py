@@ -96,7 +96,7 @@ class MapEditorScene(Scene):
                     self.map_panel.click(point)
             elif event.type == EditorEvents.BLOCK_SWITCH:
                 print(event.code)
-                self.map_panel.current_block_code = event.code
+                self.map_panel.current_code = event.code
             elif event.type == pg.KEYDOWN:
                 if event.mod & pg.KMOD_SHIFT:
                     # Enables and disables display of the corresponding layers
@@ -107,7 +107,7 @@ class MapEditorScene(Scene):
                     elif event.key == pg.K_3:
                         self.map_panel.level.map.terrain_on = not self.map_panel.level.map.terrain_on
                     elif event.key == pg.K_4:
-                        self.map_panel.level.draw_enemies = not self.map_panel.level.draw_enemies
+                        self.map_panel.level.draw_entities = not self.map_panel.level.draw_entities
                 else:
                     # Sets the current active layer
                     if event.key == pg.K_1:
@@ -118,6 +118,10 @@ class MapEditorScene(Scene):
                         self.map_panel.current_layer = 3
                     elif event.key == pg.K_4:
                         self.map_panel.current_layer = 4
+                    elif event.key == pg.K_a:
+                        self.map_panel.add_mode = True
+                    elif event.key == pg.K_d:
+                        self.map_panel.add_mode = False
 
     def update(self):
         current_keys = pg.key.get_pressed()

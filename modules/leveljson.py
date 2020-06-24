@@ -93,8 +93,6 @@ class Map:
         self.collideable_terrain_group = pg.sprite.Group()      # front layer
         self.interactive_objects_group = pg.sprite.Group()      # front layer
 
-
-
         texture_set = TextureSet()
 
         background_layer = map_dict["background"]
