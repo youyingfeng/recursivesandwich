@@ -17,6 +17,7 @@ def main() -> None:
     pg.mixer.init(44100, 16, 2, 512)
 
     pg.mixer.pre_init(44100, 16, 2, 512)
+
     # Initialise PyGame
     pg.init()
 
