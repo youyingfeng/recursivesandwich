@@ -71,20 +71,6 @@ class Spritesheet:
         self.spritesheet = pg.transform.scale(self.spritesheet, (self.width * self.columns, self.height * self.rows))
 
 
-# -------------------- Type objects to store hitboxes of different textures -------------------- #
-# This level of complication is really just to make life easier
-class TerrainType:
-    """Stores a texture and its corresponding hitbox dimensions"""
-    def __init__(self, image: pg.Surface, block_pos_x=0, block_pos_y=0, block_width=1, block_height=1):
-        # All numbers are relative to the size of a normal block
-        # (i.e. must be between 0 and 1, where 1 is the size of an actual block)
-        self.image = image
-        self.block_pos_x = block_pos_x
-        self.block_pos_y = block_pos_y
-        self.block_width = block_width
-        self.block_height = block_height
-
-
 class Tileset:
     """Utility class to load static textures from a spritesheet"""
     def __init__(self, filepath):
@@ -106,5 +92,19 @@ class Tileset:
             image.set_colorkey(colorkey, pg.RLEACCEL)
 
         return image
+
+
+# -------------------- Type objects to store hitboxes of different textures -------------------- #
+# This level of complication is really just to make life easier
+class TerrainType:
+    """Stores a texture and its corresponding hitbox dimensions"""
+    def __init__(self, image: pg.Surface, block_pos_x=0, block_pos_y=0, block_width=1, block_height=1):
+        # All numbers are relative to the size of a normal block
+        # (i.e. must be between 0 and 1, where 1 is the size of an actual block)
+        self.image = image
+        self.block_pos_x = block_pos_x
+        self.block_pos_y = block_pos_y
+        self.block_width = block_width
+        self.block_height = block_height
 
 

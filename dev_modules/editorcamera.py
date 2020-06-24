@@ -27,7 +27,7 @@ class EditorCamera:
 
 class PanelCamera:
     def __init__(self):
-        self.rect = pg.Rect(0, 0, 125, 200)
+        self.rect = pg.Rect(0, 0, 125, 240)
 
     def scroll(self, up, down):
         if up:

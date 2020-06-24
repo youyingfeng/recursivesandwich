@@ -16,7 +16,6 @@ def main() -> None:
 
     # Initialise PyGame
     pg.init()
-    ft.init()
 
     # Initialise window
     window = pg.display.set_mode((1050, 600))

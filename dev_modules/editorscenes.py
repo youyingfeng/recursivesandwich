@@ -88,7 +88,7 @@ class MapEditorScene(Scene):
                 pg.quit()
                 quit()
             elif event.type == pg.MOUSEBUTTONDOWN:
-                point = [event.pos[0], event.pos[1]]
+                point = [event.pos[0] / 2, event.pos[1] / 2]
                 if point[0] < 125:
                     self.palette_panel.click(point)
                 else:

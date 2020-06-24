@@ -21,10 +21,6 @@ class Block(pg.sprite.Sprite):
                                         (int(type_object.block_width * Block.BLOCK_SIZE),
                                          int(type_object.block_height * Block.BLOCK_SIZE))
                                         )
-        self.blit_rect = pg.Rect(x + int(type_object.block_pos_x * Block.BLOCK_SIZE),
-                                 y + int(type_object.block_pos_y * Block.BLOCK_SIZE),
-                                 int(type_object.block_width * Block.BLOCK_SIZE),
-                                 int(type_object.block_height * Block.BLOCK_SIZE))
         self.rect = pg.Rect(x + int(type_object.block_pos_x * Block.BLOCK_SIZE),
                             y + int(type_object.block_pos_y * Block.BLOCK_SIZE),
                             int(type_object.block_width * Block.BLOCK_SIZE),
@@ -70,8 +66,7 @@ class FallingBlock(Block):
         if (self.rect.top == player.rect.bottom) \
                 and (self.rect.left < player.rect.left < self.rect.right \
                      or self.rect.left < player.rect.right < self.rect.right):
-            self.blit_rect.y += self.vel
-            self.rect.y = self.blit_rect.y
+            self.rect.y += self.vel
 
             # This is necessary - or else, player will fluctuate between the IDLE and JUMPING state
             # causing it to flash
@@ -102,22 +97,21 @@ class MovingBlock(Block):
             and (self.rect.left < player.rect.left < self.rect.right \
                  or self.rect.left < player.rect.right < self.rect.right)) \
                 and (player.state != EntityState.HANGING and player.state != EntityState.CLIMBING):
-            if (player.direction == Direction.RIGHT):
-                self.blit_rect.x += self.vel
-                self.rect.x = self.blit_rect.x
+
+            if player.direction == Direction.LEFT:
+                self.rect.x -= self.vel
                 player.rect.x = self.rect.x
-            if (player.direction == Direction.LEFT):
-                self.blit_rect.x -= self.vel
-                self.rect.x = self.blit_rect.x
+
+            if player.direction == Direction.RIGHT:
+                self.rect.x += self.vel
                 player.rect.x = self.rect.x
 
             if pg.key.get_pressed()[pg.K_UP]:
-                self.blit_rect.y -= self.vel
-                self.rect.y = self.blit_rect.y
+                self.rect.y -= self.vel
                 player.rect.bottom = self.rect.top
+
             elif pg.key.get_pressed()[pg.K_DOWN]:
-                self.blit_rect.y += self.vel
-                self.rect.y = self.blit_rect.y
+                self.rect.y += self.vel
                 player.rect.bottom = self.rect.top
 
 
@@ -166,22 +160,18 @@ class PushableBlock(Block):
     # A pushable block reacts to gravity, hence it interacts with both the player and terrain group
     # In future, possible to make one superclass for all blocks that are affected by gravity and collides with other blocks
     def update(self, player, terrain_group):
-        self.blit_rect.x = self.rect.x
-        self.blit_rect.y = self.rect.y
 
         # If player is pushing the block
         if (self.rect.left == player.rect.right or self.rect.right == player.rect.left) \
                 and player.state == EntityState.WALKING \
                 and player.rect.bottom == self.rect.bottom:
             self.rect.x += player.x_velocity / 2
-            self.blit_rect.x = self.rect.x
 
         for colliding_sprite in pg.sprite.spritecollide(self, terrain_group, False):
             if colliding_sprite.rect.left < self.rect.left < colliding_sprite.rect.right:
                 self.rect.left = colliding_sprite.rect.right
             if colliding_sprite.rect.left < self.rect.right < colliding_sprite.rect.right:
                 self.rect.right = colliding_sprite.rect.left
-            self.blit_rect.x = self.rect.x
 
         self.y_velocity += self.gravity
         self.rect.y += self.y_velocity
@@ -194,4 +184,3 @@ class PushableBlock(Block):
                 isFloating = False
                 self.rect.bottom = colliding_sprite.rect.top
                 self.y_velocity = 0
-            self.blit_rect.y = self.rect.y

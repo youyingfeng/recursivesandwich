@@ -57,24 +57,24 @@ class EditorMap(Map):
             for sprite in self.background_terrain_group:
                 if camera.rect.colliderect(sprite.rect):
                     surface.blit(sprite.image,
-                                 (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+                                 (sprite.rect.x - camera.rect.x, sprite.rect.y - camera.rect.y))
 
         if self.decorations_on:
             for sprite in self.middle_ground_terrain_group:
                 if camera.rect.colliderect(sprite.rect):
                     surface.blit(sprite.image,
-                                 (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+                                 (sprite.rect.x - camera.rect.x, sprite.rect.y - camera.rect.y))
 
         if self.terrain_on:
             for sprite in self.collideable_terrain_group:
                 if camera.rect.colliderect(sprite.rect):
                     surface.blit(sprite.image,
-                                 (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+                                 (sprite.rect.x - camera.rect.x, sprite.rect.y - camera.rect.y))
 
             for sprite in self.interactive_objects_group:
                 if camera.rect.colliderect(sprite.rect):
                     surface.blit(sprite.image,
-                                 (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+                                 (sprite.rect.x - camera.rect.x, sprite.rect.y - camera.rect.y))
 
 
 class EditorEnemyManager:

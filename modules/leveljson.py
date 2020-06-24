@@ -174,19 +174,19 @@ class Map:
     def render(self, camera, surface):
         for sprite in self.background_terrain_group:
             if camera.rect.colliderect(sprite.rect):
-                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+                surface.blit(sprite.image, (sprite.rect.x - camera.rect.x, sprite.rect.y - camera.rect.y))
 
         for sprite in self.middle_ground_terrain_group:
             if camera.rect.colliderect(sprite.rect):
-                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+                surface.blit(sprite.image, (sprite.rect.x - camera.rect.x, sprite.rect.y - camera.rect.y))
 
         for sprite in self.collideable_terrain_group:
             if camera.rect.colliderect(sprite.rect):
-                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+                surface.blit(sprite.image, (sprite.rect.x - camera.rect.x, sprite.rect.y - camera.rect.y))
 
         for sprite in self.interactive_objects_group:
             if camera.rect.colliderect(sprite.rect):
-                surface.blit(sprite.image, (sprite.blit_rect.x - camera.rect.x, sprite.blit_rect.y - camera.rect.y))
+                surface.blit(sprite.image, (sprite.rect.x - camera.rect.x, sprite.rect.y - camera.rect.y))
 
 
 class EnemyManager:
