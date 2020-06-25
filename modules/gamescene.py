@@ -108,7 +108,10 @@ class TitleScene(Scene):
                 pg.quit()
                 quit()
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+                elif event.key == pg.K_SPACE:
                     # Starts the game
                     self.manager.switch_to_scene(GameScene())
 
@@ -169,7 +172,10 @@ class GameScene(Scene):
                 pg.quit()
                 quit()
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_ESCAPE:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+                elif event.key == pg.K_ESCAPE:
                     pg.mixer.music.pause()
                     self.manager.switch_to_scene(PauseScene())
             elif event.type == GameEvent.SWITCH_LEVEL.value:
@@ -235,9 +241,13 @@ class GameOverScene(Scene):
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
-            elif event.type == pg.KEYDOWN and event.key == pg.K_f:
-                # TODO: HANDLE THIS BETTER TO ENSURE NO MEMORY BLOAT
-                self.manager.switch_to_scene(GameScene())
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+                elif event.key == pg.K_f:
+                    # TODO: HANDLE THIS BETTER TO ENSURE NO MEMORY BLOAT
+                    self.manager.switch_to_scene(GameScene())
 
     def update(self):
         pass
@@ -271,7 +281,10 @@ class GameBeatenScene(Scene):
                 pg.quit()
                 quit()
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+                elif event.key == pg.K_SPACE:
                     pg.quit()
                     quit()
 
@@ -302,9 +315,13 @@ class PauseScene(Scene):
                 pg.quit()
                 quit()
             elif event.type == pg.KEYDOWN:
-                pg.mixer.music.unpause()
-                # Resume the game by going back to the previous scene
-                self.manager.go_to_previous_scene()
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+                else:
+                    pg.mixer.music.unpause()
+                    # Resume the game by going back to the previous scene
+                    self.manager.go_to_previous_scene()
 
     def update(self, *args):
         pass
@@ -327,8 +344,13 @@ class LoadingScene(Scene):
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
             elif event.type == GameEvent.GAME_COMPLETE.value:
                 self.manager.switch_to_scene(GameBeatenScene())
+
 
     def update(self, *args):
         if self.wait_frames <= 0:

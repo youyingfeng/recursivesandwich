@@ -77,7 +77,10 @@ class MapEditorScene(Scene):
                     point[0] -= 125
                     self.map_panel.click(point)
             elif event.type == pg.KEYDOWN:
-                if event.mod & pg.KMOD_SHIFT:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+                elif event.mod & pg.KMOD_SHIFT:
                     # Enables and disables display of the corresponding layers
                     if event.key == pg.K_1:
                         self.map_panel.level.map.bg_on = not self.map_panel.level.map.bg_on
@@ -139,7 +142,10 @@ class MapLoadScene(Scene):
                 pg.quit()
                 quit()
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+                elif event.key == pg.K_RETURN:
                     self.manager.switch_to_scene(MapEditorScene(self.filepath))
                 elif event.key == pg.K_ESCAPE:
                     self.manager.go_to_previous_scene()
@@ -188,7 +194,10 @@ class MapSaveScene(Scene):
                 pg.quit()
                 quit()
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+                elif event.key == pg.K_RETURN:
                     # makes the dict
                     level_dict = self.level.serialise_to_dict()
                     # writes the file
@@ -247,7 +256,10 @@ class NewMapScene(Scene):
                 pg.quit()
                 quit()
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+                elif event.key == pg.K_RETURN:
                     self.manager.switch_to_scene(MapEditorScene(None, (self.width, self.height)))
                 elif event.key == pg.K_ESCAPE:
                     self.manager.go_to_previous_scene()
