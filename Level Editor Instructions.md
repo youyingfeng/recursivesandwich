@@ -97,3 +97,28 @@ will prompt you to enter the name of the file which the
 level will be saved to. The file must have a .json file 
 extension, otherwise it will not be loaded by the game.
 
+## Summary of Controls  
+|Key      |Action   |
+|---------|---------|
+|Up       |Scrolls the map upwards|
+|Down     |Scrolls the map downwards|
+|Left     |Scrolls the map to the left|
+|Right    |Scrolls the map to the right|
+|W        |Scrolls the texture/enemy panel upwards|
+|S        |Scrolls the texture/enemy panel downwards|
+|Q        |Switches to the texture selection panel|
+|E        |Switches to the enemy selection panel|
+|A        |Switches to Add mode|
+|D        |Switches to Delete mode|
+|1        |Sets the Background layer as the focus|
+|2        |Sets the Decorations layer as the focus|
+|3        |Sets the Terrain layer as the focus|
+|4        |Sets the Enemies layer as the focus|
+|5        |Sets the Starting_Position layer as the focus|
+|Shift + 1||
+|Shift + 2||
+|Shift + 3||
+|Shift + 4||
+|Shift + 5||
+
+

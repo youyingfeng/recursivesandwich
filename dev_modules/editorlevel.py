@@ -32,7 +32,7 @@ class EditorLevel:
         self.player = EditorPlayer(starting_position)
 
         # TOGGLES
-        self.draw_entities = True
+        self.draw_enemies = True
         self.draw_player_starting_position = True
 
     def add(self, coordinates, layer, code):
@@ -69,7 +69,7 @@ class EditorLevel:
 
     def render(self, camera, surface):
         self.map.render(camera, surface)
-        if self.draw_entities is True:
+        if self.draw_enemies is True:
             self.enemies.render(camera, surface)
         if self.draw_player_starting_position is True:
             self.player.render(camera, surface)

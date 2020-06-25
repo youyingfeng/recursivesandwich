@@ -30,7 +30,7 @@ class MapPanel:
         self.layer_to_string_repr = {1: "background",
                                      2: "decorations",
                                      3: "terrain",
-                                     4: "entities",
+                                     4: "enemies",
                                      5: "starting_position"
                                      }
 
@@ -145,20 +145,20 @@ class LoadSaveSubPanel:
             )
 
     def render(self, surface):
-        surface.fill((35, 88, 112))
+        surface.fill((38, 73, 77))
         surface.blit(self.load[0], self.load_pos)
         surface.blit(self.save[0], self.save_pos)
         surface.blit(self.new[0], self.new_pos)
 
 
 class TextureSelectorSubPanel:
-    """Contains two sub-panels for selecting blocks and selecting entities"""
+    """Contains two sub-panels for selecting blocks and selecting enemies"""
     def __init__(self):
         textureset = TextureSet()
         next_x = 10
         next_y = 10
 
-        self.on_texture_menu = True     # if False, selects entities instead
+        self.on_texture_menu = True     # if False, selects enemies instead
 
         # Texture selection menu
         self.texture_button_array = []
@@ -214,7 +214,7 @@ class TextureSelectorSubPanel:
 
     def render(self, surface):
         """Renders the sub-panel"""
-        surface.fill((35, 88, 112))
+        surface.fill((38, 73, 77))
 
         # Selects which sub-menu to render based on which menu is active
         if self.on_texture_menu is True:

@@ -89,7 +89,7 @@ class MapEditorScene(Scene):
                     elif event.key == pg.K_3:
                         self.map_panel.level.map.terrain_on = not self.map_panel.level.map.terrain_on
                     elif event.key == pg.K_4:
-                        self.map_panel.level.draw_entities = not self.map_panel.level.draw_entities
+                        self.map_panel.level.draw_enemies = not self.map_panel.level.draw_enemies
                     elif event.key == pg.K_5:
                         self.map_panel.level.draw_player_starting_position = not self.map_panel.level.draw_player_starting_position
                 else:
