@@ -7,10 +7,24 @@ from modules.entities import Player, EnemyType, PinkGuy, TrashMonster, ToothWalk
 
 
 class EditorLevel:
-    def __init__(self, filepath: str):
+    """Level class with additional methods for customising the level"""
+    def __init__(self, filepath: str, dimensions):
         # loads the json file from the specified filepath
-        with open(filepath) as f:
-            data = json.load(open(filepath))
+        if filepath is None:
+            cols = int(dimensions[0])
+            rows = int(dimensions[1])
+            data = {
+                "enemies": [],
+                "map": {"background": [["  "] * cols] * rows,
+                        "decorations": [["  "] * cols] * rows,
+                        "terrain": [["  "] * cols] * rows
+                        },
+                "starting_position": [rows * Block.BLOCK_SIZE / 2,
+                                      cols * Block.BLOCK_SIZE / 2]
+            }
+        else:
+            with open(filepath) as f:
+                data = json.load(f)
 
         self.enemies = EditorEnemyManager(data["enemies"])
         self.map = EditorMap(data["map"])
@@ -19,24 +33,25 @@ class EditorLevel:
 
         # TOGGLES
         self.draw_entities = True
+        self.draw_player_starting_position = True
 
     def add(self, coordinates, layer, code):
         # validation only
-        if len(code) == 2:
-            if layer != 4:
-                self.map.add(coordinates, layer, code)
-
+        if layer == 5:
+            self.player.rect.topleft = coordinates
         else:
-            if code == "Player":
-                pass
-            elif layer == 4:
+            if layer == 4:
                 self.enemies.add(coordinates, code)
+            else:
+                if len(code) == 2:
+                    self.map.add(coordinates, layer, code)
 
     def delete(self, coordinates, layer):
-        if layer != 4:
-            self.map.delete(coordinates, layer)
-        else:
-            self.enemies.delete(coordinates)
+        if layer != 5:
+            if layer != 4:
+                self.map.delete(coordinates, layer)
+            else:
+                self.enemies.delete(coordinates)
 
     def serialise_to_dict(self):
         starting_position = self.player.rect.topleft
@@ -55,8 +70,9 @@ class EditorLevel:
     def render(self, camera, surface):
         self.map.render(camera, surface)
         if self.draw_entities is True:
-            self.player.render(camera, surface)
             self.enemies.render(camera, surface)
+        if self.draw_player_starting_position is True:
+            self.player.render(camera, surface)
 
 
 class EditorMap(Map):
@@ -180,6 +196,7 @@ class EditorMap(Map):
 
 
 class EditorEnemyManager:
+    """Stripped-down enemy manager"""
     def __init__(self, enemies_list):
         # serialise from this list
         self.enemies_list = []
@@ -194,7 +211,8 @@ class EditorEnemyManager:
                                                  enemy_dict["coordinates"]))
 
     def add(self, coordinates, code):
-        self.enemies_list.append(EditorEnemy(self.enemy_type[code],
+        self.enemies_list.append(EditorEnemy(code,
+                                             self.enemy_type[code],
                                              coordinates))
 
     def delete(self, coordinates):
@@ -203,6 +221,7 @@ class EditorEnemyManager:
                 self.enemies_list.remove(enemy)
 
     def serialise_to_list(self):
+        """Converts the state of the manager to a JSON array equivalent in python (aka a list)"""
         output_list = []
         for enemy in self.enemies_list:
             output_list.append({"type": enemy.code,
@@ -217,13 +236,13 @@ class EditorEnemyManager:
 
 
 class EditorPlayer:
+    """Stripped-down player for use in the map editor"""
     def __init__(self, coordinates):
         player = Player()
         self.image = player.image
-        self.rect = player.rect
+        self.rect = player.rect.copy()
         self.blit_rect = player.blit_rect
-        self.rect.x = coordinates[0]
-        self.rect.y = coordinates[1]
+        self.rect.topleft = coordinates
 
     def render(self, camera, surface):
         if camera.rect.colliderect(self.rect):
@@ -233,10 +252,11 @@ class EditorPlayer:
 
 
 class EditorEnemy:
+    """Stripped-down enemy for use in the map editor"""
     def __init__(self, code, type_object, coordinates):
         self.code = code
         self.image = type_object.animation_library[EntityState.IDLE][0]
-        self.rect = type_object.rect
+        self.rect = type_object.rect.copy()
         self.blit_rect = type_object.blit_rect
         self.rect.x = coordinates[0]
         self.rect.y = coordinates[1]

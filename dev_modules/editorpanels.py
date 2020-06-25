@@ -1,6 +1,5 @@
 import pygame as pg
 import pygame.freetype as ft
-import json
 
 from dev_modules.events import EditorEvents
 from modules.textureset import TextureSet
@@ -14,11 +13,16 @@ freetype.antialiased = False
 
 
 class MapPanel:
-    def __init__(self, filepath):
+    """Displays the map in the Editor, and allows for the editing of objects"""
+    def __init__(self, filepath, dimensions):
         self.camera = EditorCamera()
-        self.level = EditorLevel(filepath)
-        self.boundaries = (len(self.level.map.bg_array[0]) * Block.BLOCK_SIZE,
-                           len(self.level.map.bg_array) * Block.BLOCK_SIZE)
+        self.level = EditorLevel(filepath, dimensions)
+        if filepath is None:
+            self.boundaries = (int(dimensions[0]) * Block.BLOCK_SIZE,
+                               int(dimensions[1]) * Block.BLOCK_SIZE)
+        else:
+            self.boundaries = (len(self.level.map.bg_array[0]) * Block.BLOCK_SIZE,
+                               len(self.level.map.bg_array) * Block.BLOCK_SIZE)
         self.current_code = "xx"            # Can be an enemy code or a block code
         self.add_mode = True            # if this is false, then this is erase mode
         self.current_layer = 1
@@ -26,19 +30,24 @@ class MapPanel:
         self.layer_to_string_repr = {1: "background",
                                      2: "decorations",
                                      3: "terrain",
-                                     4: "entities"
+                                     4: "entities",
+                                     5: "starting_position"
                                      }
 
     def click(self, coordinates):
+        # Since the screen is scaled to 4x the original, we have to translate the coordinates from the game window
+        # to the virtual screen
         virtual_coordinates = (coordinates[0] + self.camera.rect.x,
                                coordinates[1] + self.camera.rect.y)
-        # handle events given the click point
+
+        # Adds or deletes blocks at the clicked coordinate
         if self.add_mode is True:
             self.level.add(virtual_coordinates, self.current_layer, self.current_code)
         else:
             self.level.delete(virtual_coordinates, self.current_layer)
 
     def update(self, current_keys):
+        # Scrolls the camera
         self.camera.update(current_keys[pg.K_UP],
                            current_keys[pg.K_DOWN],
                            current_keys[pg.K_LEFT],
@@ -62,9 +71,8 @@ class MapPanel:
 
 
 class PalettePanel:
+    """Allows the user to select objects to place on the map, and also allows for load/save/create"""
     def __init__(self):
-        # TODO: Render Surface != Actual position, so rect will collide
-        # place Map on the left and palette on the right
         self.load_save_sub_panel = LoadSaveSubPanel()
         self.load_save_sub_surface = pg.Surface((125, 60))
 
@@ -72,6 +80,7 @@ class PalettePanel:
         self.texture_selector_sub_surface = pg.Surface((125, 240))
 
     def click(self, point):
+        """Translates clicks into virtual coordinates at each panel"""
         if point[1] < 60:
             self.load_save_sub_panel.click(point)
         else:
@@ -89,8 +98,8 @@ class PalettePanel:
 
 
 class LoadSaveSubPanel:
+    """Handles the loading, saving, and creation of Levels"""
     def __init__(self):
-        # I could probably shove this in individual buttons, but im gonna save on the indirection first
         self.load = freetype.render("load file", (235, 235, 235))
         self.save = freetype.render("save file", (235, 235, 235))
         self.new = freetype.render("new file", (235, 235, 235))
@@ -143,39 +152,83 @@ class LoadSaveSubPanel:
 
 
 class TextureSelectorSubPanel:
+    """Contains two sub-panels for selecting blocks and selecting entities"""
     def __init__(self):
         textureset = TextureSet()
         next_x = 10
         next_y = 10
 
-        self.button_array = []
+        self.on_texture_menu = True     # if False, selects entities instead
+
+        # Texture selection menu
+        self.texture_button_array = []
         for code in textureset.code_to_texture_dictionary.keys():
             terraintype = textureset.get_texture_from_code(code)
-            self.button_array.append(TextureButton(code,
-                                                   (next_x, next_y),
-                                                   terraintype))
+            self.texture_button_array.append(TextureButton(code,
+                                                           (next_x, next_y),
+                                                           terraintype))
             next_y += terraintype.block_height * Block.BLOCK_SIZE + 10
 
-        self.camera = PanelCamera(next_y)
+        self.texture_panel_camera = PanelCamera(next_y)
+
+        # Entity selection menu
+        next_y = 10
+        self.entity_button_array = []
+        enemy_type = {"Pink Guy": PinkGuy(),
+                      "Trash Monster": TrashMonster(),
+                      "Tooth Walker": ToothWalker()
+                      }
+        for code in enemy_type.keys():
+            enemytypeobject = enemy_type[code]
+            self.entity_button_array.append(EntityButton(code,
+                                                         (next_x, next_y),
+                                                         enemytypeobject))
+            next_y += enemytypeobject.rect.height + 10
+
+        self.entity_panel_camera = PanelCamera(next_y)
 
     def click(self, coordinates):
-        virtual_coordinates = (coordinates[0], coordinates[1] + self.camera.rect.y)
-        for button in self.button_array:
-            if button.collidepoint(virtual_coordinates):
-                button.on_click()
-                return
+        """Handles click events in the sub-panel"""
+        # The if-else statement handles whether to select from the texture menu or the entity menu
+        if self.on_texture_menu is True:
+            virtual_coordinates = (coordinates[0], coordinates[1] + self.texture_panel_camera.rect.y)
+            for button in self.texture_button_array:
+                if button.collidepoint(virtual_coordinates):
+                    button.on_click()
+                    return
+        else:
+            virtual_coordinates = (coordinates[0], coordinates[1] + self.entity_panel_camera.rect.y)
+            for button in self.entity_button_array:
+                if button.collidepoint(virtual_coordinates):
+                    button.on_click()
+                    return
 
     def update(self, current_keys):
-        self.camera.scroll(current_keys[pg.K_w],
-                           current_keys[pg.K_s])
+        """Scrolls the texture sub-panel"""
+        if self.on_texture_menu is True:
+            self.texture_panel_camera.scroll(current_keys[pg.K_w],
+                                             current_keys[pg.K_s])
+        else:
+            self.entity_panel_camera.scroll(current_keys[pg.K_w],
+                                            current_keys[pg.K_s])
 
     def render(self, surface):
+        """Renders the sub-panel"""
         surface.fill((35, 88, 112))
-        for button in self.button_array:
-            if self.camera.rect.colliderect(button.rect):
-                surface.blit(button.image,
-                             (button.rect.x - self.camera.rect.x,
-                              button.rect.y - self.camera.rect.y))
+
+        # Selects which sub-menu to render based on which menu is active
+        if self.on_texture_menu is True:
+            for button in self.texture_button_array:
+                if self.texture_panel_camera.rect.colliderect(button.rect):
+                    surface.blit(button.image,
+                                 (button.rect.x - self.texture_panel_camera.rect.x,
+                                  button.rect.y - self.texture_panel_camera.rect.y))
+        else:
+            for button in self.entity_button_array:
+                if self.entity_panel_camera.rect.colliderect(button.rect):
+                    surface.blit(button.image,
+                                 (button.rect.x - self.entity_panel_camera.rect.x,
+                                  button.rect.y - self.entity_panel_camera.rect.y))
 
 
 class TextureButton:
@@ -201,6 +254,23 @@ class TextureButton:
             )
         )
 
+class EntityButton:
+    def __init__(self, code, coordinates, enemytype):
+        self.code = code
+        self.image = enemytype.animation_library[EntityState.IDLE][0].subsurface(enemytype.blit_rect)
+        self.rect = enemytype.rect
+        self.rect.topleft = coordinates
+
+    def collidepoint(self, coordinates):
+        return self.rect.collidepoint(coordinates)
+
+    def on_click(self):
+        pg.event.post(
+            pg.event.Event(
+                EditorEvents.BLOCK_SWITCH,
+                {"code": self.code}
+            )
+        )
 
 
 
