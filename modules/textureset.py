@@ -13,13 +13,13 @@ class TextureSet:
         decorations = Tileset("assets/textures/environment/static/decorations.png")
         self.textures = {
             # ------------------------------ INTERACTIVE BLOCKS ------------------------------ #
-            "SPIKES_UPRIGHT": TerrainType(decorations.get_image_at(pg.Rect(208, 196, 16, 16)), 0, 0.4, 1, 0.6),
+            "SPIKES_UPRIGHT": TerrainType(decorations.get_image_at(pg.Rect(208, 196, 32, 10)), 0, 0.7, 1, 0.3),
             "ENTRANCE/EXIT": TerrainType(tileset.get_image_at(pg.Rect(1584, 464, 32, 28)), 0, -0.5, 1, 1.5),
             "COIN": TerrainType(ruby.get_image_at(pg.Rect(0, 0, 15, 16)), 0.2, 0.2, 0.6, 0.6),
             "FALLING_BLOCK": TerrainType(tileset.get_image_at(pg.Rect(208, 672, 32, 32))),
             "MOVING_BLOCK": TerrainType(tileset.get_image_at(pg.Rect(1424, 656, 32, 32))),
             "LADDER": TerrainType(decorations.get_image_at(pg.Rect(184, 16, 32, 32))),
-            "PUSHABLE": TerrainType(decorations.get_image_at(pg.Rect(209, 113, 13, 13))),
+            "PUSHABLE": TerrainType(decorations.get_image_at(pg.Rect(209, 113, 14, 15))),
 
             # ------------------------------ COLLIDEABLE BLOCKS ------------------------------ #
             "CORNER_BOTTOM_LEFT":   TerrainType(tileset.get_image_at(pg.Rect(160, 720, 32, 32))),
@@ -40,7 +40,7 @@ class TextureSet:
             # ------------------------------ NON-COLLIDEABLE BLOCKS ------------------------------ #
             "BG_FILLER":               TerrainType(tileset.get_image_at(pg.Rect(48, 544, 32, 32))),
             "BG_WALL":              TerrainType(tileset.get_image_at(pg.Rect(1328, 472, 32, 32))),
-            "BG_WALL_BOTTOM_HALF":  TerrainType(tileset.get_image_at(pg.Rect(1328, 488, 32, 16)), 0, 0.5, 1, 0.5),
+            "BG_WALL_BOTTOM_HALF":  TerrainType(tileset.get_image_at(pg.Rect(1328, 488, 32, 16)), 0, 0.48, 1, 0.52),
             "BG_WINDOW_DOUBLE":    TerrainType(tileset.get_image_at(pg.Rect(1088, 240, 144, 128)), 0, 0, 4.5, 4),
             # single window adds one extra pixel to eliminate a hole
             "BG_WINDOW_SINGLE":     TerrainType(tileset.get_image_at(pg.Rect(1472, 96, 65, 64)), -0.5, -0.40625, 2, 2),

@@ -133,7 +133,7 @@ class PhysicsComponent(Component):
         super().__init__()
         self.gravity = 1
 
-    def update(self, entity, map):
+    def update(self, entity, game_map):
         # Enforces gravity
         if entity.state != EntityState.CLIMBING and entity.state != EntityState.HANGING:
             entity.y_velocity += self.gravity
@@ -143,7 +143,7 @@ class PhysicsComponent(Component):
         entity.rect.y += entity.y_velocity
 
         isJumping = True
-        for colliding_sprite in pg.sprite.spritecollide(entity, map.collideable_terrain_group, False):
+        for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
             if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
                 entity.rect.top = colliding_sprite.rect.bottom
                 entity.y_velocity = 0
@@ -161,14 +161,14 @@ class PhysicsComponent(Component):
         # Then handles collisions along the x axis
         entity.rect.x += entity.x_velocity
 
-        for colliding_sprite in pg.sprite.spritecollide(entity, map.collideable_terrain_group, False):
+        for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
             if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
                 entity.rect.left = colliding_sprite.rect.right
             if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
                 entity.rect.right = colliding_sprite.rect.left
 
         # Then keeps everything within map boundaries
-        map_width = map.rect.width
+        map_width = game_map.rect.width
         if entity.rect.top < 0:
             entity.rect.top = 0
         if entity.rect.left < 0:
@@ -247,14 +247,6 @@ class RenderComponent(Component):
             rendered_image = pg.transform.flip(rendered_image, True, False)
         surface.blit(rendered_image,
                      (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y))
-        # if entity.direction == Direction.LEFT:
-        #     rendered_image = pg.transform.flip(entity.image, True, False)
-        # else:
-        #     rendered_image = entity.image
-        #
-        # surface.blit(rendered_image,
-        #              (entity.rect.x - camera.rect.x, entity.rect.y - camera.rect.y),
-        #              entity.blit_rect)
 
 
 class SoundComponent(Component):
@@ -303,6 +295,16 @@ class EnemyAIInputComponent(Component):
             else:
                 entity.direction = Direction.LEFT
                 entity.x_velocity = -1
+
+
+class EnemyAdvancedAIInputComponent(Component):
+    def __init__(self):
+        super().__init__()
+
+    def update(self, entity, game_map):
+        # Assume I have already generated the Floyd-Warshall array
+        #
+        pass
 
 
 class EnemyDamageCollisionComponent(Component):
