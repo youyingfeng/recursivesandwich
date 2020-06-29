@@ -1,9 +1,9 @@
 import pygame as pg
 import pygame.freetype as ft
-from .leveljson import *
-from .entities import Player
 from .camera import Camera
-from .background import *
+from .leveljson import LevelManager
+from .entities import Player
+from .background import StaticBackground
 from .headsupdisplay import HeadsUpDisplay
 from .entitystate import GameEvent
 

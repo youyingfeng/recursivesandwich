@@ -1,10 +1,11 @@
 import pygame as pg
 import pygame.freetype as ft
-
-from dev_modules.events import EditorEvents
 from modules.textureset import TextureSet
-from modules.leveljson import *
-from dev_modules.editorlevel import *
+from modules.block import Block
+from modules.entitystate import EntityState
+from modules.entities import PinkGuy, TrashMonster, ToothWalker
+from dev_modules.events import EditorEvents
+from dev_modules.editorlevel import EditorLevel
 from dev_modules.editorcamera import EditorCamera, PanelCamera
 
 ft.init()

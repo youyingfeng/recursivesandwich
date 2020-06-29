@@ -1,7 +1,6 @@
 import pygame as pg
 import pygame.freetype as ft
 import json
-
 from dev_modules.events import EditorEvents
 from dev_modules.editorpanels import PalettePanel, MapPanel
 

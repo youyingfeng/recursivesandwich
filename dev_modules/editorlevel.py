@@ -1,9 +1,10 @@
 import pygame as pg
 import json
-from modules.block import *
+from modules.block import Block
 from modules.textureset import TextureSet
 from modules.leveljson import Map
-from modules.entities import Player, EnemyType, PinkGuy, TrashMonster, ToothWalker
+from modules.entities import Player, PinkGuy, TrashMonster, ToothWalker
+from modules.entitystate import EntityState
 
 
 class EditorLevel:

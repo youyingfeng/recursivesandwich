@@ -1,10 +1,9 @@
 import pygame as pg
 import json
-
-from modules.block import *
-from modules.entities import *
-from modules.components import *
-from modules.spritesheet import *
+from modules.block import Block, FallingBlock, PushableBlock, LadderBlock, SpikeBlock, GatewayBlock, Coin
+from modules.entities import Enemy, PinkGuy, TrashMonster, ToothWalker
+from modules.entitystate import GameEvent, EntityState
+from modules.components import PhysicsComponent, RenderComponent, EnemyAIInputComponent
 from modules.textureset import TextureSet
 
 """

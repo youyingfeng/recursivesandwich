@@ -1,7 +1,8 @@
 import pygame as pg
-from .entitystate import GameEvent
+from .entitystate import GameEvent, EntityState, Direction
 from .spritesheet import Spritesheet
-from .components import *
+from .components import PlayerInputComponent, PlayerAnimationComponent, PhysicsComponent, \
+                        SoundComponent, RenderComponent, EnemyDamageCollisionComponent
 
 """
 * =============================================================== *
@@ -171,9 +172,6 @@ class Enemy(Entity):
         self.rect.x = starting_position[0]
         self.rect.y = starting_position[1]
         self.blit_rect = type_object.blit_rect
-
-        # Reason why I implemented a hitbox is because some enemy types 
-        # are thin and require a smaller hit width than others
 
         self.image = self.animation_component.get_current_image()
 

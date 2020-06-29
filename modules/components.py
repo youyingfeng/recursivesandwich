@@ -298,6 +298,7 @@ class EnemyAIInputComponent(Component):
 
 
 class EnemyAdvancedAIInputComponent(Component):
+    """Allows the enemy to chase the target within the boundaries of its own island."""
     def __init__(self):
         super().__init__()
 

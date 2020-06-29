@@ -40,11 +40,5 @@ Gemini
 3. Clone the repository and run main.py using Python  
 
 # Credits
-Resources taken from Kevin MacLeod, JDWasabi, DaFluffyPotato, edermunizz and Pixel Frog.
+Resources taken from JDWasabi, rvros, Szadi art., edermunizz, Cathran Music and Pixel Frog.
 
-
-# Good reading material  
-http://gameprogrammingpatterns.com/game-loop.html  
-http://gameprogrammingpatterns.com/state.html and pretty much the entire book lmao  
-https://stackoverflow.com/questions/14354171/add-scrolling-to-a-platformer-in-pygame for camera scrolling
-https://stackoverflow.com/questions/14700889/pygame-level-menu-states for state machine

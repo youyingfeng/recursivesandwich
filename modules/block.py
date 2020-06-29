@@ -1,7 +1,7 @@
 import pygame as pg
-from .components import *
-from .entitystate import GameEvent
-from .spritesheet import *
+from .components import SimpleAnimationComponent
+from .entitystate import GameEvent, EntityState, Direction
+from .spritesheet import Spritesheet, TerrainType
 
 """
 * =============================================================== *
@@ -64,7 +64,7 @@ class FallingBlock(Block):
 
     def update(self, player, terrain_group):
         if (self.rect.top == player.rect.bottom) \
-                and (self.rect.left < player.rect.left < self.rect.right \
+                and (self.rect.left < player.rect.left < self.rect.right
                      or self.rect.left < player.rect.right < self.rect.right):
             self.rect.y += self.vel
 
@@ -74,17 +74,16 @@ class FallingBlock(Block):
 
         # Block should also fall when a pushable block falls on it
         # Commented this out because it is still buggy - player's state will fluctuate rapidly
-        '''
-		for pushable in pushable_group:
-			if (self.rect.top == pushable.rect.bottom)\
-				and (self.rect.left < pushable.rect.left < self.rect.right\
-					or self.rect.left < pushable.rect.right < self.rect.right\
-						or self.rect.left < pushable.rect.centerx < self.rect.right):
-				self.blit_rect.y += self.vel
-				self.rect.y = self.blit_rect.y
-				pushable.rect.bottom = self.rect.top
-				pushable.blit_rect.bottom = pushable.rect.bottom
-		'''
+
+        # for pushable in pushable_group:
+        # 	if (self.rect.top == pushable.rect.bottom)\
+        # 		and (self.rect.left < pushable.rect.left < self.rect.right\
+        # 			or self.rect.left < pushable.rect.right < self.rect.right\
+        # 				or self.rect.left < pushable.rect.centerx < self.rect.right):
+        # 		self.blit_rect.y += self.vel
+        # 		self.rect.y = self.blit_rect.y
+        # 		pushable.rect.bottom = self.rect.top
+        # 		pushable.blit_rect.bottom = pushable.rect.bottom
 
 
 class MovingBlock(Block):
