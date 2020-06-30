@@ -7,6 +7,7 @@ from enum import Enum
 * =============================================================== *
 """
 
+
 class EntityState(Enum):
     IDLE = 0
     WALKING = 1
@@ -32,3 +33,6 @@ class GameEvent(Enum):
     SWITCH_LEVEL = pg.USEREVENT + 0
     GAME_OVER = pg.USEREVENT + 1
     GAME_COMPLETE = pg.USEREVENT + 2
+    GAME_RESUME = pg.USEREVENT + 3
+    GAME_RESTART = pg.USEREVENT + 4
+    GAME_RETURN_TO_TITLE_SCREEN = pg.USEREVENT + 5

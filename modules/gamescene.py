@@ -6,6 +6,7 @@ from .entities import Player
 from .background import StaticBackground
 from .headsupdisplay import HeadsUpDisplay
 from .entitystate import GameEvent
+from .userinterface import Menu, MenuButton
 
 """
 * =============================================================== *
@@ -37,6 +38,9 @@ SCENE MANAGER
 WINDOW_SIZE = (800, 600)
 SURFACE_SIZE = (400, 300)
 
+# Initialise sound
+pg.mixer.init(44100, 16, 2, 512)
+
 # Freetype font
 # Initialise the FreeType font system
 ft.init()
@@ -45,6 +49,10 @@ freetype = ft.Font("assets/fonts/pixChicago.ttf", 8)
 
 class Scene:
     """Represents a scene in the program, which is analogous to the state of the game"""
+    sound_library = {"Scroll": pg.mixer.Sound("assets/sound/sfx/confirm.ogg"),
+                     "Confirm": pg.mixer.Sound("assets/sound/sfx/confirm.ogg")
+                     }
+
     def __init__(self):
         self.manager = SceneManager(self)
         self.game_display = pg.Surface(SURFACE_SIZE)
@@ -63,17 +71,20 @@ class SceneManager:
     """Handles scene transitions from one scene to another"""
     def __init__(self, scene: Scene):
         # TODO: Implement previous_scene as stack without dictionary
+        self.scene_stack = []           # Lists can also act as stacks
+
+        self.scene_stack.append(scene)
         self.scene = scene
         self.scene.manager = self
-        self.previous_scene = None
 
     def switch_to_scene(self, scene: Scene):
-        self.previous_scene = self.scene
+        self.scene_stack.append(scene)
         self.scene = scene
         self.scene.manager = self
 
     def go_to_previous_scene(self):
-        self.scene = self.previous_scene
+        self.scene_stack.pop()
+        self.scene = self.scene_stack[-1]
         self.scene.manager = self
 
 
@@ -92,9 +103,11 @@ class TitleScene(Scene):
         self.title = freetype.render("THE TOWER", (70, 35, 35), None, 0, 0, 32)
         self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
 
-        # Initialize instruction text
-        self.text = freetype.render("Press space to begin", (200, 200, 200))
-        self.text_blit_position = (int((self.game_display.get_width() - self.text[0].get_width()) / 2), 200)
+        # Initialise menu
+        self.menu = Menu(8,
+                         (235, 235, 235),
+                         ("Start", lambda: self.manager.switch_to_scene(GameScene()), (190, 180)),
+                         ("Quit", lambda: pg.quit(), (190, 200)))
 
         # Play BGM
         pg.mixer.music.load("assets/sound/music/Debris of the Lost.ogg")
@@ -111,9 +124,18 @@ class TitleScene(Scene):
                 if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
                     pg.quit()
                     quit()
-                elif event.key == pg.K_SPACE:
-                    # Starts the game
-                    self.manager.switch_to_scene(GameScene())
+                elif event.key == pg.K_UP:
+                    self.sound_library["Scroll"].play()
+                    self.menu.scroll_up()
+                elif event.key == pg.K_DOWN:
+                    self.sound_library["Scroll"].play()
+                    self.menu.scroll_down()
+                elif event.key == pg.K_RETURN:
+                    self.sound_library["Confirm"].play()
+                    self.menu.activate_current_button()
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                self.sound_library["Confirm"].play()
+                self.menu.click((event.pos[0] / 2, event.pos[1] / 2))
 
     def update(self):
         pass
@@ -125,7 +147,10 @@ class TitleScene(Scene):
 
         # Blit text on game_display
         self.game_display.blit(self.title[0], self.title_blit_position)
-        self.game_display.blit(self.text[0], self.text_blit_position)
+        # self.game_display.blit(self.text[0], self.text_blit_position)
+
+        # TODO: render menu
+        self.menu.render(self.game_display)
 
         # Blit game_display on window surface
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
@@ -232,22 +257,42 @@ class GameOverScene(Scene):
         self.title = freetype.render("GAME OVER", (235, 235, 235), None, 0, 0, 32)
         self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
 
-        # Initialize subtitle
-        self.subtitle = freetype.render("Press F to pay respects", (235, 235, 235))
-        self.subtitle_blit_position = (int((self.game_display.get_width() - self.subtitle[0].get_width()) / 2), 200)
+        self.menu = Menu(8,
+                         (235, 235, 235),
+                         ("Restart", lambda: pg.event.post(pg.event.Event(GameEvent.GAME_RESTART.value)), (182, 180)),
+                         ("Main Menu",
+                          lambda: pg.event.post(pg.event.Event(GameEvent.GAME_RETURN_TO_TITLE_SCREEN.value)),
+                          (182, 200)),
+                         ("Quit", lambda: pg.event.post(pg.event.Event(pg.QUIT)), (182, 220)))
 
     def handle_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
+            elif event.type == GameEvent.GAME_RESTART.value:
+                self.manager.go_to_previous_scene()
+                self.manager.go_to_previous_scene()
+                self.manager.switch_to_scene(GameScene())
+            elif event.type == GameEvent.GAME_RETURN_TO_TITLE_SCREEN.value:
+                self.manager.go_to_previous_scene()
+                self.manager.go_to_previous_scene()
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
                     pg.quit()
                     quit()
-                elif event.key == pg.K_f:
-                    # TODO: HANDLE THIS BETTER TO ENSURE NO MEMORY BLOAT
-                    self.manager.switch_to_scene(GameScene())
+                elif event.key == pg.K_UP:
+                    self.sound_library["Scroll"].play()
+                    self.menu.scroll_up()
+                elif event.key == pg.K_DOWN:
+                    self.sound_library["Scroll"].play()
+                    self.menu.scroll_down()
+                elif event.key == pg.K_RETURN:
+                    self.sound_library["Confirm"].play()
+                    self.menu.activate_current_button()
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                self.sound_library["Confirm"].play()
+                self.menu.click((event.pos[0] / 2, event.pos[1] / 2))
 
     def update(self):
         pass
@@ -258,7 +303,7 @@ class GameOverScene(Scene):
 
         # Blit title and subtitle on game_display
         self.game_display.blit(self.title[0], self.title_blit_position)
-        self.game_display.blit(self.subtitle[0], self.subtitle_blit_position)
+        self.menu.render(self.game_display)
 
         # Blit game_display on window surface
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
@@ -271,22 +316,42 @@ class GameBeatenScene(Scene):
         self.title = freetype.render("VICTORY", (0, 0, 0), None, 0, 0, 32)
         self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
 
-        # Initialize subtitle
-        self.subtitle = freetype.render("Press space to quit", (0, 0, 0))
-        self.subtitle_blit_position = (int((self.game_display.get_width() - self.subtitle[0].get_width()) / 2), 200)
+        self.menu = Menu(8,
+                         (80, 80, 80),
+                         ("Restart", lambda: pg.event.post(pg.event.Event(GameEvent.GAME_RESTART.value)), (182, 180)),
+                         ("Main Menu",
+                          lambda: pg.event.post(pg.event.Event(GameEvent.GAME_RETURN_TO_TITLE_SCREEN.value)),
+                          (182, 200)),
+                         ("Quit", lambda: pg.event.post(pg.event.Event(pg.QUIT)), (182, 220)))
 
     def handle_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
+            elif event.type == GameEvent.GAME_RESTART.value:
+                self.manager.go_to_previous_scene()
+                self.manager.go_to_previous_scene()
+                self.manager.switch_to_scene(GameScene())
+            elif event.type == GameEvent.GAME_RETURN_TO_TITLE_SCREEN.value:
+                self.manager.go_to_previous_scene()
+                self.manager.go_to_previous_scene()
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
                     pg.quit()
                     quit()
-                elif event.key == pg.K_SPACE:
-                    pg.quit()
-                    quit()
+                elif event.key == pg.K_UP:
+                    self.sound_library["Scroll"].play()
+                    self.menu.scroll_up()
+                elif event.key == pg.K_DOWN:
+                    self.sound_library["Scroll"].play()
+                    self.menu.scroll_down()
+                elif event.key == pg.K_RETURN:
+                    self.sound_library["Confirm"].play()
+                    self.menu.activate_current_button()
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                self.sound_library["Confirm"].play()
+                self.menu.click((event.pos[0] / 2, event.pos[1] / 2))
 
     def update(self, *args):
         pass
@@ -297,7 +362,7 @@ class GameBeatenScene(Scene):
 
         # Blit title and subtitle on game_display
         self.game_display.blit(self.title[0], self.title_blit_position)
-        self.game_display.blit(self.subtitle[0], self.subtitle_blit_position)
+        self.menu.render(self.game_display)
 
         # Blit game_display on window surface
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
@@ -306,29 +371,42 @@ class GameBeatenScene(Scene):
 class PauseScene(Scene):
     def __init__(self):
         super().__init__()
-        self.text = freetype.render("Press any key to unpause", (255, 255, 255))
-        self.text_blit_position = (int((self.game_display.get_width() - self.text[0].get_width()) / 2), 200)
+        self.menu = Menu(20,
+                         (235, 235, 235),
+                         ("RESUME", lambda: pg.event.post(pg.event.Event(GameEvent.GAME_RESUME.value)), (170, 120)),
+                         ("QUIT", lambda: pg.event.post(pg.event.Event(pg.QUIT)), (170, 160)))
 
     def handle_events(self):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
                 quit()
+            elif event.type == GameEvent.GAME_RESUME.value:
+                pg.mixer.music.unpause()
+                self.manager.go_to_previous_scene()
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
                     pg.quit()
                     quit()
-                else:
-                    pg.mixer.music.unpause()
-                    # Resume the game by going back to the previous scene
-                    self.manager.go_to_previous_scene()
+                elif event.key == pg.K_UP:
+                    self.sound_library["Scroll"].play()
+                    self.menu.scroll_up()
+                elif event.key == pg.K_DOWN:
+                    self.sound_library["Scroll"].play()
+                    self.menu.scroll_down()
+                elif event.key == pg.K_RETURN:
+                    self.sound_library["Confirm"].play()
+                    self.menu.activate_current_button()
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                self.sound_library["Confirm"].play()
+                self.menu.click((event.pos[0] / 2, event.pos[1] / 2))
 
     def update(self, *args):
         pass
 
     def render(self, surface: pg.Surface):
-        self.game_display.fill((0, 0, 0))
-        self.game_display.blit(self.text[0], self.text_blit_position)
+        self.game_display.fill((20, 20, 20))
+        self.menu.render(self.game_display)
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 
 
@@ -350,7 +428,6 @@ class LoadingScene(Scene):
                     quit()
             elif event.type == GameEvent.GAME_COMPLETE.value:
                 self.manager.switch_to_scene(GameBeatenScene())
-
 
     def update(self, *args):
         if self.wait_frames <= 0:

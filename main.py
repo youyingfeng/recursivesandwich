@@ -14,7 +14,7 @@ def main() -> None:
     """Initialises PyGame and invokes all the necessary functions and modules to run the game"""
 
     # Initialise sound
-    pg.mixer.init(44100, 16, 2, 512)
+    # pg.mixer.init(44100, 16, 2, 512)
 
     pg.mixer.pre_init(44100, 16, 2, 512)
 

@@ -22,7 +22,8 @@ options = {
                      "dev_modules.events"
                      ],
 
-        "include_files": ["assets/"]
+        "include_files": ["assets/",
+                          "Level Editor Instructions.md"]
     }
 }
 

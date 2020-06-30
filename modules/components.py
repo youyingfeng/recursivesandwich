@@ -259,18 +259,9 @@ class SoundComponent(Component):
         pass
 
     def receive(self, message):
-        if message == "WALK":
-            pass
-            # play walking sound in infinite loop
-        elif message == "STOP":
-            pass
-            # stop walking sound playback
-        elif message == "JUMP":
+        if message == "JUMP":
             # also stop walking sound playback
             self.sounds["JUMP"].play()
-        elif message == "LAND":
-            pass
-            # play landing sound
         elif message == "HIT":
             self.sounds["HIT"].play()
 
