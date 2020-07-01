@@ -204,8 +204,7 @@ class GameScene(Scene):
                     pg.mixer.music.pause()
                     self.manager.switch_to_scene(PauseScene())
             elif event.type == GameEvent.SWITCH_LEVEL.value:
-                self.level_manager.load_next_level(self.player, self.camera)
-                self.manager.switch_to_scene(LoadingScene())
+                self.manager.switch_to_scene(FadeOutScene())
             elif event.type == GameEvent.GAME_OVER.value:
                 self.manager.switch_to_scene(GameOverScene())
             elif event.type == GameEvent.GAME_COMPLETE.value:
@@ -410,6 +409,40 @@ class PauseScene(Scene):
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 
 
+# -------------------- LEVEL TRANSITION SCENES -------------------- #
+class FadeOutScene(Scene):
+    def __init__(self):
+        super().__init__()
+        self.counter = 30
+        self.game_display.fill((0, 0, 0))
+        self.game_display.set_alpha(50)
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+
+    def update(self):
+        if self.counter > 0:
+            self.counter -= 1
+        else:
+            self.manager.go_to_previous_scene()
+            # at this point the scene is definitely GameScene
+            # to ensure correctness can push a "FADE OUT" Event
+            # FIXME: This is super hacky and ideally should be resolved, but other methods are more complicated
+            self.manager.scene.level_manager.load_next_level(self.manager.scene.player,
+                                                             self.manager.scene.camera)
+            self.manager.switch_to_scene(LoadingScene())
+
+    def render(self, surface: pg.Surface):
+        surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
+
+
 class LoadingScene(Scene):
     def __init__(self):
         super().__init__()
@@ -430,13 +463,45 @@ class LoadingScene(Scene):
                 self.manager.switch_to_scene(GameBeatenScene())
 
     def update(self, *args):
-        if self.wait_frames <= 0:
-            self.manager.go_to_previous_scene()
-        else:
+        if self.wait_frames > 0:
             self.wait_frames -= 1
+        else:
+            self.manager.go_to_previous_scene()
+            self.manager.switch_to_scene(FadeInScene(self.manager.scene))
 
     def render(self, surface: pg.Surface):
         self.game_display.fill((0, 0, 0))
 
         self.game_display.blit(self.text[0], self.text_blit_position)
+        surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
+
+
+class FadeInScene(Scene):
+    def __init__(self, previous_scene):
+        super().__init__()
+        self.counter = 15
+        self.game_display.fill((0, 0, 0))
+        self.game_display.set_alpha(255)
+        self.previous_scene = previous_scene
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+
+    def update(self):
+        if self.counter > 0:
+            self.counter -= 1
+            self.game_display.set_alpha(17 * self.counter)
+        else:
+            self.manager.go_to_previous_scene()
+
+    def render(self, surface: pg.Surface):
+        # Basically render the previous scene and then render the overlay over it
+        self.previous_scene.render(surface)
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
