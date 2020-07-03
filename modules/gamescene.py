@@ -60,7 +60,7 @@ class Scene:
     def handle_events(self):
         raise NotImplementedError
 
-    def update(self):
+    def update(self, *args):
         raise NotImplementedError
 
     def render(self, surface: pg.Surface):
@@ -137,7 +137,7 @@ class TitleScene(Scene):
                 self.sound_library["Confirm"].play()
                 self.menu.click((event.pos[0] / 2, event.pos[1] / 2))
 
-    def update(self):
+    def update(self, *args):
         pass
 
     def render(self, surface: pg.Surface):
@@ -184,7 +184,6 @@ class GameScene(Scene):
                             StaticBackground("assets/textures/background/03 background B.png", self.game_display),
                             StaticBackground("assets/textures/background/04 background.png", self.game_display))
 
-
         # Play BGM
         pg.mixer.music.load("assets/sound/music/Deep Dream.ogg")
         pg.mixer.music.set_volume(0.8)
@@ -208,16 +207,16 @@ class GameScene(Scene):
             elif event.type == GameEvent.GAME_OVER.value:
                 self.manager.switch_to_scene(GameOverScene())
             elif event.type == GameEvent.GAME_COMPLETE.value:
-                # this is unnecessary
+                # FIXME: this is unnecessary, check and remove
                 self.manager.switch_to_scene(GameBeatenScene())
 
         # Processes the input for the player
         self.player.handle_input()
 
-    def update(self):
-        self.player.update(self.level_manager.level.map)
-        self.level_manager.level.update(self.player)
-        self.hud.update(self.player, self.camera)
+    def update(self, delta_time):
+        self.player.update(delta_time, self.level_manager.level.map)
+        self.level_manager.level.update(delta_time, self.player)
+        self.hud.update(delta_time, self.player, self.camera)
 
         # Move camera to player's position
         self.camera.follow_target(self.player)
@@ -293,7 +292,7 @@ class GameOverScene(Scene):
                 self.sound_library["Confirm"].play()
                 self.menu.click((event.pos[0] / 2, event.pos[1] / 2))
 
-    def update(self):
+    def update(self, *args):
         pass
 
     def render(self, surface: pg.Surface):
@@ -333,6 +332,7 @@ class GameBeatenScene(Scene):
                 self.manager.go_to_previous_scene()
                 self.manager.switch_to_scene(GameScene())
             elif event.type == GameEvent.GAME_RETURN_TO_TITLE_SCREEN.value:
+                self.manager.go_to_previous_scene()
                 self.manager.go_to_previous_scene()
                 self.manager.go_to_previous_scene()
             elif event.type == pg.KEYDOWN:
@@ -427,7 +427,7 @@ class FadeOutScene(Scene):
                     pg.quit()
                     quit()
 
-    def update(self):
+    def update(self, delta_time):
         if self.counter > 0:
             self.counter -= 1
         else:
@@ -462,7 +462,7 @@ class LoadingScene(Scene):
             elif event.type == GameEvent.GAME_COMPLETE.value:
                 self.manager.switch_to_scene(GameBeatenScene())
 
-    def update(self, *args):
+    def update(self, delta_time):
         if self.wait_frames > 0:
             self.wait_frames -= 1
         else:
@@ -494,7 +494,7 @@ class FadeInScene(Scene):
                     pg.quit()
                     quit()
 
-    def update(self):
+    def update(self, delta_time):
         if self.counter > 0:
             self.counter -= 1
             self.game_display.set_alpha(17 * self.counter)

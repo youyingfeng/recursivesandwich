@@ -36,16 +36,16 @@ def main() -> None:
 
     # -------------------- GAME LOOP -------------------- #
     while run:
+        # gets the delta time, capped at 60 fps
+        delta_time = clock.tick(60) / 1000
+
         # Directs the scene to process events in the queue, update its state and render onto the window
         manager.scene.handle_events()
-        manager.scene.update()
+        manager.scene.update(delta_time)
         manager.scene.render(window)
 
         # Updates the window to reflect the current rendered image
         pg.display.update()
-
-        # Limits the game to 60 fps
-        clock.tick(60)
     # -------------------- END GAME LOOP ---------------- #
     # Quit PyGame
     pg.quit()

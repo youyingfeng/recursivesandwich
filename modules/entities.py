@@ -122,7 +122,7 @@ class Player(Entity):
     def handle_input(self):
         self.input_component.update(self)
 
-    def update(self, map):
+    def update(self, delta_time, map):
         if self.rect.top > map.rect.bottom:
             self.state = EntityState.DEAD
             pg.event.post(
@@ -131,7 +131,7 @@ class Player(Entity):
                 )
             )
         else:
-            self.physics_component.update(self, map)
+            self.physics_component.update(delta_time, self, map)
             self.animation_component.update(self)
 
     def render(self, camera, surface):
@@ -183,9 +183,9 @@ class Enemy(Entity):
     def message(self, message):
         pass
     
-    def update(self, map, player):
+    def update(self,delta_time, map, player):
         self.input_component.update(self)
-        self.physics_component.update(self, map)
+        self.physics_component.update(delta_time, self, map)
         self.damage_collide_component.update(self, player)
         self.animation_component.update(self)
 

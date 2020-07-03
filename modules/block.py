@@ -164,7 +164,7 @@ class PushableBlock(Block):
         if (self.rect.left == player.rect.right or self.rect.right == player.rect.left) \
                 and player.state == EntityState.WALKING \
                 and player.rect.bottom == self.rect.bottom:
-            self.rect.x += player.x_velocity / 2
+            self.rect.x += (self.rect.centerx - player.rect.centerx) / 20
 
         for colliding_sprite in pg.sprite.spritecollide(self, terrain_group, False):
             if colliding_sprite.rect.left < self.rect.left < colliding_sprite.rect.right:

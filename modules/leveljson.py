@@ -74,9 +74,9 @@ class Level:
         self.map = Map(data["map"])
         self.starting_position = data["starting_position"]
 
-    def update(self, player):
+    def update(self, delta_time, player):
         # TODO: rework update for map to send events instead
-        self.enemies.update(self.map, player)
+        self.enemies.update(delta_time, self.map, player)
         self.map.update(player)
 
     def render(self, camera, surface):
@@ -209,12 +209,12 @@ class EnemyManager:
                                    50)
                              )
 
-    def update(self, map, player):
+    def update(self, delta_time, map, player):
         for entity in self.enemies:
             if entity.state == EntityState.DEAD:
                 entity.kill()
             else:
-                entity.update(map, player)
+                entity.update(delta_time, map, player)
 
     def render(self, camera, surface):
         for entity in self.enemies:

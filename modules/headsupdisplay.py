@@ -16,11 +16,11 @@ class HeadsUpDisplay:
         self.healthbar = Healthbar()
         self.fps_counter = FPSCounter()
 
-    def update(self, player, camera):
+    def update(self, delta_time, player, camera):
         """Updates all the elements of the HUD"""
         # self.vignette.update(player, camera)
         self.healthbar.update(player)
-        self.fps_counter.update()
+        self.fps_counter.update(delta_time)
 
     def render(self, surface):
         """Renders the elements of the HUD onto the specified surface"""
@@ -55,15 +55,23 @@ class Healthbar:
 class FPSCounter:
     """Tracks the FPS of the game"""
     def __init__(self):
-        self.clock = pg.time.Clock()
         self.freetype = ft.Font("assets/fonts/pixChicago.ttf", 8)   # size must be set to 8, otherwise AA kicks in
         self.freetype.antialiased = False
         self.fps = self.freetype.render("0", (150, 100, 100), None, 0, 0, 8)
+        # Variables for calculating FPS
+        self.time_counter = 0
+        self.frame_counter = 0
 
-    def update(self):
+    def update(self, delta_time):
         """Updates the current FPS of the game"""
-        self.clock.tick()
-        self.fps = self.freetype.render(str('%.1f' % self.clock.get_fps()), (150, 100, 100), None, 0, 0, 8)
+        if self.time_counter > 0.5:
+            self.fps = self.freetype.render(str('%.1f' % (self.frame_counter / self.time_counter)),
+                                            (150, 100, 100))
+            self.time_counter -= 0.5
+            self.frame_counter = 0
+        else:
+            self.time_counter += delta_time
+            self.frame_counter += 1
 
     def render(self, surface):
         """Renders the FPS counter at the top-right corner of the specified surface"""

@@ -57,25 +57,25 @@ class PlayerInputComponent(Component):
             if current_keys[pg.K_LEFT]:
                 player.state = EntityState.WALKING
                 player.direction = Direction.LEFT
-                player.x_velocity = -3
+                player.x_velocity = -180
 
             if current_keys[pg.K_RIGHT]:
                 player.state = EntityState.WALKING
                 player.direction = Direction.RIGHT
-                player.x_velocity = 3
+                player.x_velocity = 180
 
             if current_keys[pg.K_SPACE]:
                 player.state = EntityState.JUMPING
-                player.y_velocity = -13
+                player.y_velocity = -780
                 player.message("JUMP")
 
         elif player.state == EntityState.WALKING:
             if current_keys[pg.K_LEFT]:
-                player.x_velocity = -3
+                player.x_velocity = -180
                 player.direction = Direction.LEFT
 
             if current_keys[pg.K_RIGHT]:
-                player.x_velocity = 3
+                player.x_velocity = 180
                 player.direction = Direction.RIGHT
 
             if not (current_keys[pg.K_LEFT] or current_keys[pg.K_RIGHT]):
@@ -84,16 +84,16 @@ class PlayerInputComponent(Component):
 
             if current_keys[pg.K_SPACE]:
                 player.state = EntityState.JUMPING
-                player.y_velocity = -13
+                player.y_velocity = -780
                 player.message("JUMP")
 
         if player.state == EntityState.JUMPING:
             if current_keys[pg.K_LEFT]:
-                player.x_velocity = -3
+                player.x_velocity = -180
                 player.direction = Direction.LEFT
 
             if current_keys[pg.K_RIGHT]:
-                player.x_velocity = 3
+                player.x_velocity = 180
                 player.direction = Direction.RIGHT
 
             if not (current_keys[pg.K_LEFT] or current_keys[pg.K_RIGHT]):
@@ -114,15 +114,15 @@ class PlayerInputComponent(Component):
 
             if current_keys[pg.K_SPACE]:
                 player.state = EntityState.JUMPING
-                player.y_velocity = -13
+                player.y_velocity = -780
                 player.message("JUMP")
 
         if player.state == EntityState.CLIMBING:
             if current_keys[pg.K_UP]:
-                player.y_velocity = -2
+                player.y_velocity = -120
 
             if current_keys[pg.K_DOWN]:
-                player.y_velocity = 3
+                player.y_velocity = 180
 
             if not (current_keys[pg.K_UP] or current_keys[pg.K_DOWN]):
                 player.state = EntityState.HANGING
@@ -131,35 +131,70 @@ class PlayerInputComponent(Component):
 class PhysicsComponent(Component):
     def __init__(self):
         super().__init__()
-        self.gravity = 1
+        self.gravity = 70           # because 60 * delta time gives 0 occasionally, which makes entity change state
+                                    # due to the game thinking that it is jumping
+        self.DISCRETE_TIMESTEP = 1 / 60      # This is important for framerate independence
 
-    def update(self, entity, game_map):
-        # Enforces gravity
+    def update(self, delta_time, entity, game_map):
+        # simulate multiple timesteps
+        num_full_steps = int(delta_time / self.DISCRETE_TIMESTEP)
+        remainder_time = delta_time % self.DISCRETE_TIMESTEP
+
+        for i in range(0, num_full_steps):
+            if entity.state != EntityState.CLIMBING and entity.state != EntityState.HANGING:
+                entity.y_velocity += int(self.gravity * self.DISCRETE_TIMESTEP * 60)
+
+            entity.rect.y += int(entity.y_velocity * self.DISCRETE_TIMESTEP)
+            isJumping = True
+            for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
+                if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
+                    entity.rect.top = colliding_sprite.rect.bottom
+                    entity.y_velocity = 0
+                if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
+                    isJumping = False
+                    if entity.state == EntityState.JUMPING:
+                        entity.state = EntityState.IDLE
+                    entity.rect.bottom = colliding_sprite.rect.top
+                    entity.y_velocity = 0
+            if entity.state != EntityState.CLIMBING and entity.state != EntityState.HANGING:
+                if isJumping:
+                    entity.state = EntityState.JUMPING
+
+            entity.rect.x += int(entity.x_velocity * self.DISCRETE_TIMESTEP)
+            for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
+                if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
+                    entity.rect.left = colliding_sprite.rect.right
+                if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
+                    entity.rect.right = colliding_sprite.rect.left
+
+        # lerps the remainder and run simulation one last time
         if entity.state != EntityState.CLIMBING and entity.state != EntityState.HANGING:
-            entity.y_velocity += self.gravity
+            # FIXME: Problem lies here bc remainder_time * 60 < 1, so rounded off to 0
+            # FIXME: Rework fall detection
+            entity.y_velocity += int(self.gravity * remainder_time * 60)
 
         # Handles collisions along the y axis first
         # Positions the entity at its future position
-        entity.rect.y += entity.y_velocity
-
-        isJumping = True
-        for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
-            if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
-                entity.rect.top = colliding_sprite.rect.bottom
-                entity.y_velocity = 0
-            if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
-                isJumping = False
-                if entity.state == EntityState.JUMPING:
-                    entity.state = EntityState.IDLE
-                entity.rect.bottom = colliding_sprite.rect.top
-                entity.y_velocity = 0
-        # This is a hack to ensure that people fall properly
-        if entity.state != EntityState.CLIMBING and entity.state != EntityState.HANGING:
-            if isJumping:
-                entity.state = EntityState.JUMPING
+        entity.rect.y += int(entity.y_velocity * remainder_time)
+        if int(entity.y_velocity * remainder_time) != 0:
+            isJumping = True
+            for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
+                if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
+                    entity.rect.top = colliding_sprite.rect.bottom
+                    entity.y_velocity = 0
+                if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
+                    isJumping = False
+                    if entity.state == EntityState.JUMPING:
+                        entity.state = EntityState.IDLE
+                    entity.rect.bottom = colliding_sprite.rect.top
+                    entity.y_velocity = 0
+            # This is a hack to ensure that people fall properly
+            if entity.state != EntityState.CLIMBING and entity.state != EntityState.HANGING:
+                if isJumping:
+                    entity.state = EntityState.JUMPING
 
         # Then handles collisions along the x axis
-        entity.rect.x += entity.x_velocity
+        entity.rect.x += int(entity.x_velocity * remainder_time)
 
         for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
             if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
@@ -276,16 +311,16 @@ class EnemyAIInputComponent(Component):
         entity.state = EntityState.WALKING
         if entity.direction == Direction.LEFT:
             if entity.rect.x > entity.left_bound:
-                entity.x_velocity = -1
+                entity.x_velocity = -90
             else:
                 entity.direction = Direction.RIGHT
-                entity.x_velocity = 1
+                entity.x_velocity = 90
         else:
             if entity.rect.x < entity.right_bound:
-                entity.x_velocity = 1
+                entity.x_velocity = 90
             else:
                 entity.direction = Direction.LEFT
-                entity.x_velocity = -1
+                entity.x_velocity = -90
 
 
 class EnemyAdvancedAIInputComponent(Component):
