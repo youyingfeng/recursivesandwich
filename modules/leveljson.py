@@ -63,6 +63,14 @@ class LevelManager:
         camera.snap_to_target(player)
         camera.update_boundaries(self.level.map.rect)
 
+    def load_level(self, level_num: int, player, camera):
+        self.current_level = level_num
+        self.level = Level("assets/levels/level" + str(level_num) + ".json")
+        player.rect.x = self.level.starting_position[0]
+        player.rect.y = self.level.starting_position[1]
+        camera.snap_to_target(player)
+        camera.update_boundaries(self.level.map.rect)
+
 
 class Level:
     def __init__(self, filepath: str):

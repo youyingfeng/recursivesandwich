@@ -87,7 +87,7 @@ class PlayerInputComponent(Component):
                 player.y_velocity = -780
                 player.message("JUMP")
 
-        if player.state == EntityState.JUMPING:
+        elif player.state == EntityState.JUMPING:
             if current_keys[pg.K_LEFT]:
                 player.x_velocity = -180
                 player.direction = Direction.LEFT
@@ -169,8 +169,6 @@ class PhysicsComponent(Component):
 
         # lerps the remainder and run simulation one last time
         if entity.state != EntityState.CLIMBING and entity.state != EntityState.HANGING:
-            # FIXME: Problem lies here bc remainder_time * 60 < 1, so rounded off to 0
-            # FIXME: Rework fall detection
             entity.y_velocity += int(self.gravity * remainder_time * 60)
 
         # Handles collisions along the y axis first

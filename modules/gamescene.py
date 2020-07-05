@@ -6,7 +6,8 @@ from .entities import Player
 from .background import StaticBackground
 from .headsupdisplay import HeadsUpDisplay
 from .entitystate import GameEvent
-from .userinterface import Menu, MenuButton
+from .userinterface import Menu, MenuButton, LevelSelectButton
+import os
 
 """
 * =============================================================== *
@@ -45,6 +46,7 @@ pg.mixer.init(44100, 16, 2, 512)
 # Initialise the FreeType font system
 ft.init()
 freetype = ft.Font("assets/fonts/pixChicago.ttf", 8)
+freetype.antialiased = False
 
 
 class Scene:
@@ -105,9 +107,11 @@ class TitleScene(Scene):
 
         # Initialise menu
         self.menu = Menu(8,
-                         (235, 235, 235),
-                         ("Start", lambda: self.manager.switch_to_scene(GameScene()), (190, 180)),
-                         ("Quit", lambda: pg.quit(), (190, 200)))
+                         (200, 200, 200),
+                         ("New Game", lambda: self.manager.switch_to_scene(GameScene()), (165, 180)),
+                         ("Level Select", lambda: self.manager.switch_to_scene(LevelSelectionScene()), (165, 200)),
+                         ("Quit Game", lambda: pg.quit(), (165, 220))
+                         )
 
         # Play BGM
         pg.mixer.music.load("assets/sound/music/Debris of the Lost.ogg")
@@ -153,6 +157,118 @@ class TitleScene(Scene):
         self.menu.render(self.game_display)
 
         # Blit game_display on window surface
+        surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
+
+
+class LevelSelectionScene(Scene):
+    def __init__(self):
+        super().__init__()
+        # Get the count of items in the directory
+        levelcount = 0
+        for i in range(1, 100):
+            if os.path.exists("assets/levels/level" + str(i) + ".json"):
+                levelcount += 1
+            else:
+                break
+
+        # assign buttons based on the number of items in the directory
+
+        self.pages_list = []
+        # making the array of buttons
+        current_limit = 12
+        column_count = 0
+        row_count = 0
+        current_button_list = []
+        for i in range(1, levelcount + 1):
+            current_level = i
+            current_button_list.append(LevelSelectButton(str(i) if i > 9 else ("0" + str(i)),
+                                                  i,
+                                                  (60 + column_count * 80, 100 + row_count * 60),
+                                                  25,
+                                                  (235, 235, 235)
+                                                  )
+                                       )
+            column_count += 1
+            if column_count > 3:
+                column_count = 0
+                row_count += 1
+
+            if row_count > 2:
+                column_count = 0
+                row_count = 0
+                self.pages_list.append(current_button_list)
+                current_button_list = []
+
+        self.pages_list.append(current_button_list)
+
+        self.current_index = 0
+
+        # additional text
+        self.level_select_title = freetype.render("Level Select", (235, 235, 235), None, 0, 0, 24)
+        self.title_blit_position = (int((self.game_display.get_width() - self.level_select_title[0].get_width()) / 2),
+                                    35)
+
+        # TODO: add two buttons for scrolling
+        # this is hardcoded
+        back_button_text = freetype.render("<", (235, 235, 235), None, 0, 0, 24)
+        self.back_button = back_button_text[0]
+        self.back_button_rect = pg.Rect(13, 100, 20, 150)
+
+        self.forward_button = pg.transform.flip(self.back_button.copy(), True, False)
+        self.forward_button_rect = pg.Rect(363, 100, 20, 150)
+
+        # backgrounds
+        self.backgrounds = (StaticBackground("assets/textures/background/01_background.png", self.game_display),
+                            StaticBackground("assets/textures/background/03 background B.png", self.game_display),
+                            StaticBackground("assets/textures/background/04 background.png", self.game_display))
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                coordinates = [int(event.pos[0] / 2), int(event.pos[1] / 2)]
+                if self.forward_button_rect.collidepoint(coordinates):
+                    if not self.current_index >= len(self.pages_list) - 1:
+                        self.current_index += 1
+                elif self.back_button_rect.collidepoint(coordinates):
+                    if not self.current_index <= 0:
+                        self.current_index -= 1
+                for button in self.pages_list[self.current_index]:
+                    if button.collidepoint(coordinates):
+                        button.on_click()
+                        break
+            elif event.type == GameEvent.GAME_LOAD_LEVEL.value:
+                print(event.code)
+                self.manager.go_to_previous_scene()
+                self.manager.switch_to_scene(GameScene())
+                self.manager.scene.level_manager.load_level(event.code,
+                                                            self.manager.scene.player,
+                                                            self.manager.scene.camera)
+
+
+    def update(self, *args):
+        pass
+
+    def render(self, surface: pg.Surface):
+        for background in self.backgrounds:
+            background.render()
+
+        self.game_display.blit(self.level_select_title[0], self.title_blit_position)
+
+        self.game_display.blit(self.forward_button,
+                               (365, 150))
+        self.game_display.blit(self.back_button,
+                               (15, 150))
+
+        for button in self.pages_list[self.current_index]:
+            button.render(self.game_display)
+
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 
 

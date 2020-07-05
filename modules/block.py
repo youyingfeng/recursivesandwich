@@ -157,13 +157,21 @@ class PushableBlock(Block):
         self.gravity = 1
 
     # A pushable block reacts to gravity, hence it interacts with both the player and terrain group
-    # In future, possible to make one superclass for all blocks that are affected by gravity and collides with other blocks
+    # In future, possible to make one superclass for all blocks that are affected by gravity and collides with other
+    # blocks
     def update(self, player, terrain_group):
 
         # If player is pushing the block
         if (self.rect.left == player.rect.right or self.rect.right == player.rect.left) \
                 and player.state == EntityState.WALKING \
                 and player.rect.bottom == self.rect.bottom:
+            # FIXME: Block movement speed varies with FPS
+            # Reason is bc the block is in the collideable terrain group
+            # Hence every update cycle, the colliding player will be at the same distance from the block
+            # and the speed therefore depends on the rate of update
+            # The ideal solution is to add a delta_time field to the arguments, but nah
+            # The hack is to let the block handle its own collision separately
+            # The broke method is to ignore this since it is slightly discernible at normal speeds of 30 - 60 fps
             self.rect.x += (self.rect.centerx - player.rect.centerx) / 20
 
         for colliding_sprite in pg.sprite.spritecollide(self, terrain_group, False):

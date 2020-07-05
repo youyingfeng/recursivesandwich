@@ -1,6 +1,7 @@
 import pygame as pg
 import pygame.freetype as ft
 
+from modules.entitystate import GameEvent
 
 ft.init()
 freetype = ft.Font("assets/fonts/pixChicago.ttf")
@@ -74,3 +75,20 @@ class Menu:
             button.render(surface)
         surface.blit(self.caret[0], self.current_caret_position)
 
+
+class LevelSelectButton:
+    def __init__(self, text, level_num, position, fontsize = 8, color = (235, 235, 235)):
+        self.text = freetype.render(text, color, None, 0, 0, fontsize)
+        self.level_num = level_num
+        self.rect = pg.Rect(position, (self.text[0].get_width(),
+                                       self.text[0].get_height()))
+
+    def collidepoint(self, point):
+        return self.rect.collidepoint(point)
+
+    def on_click(self):
+        pg.event.post(pg.event.Event(GameEvent.GAME_LOAD_LEVEL.value,
+                      {"code": self.level_num}))
+
+    def render(self, surface):
+        surface.blit(self.text[0], self.rect.topleft)
