@@ -33,8 +33,11 @@ class SpikeBlock(Block):
     def __init__(self, type_object, x, y):
         super().__init__(type_object, x, y)
 
-    def update(self, entity, terrain_group):
-        """Checks for collison between the player and the Hazardous Block, and damages the player upon colliding"""
+    def update(self, entity, *args):
+        """Checks for collision between the player and the Hazardous Block, and damages the player upon colliding"""
+        if self.rect.colliderect(entity.rect):
+            # Since spikes are always at the bottom, the player must always come from the top
+            entity.rect.bottom = self.rect.top
         if (self.rect.left < entity.rect.left < self.rect.right or self.rect.left < entity.rect.right < self.rect.right) \
                 and self.rect.top == entity.rect.bottom:
             entity.take_damage(20)
