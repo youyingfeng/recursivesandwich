@@ -36,6 +36,7 @@ class TextureSet:
             "WALL_RIGHT":           TerrainType(tileset.get_image_at(pg.Rect(512, 672, 32, 32))),
             "CEILING":              TerrainType(tileset.get_image_at(pg.Rect(240, 448, 32, 32))),
             "FLOOR":                TerrainType(tileset.get_image_at(pg.Rect(240, 720, 32, 32))),
+            "FLOOR_TOP_HALF":       TerrainType(tileset.get_image_at(pg.Rect(240, 720, 32, 16)), 0, 0.48, 1, 0.52),
 
             # ------------------------------ NON-COLLIDEABLE BLOCKS ------------------------------ #
             "BG_FILLER":               TerrainType(tileset.get_image_at(pg.Rect(48, 544, 32, 32))),
@@ -63,6 +64,7 @@ class TextureSet:
                                            "LB": "LADDER",
                                            "PB": "PUSHABLE",
                                            "f1": "FLOOR",
+                                           "f2": "FLOOR_TOP_HALF",
                                            "l1": "WALL_LEFT",
                                            "r1": "WALL_RIGHT",
                                            "c1": "CEILING",

@@ -25,7 +25,7 @@ def main() -> None:
     clock = pg.time.Clock()
 
     # Initialise scene manager with TitleScene set as the initial scene
-    manager = SceneManager(MapEditorScene("assets/levels/level4.json"))
+    manager = SceneManager(MapEditorScene("assets/levels/level1.json"))
 
     # Game loop runs when this is true
     run = True
