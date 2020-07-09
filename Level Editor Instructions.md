@@ -1,4 +1,4 @@
-# Instructions to operate the level editor  
+5# Instructions to operate the level editor  
 ## Structure of the editor  
 The Level is split into 5 different layers: Background, 
 Decorations, Terrain, Entities and Starting_Position. 
