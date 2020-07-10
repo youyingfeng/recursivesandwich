@@ -45,7 +45,7 @@ class LevelManager:
     def __init__(self):
         self.level = Level("assets/levels/level1.json")
         self.current_level = 1
-        self.number_of_levels = 15
+        self.number_of_levels = 20
 
     def load_next_level(self, player, camera):
         self.current_level += 1
