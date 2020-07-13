@@ -54,6 +54,10 @@ class PlayerInputComponent(Component):
         current_keys = pg.key.get_pressed()
 
         if player.state == EntityState.IDLE:
+            # Resolves the bug of player sliding along surface when idle
+            player.x_velocity = 0
+            player.y_velocity = 0
+
             if current_keys[pg.K_LEFT]:
                 player.state = EntityState.WALKING
                 player.direction = Direction.LEFT
@@ -171,7 +175,17 @@ class PhysicsComponent(Component):
         if entity.state != EntityState.CLIMBING and entity.state != EntityState.HANGING:
             entity.y_velocity += int(self.gravity * remainder_time * 60)
 
-        # Handles collisions along the y axis first
+        # # Handle collisions along x-axis first
+        # # Handling x-axis collisions first resolves the bug of falling through spikes
+        # entity.rect.x += int(entity.x_velocity * remainder_time)
+
+        # for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
+        #     if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
+        #         entity.rect.left = colliding_sprite.rect.right
+        #     if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
+        #         entity.rect.right = colliding_sprite.rect.left
+
+        # Handles collisions along the y axis next
         # Positions the entity at its future position
         entity.rect.y += int(entity.y_velocity * remainder_time)
         if int(entity.y_velocity * remainder_time) != 0:
@@ -191,7 +205,8 @@ class PhysicsComponent(Component):
                 if isJumping:
                     entity.state = EntityState.JUMPING
 
-        # Then handles collisions along the x axis
+        # Handle collisions along x-axis first
+        # Handling x-axis collisions first resolves the bug of falling through spikes
         entity.rect.x += int(entity.x_velocity * remainder_time)
 
         for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):

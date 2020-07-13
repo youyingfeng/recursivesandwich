@@ -145,7 +145,10 @@ class MapLoadScene(Scene):
                     pg.quit()
                     quit()
                 elif event.key == pg.K_RETURN:
-                    self.manager.switch_to_scene(MapEditorScene(self.filepath))
+                    try:
+                        self.manager.switch_to_scene(MapEditorScene(self.filepath))
+                    except FileNotFoundError:
+                        self.manager.switch_to_scene(MapLoadAgainScene())
                 elif event.key == pg.K_ESCAPE:
                     self.manager.go_to_previous_scene()
                 elif event.key == pg.K_BACKSPACE:
@@ -178,6 +181,13 @@ class MapLoadScene(Scene):
                                 int((self.game_display.get_height() - self.load_text[0].get_height()) / 2) - 18))
 
         surface.blit(pg.transform.scale(self.game_display, (1050, 600)), (0, 0))
+
+
+class MapLoadAgainScene(MapLoadScene):
+    def __init__(self):
+        super().__init__()
+        self.filepath = "assets/levels/"
+        self.load_text = freetype.render("File not found! Try again:", (235, 235, 235))
 
 
 class MapSaveScene(Scene):

@@ -212,9 +212,11 @@ class EditorEnemyManager:
                                                  enemy_dict["coordinates"]))
 
     def add(self, coordinates, code):
-        self.enemies_list.append(EditorEnemy(code,
-                                             self.enemy_type[code],
-                                             coordinates))
+        # This line prevents the program from crashing if you accidentally add a block in the enemies layer
+        if code == "Pink Guy" or code == "Trash Monster" or code == "Tooth Walker":
+            self.enemies_list.append(EditorEnemy(code,
+                                                 self.enemy_type[code],
+                                                 coordinates))
 
     def delete(self, coordinates):
         for enemy in self.enemies_list:
