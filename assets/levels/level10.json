@@ -3,20 +3,6 @@
         {
             "type": "Trash Monster",
             "coordinates": [
-                304,
-                311
-            ]
-        },
-        {
-            "type": "Trash Monster",
-            "coordinates": [
-                186,
-                219
-            ]
-        },
-        {
-            "type": "Trash Monster",
-            "coordinates": [
                 188,
                 113
             ]
@@ -917,11 +903,11 @@
                 "  ",
                 "  ",
                 "  ",
-                "  ",
-                "  ",
-                "  ",
-                "  ",
-                "  ",
+                "k1",
+                "k1",
+                "k1",
+                "k1",
+                "k1",
                 "  ",
                 "  ",
                 "  ",

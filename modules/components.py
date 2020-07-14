@@ -70,7 +70,7 @@ class PlayerInputComponent(Component):
 
             if current_keys[pg.K_SPACE]:
                 player.state = EntityState.JUMPING
-                player.y_velocity = -780
+                player.y_velocity = -700
                 player.message("JUMP")
 
         elif player.state == EntityState.WALKING:
@@ -88,7 +88,7 @@ class PlayerInputComponent(Component):
 
             if current_keys[pg.K_SPACE]:
                 player.state = EntityState.JUMPING
-                player.y_velocity = -780
+                player.y_velocity = -700
                 player.message("JUMP")
 
         elif player.state == EntityState.JUMPING:
@@ -135,7 +135,7 @@ class PlayerInputComponent(Component):
 class PhysicsComponent(Component):
     def __init__(self):
         super().__init__()
-        self.gravity = 70           # because 60 * delta time gives 0 occasionally, which makes entity change state
+        self.gravity = 60           # because 60 * delta time gives 0 occasionally, which makes entity change state
                                     # due to the game thinking that it is jumping
         self.DISCRETE_TIMESTEP = 1 / 60      # This is important for framerate independence
 
@@ -148,12 +148,14 @@ class PhysicsComponent(Component):
             if entity.state != EntityState.CLIMBING and entity.state != EntityState.HANGING:
                 entity.y_velocity += int(self.gravity * self.DISCRETE_TIMESTEP * 60)
 
+            # Handle collisions in y-axis
             entity.rect.y += int(entity.y_velocity * self.DISCRETE_TIMESTEP)
             isJumping = True
             for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
-                if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
-                    entity.rect.top = colliding_sprite.rect.bottom
-                    entity.y_velocity = 0
+                if not colliding_sprite.is_spike:
+                    if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
+                        entity.rect.top = colliding_sprite.rect.bottom
+                        entity.y_velocity = 0
                 if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
                     isJumping = False
                     if entity.state == EntityState.JUMPING:
@@ -164,26 +166,18 @@ class PhysicsComponent(Component):
                 if isJumping:
                     entity.state = EntityState.JUMPING
 
+            # Handle collisions in x-axis
             entity.rect.x += int(entity.x_velocity * self.DISCRETE_TIMESTEP)
             for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
-                if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
-                    entity.rect.left = colliding_sprite.rect.right
-                if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
-                    entity.rect.right = colliding_sprite.rect.left
+                if not colliding_sprite.is_spike:
+                    if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
+                        entity.rect.left = colliding_sprite.rect.right
+                    if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
+                        entity.rect.right = colliding_sprite.rect.left
 
         # lerps the remainder and run simulation one last time
         if entity.state != EntityState.CLIMBING and entity.state != EntityState.HANGING:
             entity.y_velocity += int(self.gravity * remainder_time * 60)
-
-        # # Handle collisions along x-axis first
-        # # Handling x-axis collisions first resolves the bug of falling through spikes
-        # entity.rect.x += int(entity.x_velocity * remainder_time)
-
-        # for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
-        #     if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
-        #         entity.rect.left = colliding_sprite.rect.right
-        #     if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
-        #         entity.rect.right = colliding_sprite.rect.left
 
         # Handles collisions along the y axis next
         # Positions the entity at its future position
@@ -191,9 +185,10 @@ class PhysicsComponent(Component):
         if int(entity.y_velocity * remainder_time) != 0:
             isJumping = True
             for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
-                if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
-                    entity.rect.top = colliding_sprite.rect.bottom
-                    entity.y_velocity = 0
+                if not colliding_sprite.is_spike:
+                    if colliding_sprite.rect.top < entity.rect.top < colliding_sprite.rect.bottom:
+                        entity.rect.top = colliding_sprite.rect.bottom
+                        entity.y_velocity = 0
                 if colliding_sprite.rect.top < entity.rect.bottom < colliding_sprite.rect.bottom:
                     isJumping = False
                     if entity.state == EntityState.JUMPING:
@@ -205,15 +200,14 @@ class PhysicsComponent(Component):
                 if isJumping:
                     entity.state = EntityState.JUMPING
 
-        # Handle collisions along x-axis first
-        # Handling x-axis collisions first resolves the bug of falling through spikes
+        # Handle collisions along x-axis next
         entity.rect.x += int(entity.x_velocity * remainder_time)
-
         for colliding_sprite in pg.sprite.spritecollide(entity, game_map.collideable_terrain_group, False):
-            if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
-                entity.rect.left = colliding_sprite.rect.right
-            if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
-                entity.rect.right = colliding_sprite.rect.left
+            if not colliding_sprite.is_spike:
+                if colliding_sprite.rect.left < entity.rect.left < colliding_sprite.rect.right:
+                    entity.rect.left = colliding_sprite.rect.right
+                if colliding_sprite.rect.left < entity.rect.right < colliding_sprite.rect.right:
+                    entity.rect.right = colliding_sprite.rect.left
 
         # Then keeps everything within map boundaries
         map_width = game_map.rect.width
