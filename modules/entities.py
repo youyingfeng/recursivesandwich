@@ -1,8 +1,9 @@
 import pygame as pg
 from .entitystate import GameEvent, EntityState, Direction
 from .spritesheet import Spritesheet
-from .components import PlayerInputComponent, PlayerAnimationComponent, PhysicsComponent, \
-                        SoundComponent, RenderComponent, EnemyDamageCollisionComponent
+from .components import PlayerInputComponent, PlayerAnimationComponent, PlayerPhysicsComponent, \
+                        SoundComponent, RenderComponent, EnemyDamageCollisionComponent, \
+                        EnemyDamageCrushComponent
 
 """
 * =============================================================== *
@@ -84,7 +85,7 @@ class Player(Entity):
         # Components
         self.input_component = PlayerInputComponent()
         self.animation_component = PlayerAnimationComponent(animation_library, self.state)
-        self.physics_component = PhysicsComponent()
+        self.physics_component = PlayerPhysicsComponent()
         self.sound_component = SoundComponent(sound_library)
         self.render_component = RenderComponent()
 
@@ -161,6 +162,7 @@ class Enemy(Entity):
         self.render_component = render_component
 
         self.damage_collide_component = EnemyDamageCollisionComponent()
+        self.damage_crush_component = EnemyDamageCrushComponent()
 
         # Animation and sound are taken from a type object
         self.animation_component = PlayerAnimationComponent(type_object.animation_library, self.state)
@@ -184,9 +186,10 @@ class Enemy(Entity):
         pass
     
     def update(self,delta_time, map, player):
-        self.input_component.update(self)
+        self.input_component.update(self, map)
         self.physics_component.update(delta_time, self, map)
         self.damage_collide_component.update(self, player)
+        self.damage_crush_component.update(self, map)
         self.animation_component.update(self)
 
     def render(self, camera, surface):
