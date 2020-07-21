@@ -69,9 +69,10 @@ class FallingBlock(Block):
     def __init__(self, type_object, x, y):
         super().__init__(type_object, x, y)
         self.vel = 1
+        self.fallen = False
 
     def update(self, player, terrain_group):
-        if (self.rect.top == player.rect.bottom) \
+        if (self.rect.top == player.rect.bottom) and not self.fallen \
                 and (self.rect.left < player.rect.left < self.rect.right
                      or self.rect.left < player.rect.right < self.rect.right):
             self.rect.y += self.vel
@@ -79,6 +80,12 @@ class FallingBlock(Block):
             # This is necessary - or else, player will fluctuate between the IDLE and JUMPING state
             # causing it to flash
             player.rect.bottom = self.rect.top
+
+        # If the FallingBlock falls on a Block
+        for colliding_sprite in pg.sprite.spritecollide(self, terrain_group, False):
+                if colliding_sprite.rect.top < self.rect.bottom < colliding_sprite.rect.bottom:
+                    self.rect.bottom = colliding_sprite.rect.top
+                    self.fallen = True
 
         # Block should also fall when a pushable block falls on it
         # Commented this out because it is still buggy - player's state will fluctuate rapidly

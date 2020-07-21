@@ -43,7 +43,7 @@ SURFACE_SIZE = (400, 300)
 
 # Temporarily put this here so that code runs in Joshua's computer
 # Will comment this out when I push
-# pg.init()
+pg.init()
 
 # Initialise sound
 pg.mixer.init(44100, 16, 2, 512)
