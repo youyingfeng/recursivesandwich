@@ -8,6 +8,8 @@ from .headsupdisplay import HeadsUpDisplay
 from .entitystate import GameEvent
 from .userinterface import Menu, MenuButton, LevelSelectButton
 import os
+import json
+import requests
 
 """
 * =============================================================== *
@@ -309,6 +311,10 @@ class GameScene(Scene):
         pg.mixer.music.set_volume(0.8)
         pg.mixer.music.play(-1)
 
+        # Track the time passed since the game started
+        self.score_timer = pg.time.Clock()
+        self.score_timer.tick()
+
     def handle_events(self):
         # Clears the event queue and processes the events
         for event in pg.event.get():
@@ -357,12 +363,6 @@ class GameScene(Scene):
 
         # Blit game_display on window surface
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
-
-    def initialise(self):
-        pass
-
-    def cleanup(self):
-        pass
 
 
 class GameOverScene(Scene):
@@ -485,6 +485,43 @@ class GameBeatenScene(Scene):
 
         # Blit game_display on window surface
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
+
+
+class LeaderboardScene(Scene):
+    def __init__(self):
+        super().__init__()
+        # First list the top ten
+        # then list your score
+        # then have submit and back buttons
+        self.title = freetype.render("Leaderboard", (0, 0, 0), None, 0, 0, 32)
+        self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
+
+        # Get the json from the remote server and parse
+        leaderboard_json_response = None
+
+        # Generate text based on the results of json parse
+        # TODO: these must contain names and blit positions
+        self.leaderboard_names_list = []
+
+        self.leaderboard_timings_list = []
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+        # TODO: when posting the request, make a new get request from the server and update the list again 
+
+    def update(self, *args):
+        pass
+
+    def render(self, surface: pg.Surface):
+        # TODO: render all elements on the screen
+        pass
 
 
 class PauseScene(Scene):
