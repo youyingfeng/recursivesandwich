@@ -70,7 +70,7 @@ class PlayerInputComponent(Component):
 
             if current_keys[pg.K_SPACE]:
                 player.state = EntityState.JUMPING
-                player.y_velocity = -700
+                player.y_velocity = -750
                 player.message("JUMP")
 
         elif player.state == EntityState.WALKING:
@@ -88,7 +88,7 @@ class PlayerInputComponent(Component):
 
             if current_keys[pg.K_SPACE]:
                 player.state = EntityState.JUMPING
-                player.y_velocity = -700
+                player.y_velocity = -750
                 player.message("JUMP")
 
         elif player.state == EntityState.JUMPING:
@@ -118,7 +118,7 @@ class PlayerInputComponent(Component):
 
             if current_keys[pg.K_SPACE]:
                 player.state = EntityState.JUMPING
-                player.y_velocity = -780
+                player.y_velocity = -750
                 player.message("JUMP")
 
         if player.state == EntityState.CLIMBING:
