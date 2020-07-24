@@ -237,6 +237,8 @@ class LevelSelectionScene(Scene):
                 if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
                     pg.quit()
                     quit()
+                elif event.key == pg.K_ESCAPE:
+                    self.manager.go_to_previous_scene()
             elif event.type == pg.MOUSEBUTTONDOWN:
                 coordinates = [int(event.pos[0] / 2), int(event.pos[1] / 2)]
                 if self.forward_button_rect.collidepoint(coordinates):
@@ -256,7 +258,6 @@ class LevelSelectionScene(Scene):
                 self.manager.scene.level_manager.load_level(event.code,
                                                             self.manager.scene.player,
                                                             self.manager.scene.camera)
-
 
     def update(self, *args):
         pass
@@ -334,7 +335,7 @@ class GameScene(Scene):
                 self.manager.switch_to_scene(GameOverScene())
             elif event.type == GameEvent.GAME_COMPLETE.value:
                 # FIXME: this is unnecessary, check and remove
-                self.manager.switch_to_scene(GameBeatenScene())
+                self.manager.switch_to_scene(GameBeatenScene(self.score_timer.tick() / 1000))
 
         # Processes the input for the player
         self.player.handle_input()
@@ -428,7 +429,7 @@ class GameOverScene(Scene):
 
 
 class GameBeatenScene(Scene):
-    def __init__(self):
+    def __init__(self, time: float):
         super().__init__()
         # Initialize title
         self.title = freetype.render("VICTORY", (0, 0, 0), None, 0, 0, 32)
@@ -440,7 +441,11 @@ class GameBeatenScene(Scene):
                          ("Main Menu",
                           lambda: pg.event.post(pg.event.Event(GameEvent.GAME_RETURN_TO_TITLE_SCREEN.value)),
                           (182, 200)),
-                         ("Quit", lambda: pg.event.post(pg.event.Event(pg.QUIT)), (182, 220)))
+                         ("Leaderboard", lambda: self.manager.switch_to_scene(LeaderboardScene(self.time, self.submitted)), (182, 220)),
+                         ("Quit", lambda: pg.event.post(pg.event.Event(pg.QUIT)), (182, 240)))
+
+        self.time = time
+        self.submitted = False          # This is the last place to change this
 
     def handle_events(self):
         for event in pg.event.get():
@@ -488,22 +493,35 @@ class GameBeatenScene(Scene):
 
 
 class LeaderboardScene(Scene):
-    def __init__(self):
+    def __init__(self, time: float, submitted = False):
         super().__init__()
+        self.time = time
         # First list the top ten
         # then list your score
         # then have submit and back buttons
-        self.title = freetype.render("Leaderboard", (0, 0, 0), None, 0, 0, 32)
-        self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
+        self.title = freetype.render("Leaderboard", (0, 0, 0), None, 0, 0, 18)
+        self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 25)
 
-        # Get the json from the remote server and parse
-        leaderboard_json_response = None
-
-        # Generate text based on the results of json parse
-        # TODO: these must contain names and blit positions
         self.leaderboard_names_list = []
-
         self.leaderboard_timings_list = []
+        self.render_heights = []
+
+        self.fetch_leaderboard()
+
+        self.submitted = submitted
+        if submitted:
+            self.menu = Menu(8,
+                             (80, 80, 80),
+                             ("Back", lambda: self.manager.go_to_previous_scene(), (180, 250))
+                             )
+        else:
+            self.menu = Menu(8,
+                             (80, 80, 80),
+                             ("Submit Score", lambda: self.manager.switch_to_scene(LeaderboardSubmissionScene(self.time)),
+                              (90, 250)),
+                             ("Back", lambda: self.manager.go_to_previous_scene(), (280, 250))
+                             )
+
 
     def handle_events(self):
         for event in pg.event.get():
@@ -514,14 +532,176 @@ class LeaderboardScene(Scene):
                 if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
                     pg.quit()
                     quit()
+                elif event.key == pg.K_LEFT:
+                    self.sound_library["Scroll"].play()
+                    self.menu.scroll_up()
+                elif event.key == pg.K_RIGHT:
+                    self.sound_library["Scroll"].play()
+                    self.menu.scroll_down()
+                elif event.key == pg.K_RETURN:
+                    self.sound_library["Confirm"].play()
+                    self.menu.activate_current_button()
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                self.sound_library["Confirm"].play()
+                self.menu.click((event.pos[0] / 2, event.pos[1] / 2))
         # TODO: when posting the request, make a new get request from the server and update the list again 
+
+    def update(self, *args):
+        if self.submitted:
+            self.manager.scene_stack[-2].submitted = True
+
+    def render(self, surface: pg.Surface):
+        # TODO: render all elements on the screen
+        self.game_display.fill((235, 235, 235))
+        self.game_display.blit(self.title[0], self.title_blit_position)
+        for i in range (0, len(self.leaderboard_names_list)):
+            self.game_display.blit(self.leaderboard_names_list[i][0][0], self.leaderboard_names_list[i][1])
+            self.game_display.blit(self.leaderboard_timings_list[i][0][0], self.leaderboard_timings_list[i][1])
+        self.menu.render(self.game_display)
+
+        surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
+
+    def fetch_leaderboard(self):
+        # Get the json from the remote server and parse
+        leaderboard_json_response = requests.get('https://recursivesandwich-api.herokuapp.com/highscores').text
+        leaderboard_json_dict = json.loads(leaderboard_json_response)
+
+        # Generate text based on the results of json parse
+        # TODO: these must contain names and blit positions
+        self.leaderboard_names_list = []
+        self.leaderboard_timings_list = []
+        self.render_heights = []
+
+        name_x = 50
+        time_x = 300
+        starting_y = 60
+
+        for i in range(0, 10):
+            # get key, if key not valid break immediately
+            try:
+                self.leaderboard_names_list.append((freetype.render(leaderboard_json_dict[i]["user"],
+                                                                    (0, 0, 0),
+                                                                    None,
+                                                                    0,
+                                                                    0,
+                                                                    12),
+                                                    (name_x, starting_y)))
+                self.leaderboard_timings_list.append((freetype.render('%.1f' % leaderboard_json_dict[i]["time"],
+                                                                      (0, 0, 0),
+                                                                      None,
+                                                                      0,
+                                                                      0,
+                                                                      12),
+                                                      (time_x, starting_y)))
+                starting_y += 18
+            except IndexError:
+                break
+
+    def change_menu_upon_successful_submission(self):
+        """Call this to restrict the ability to resubmit scores"""
+        self.menu = Menu(8,
+                         (80, 80, 80),
+                         ("Back", lambda: self.manager.go_to_previous_scene(), (180, 250))
+                         )
+
+
+class LeaderboardSubmissionScene(Scene):
+    def __init__(self, time: float):
+        super().__init__()
+        self.player_name = ""
+        self.time = time
+        self.render_length_warning = False
+        self.render_fail_warning = False
+        self.length_warning = freetype.render("Name cannot be empty!", (150, 0, 0), None, 0, 0, 12)
+        self.fail_warning = freetype.render("A problem occurred with the request", (150, 0, 0), None, 0, 0, 12)
+        self.success_notification = freetype.render("Your highscore has been submitted!", (0, 150, 0), None, 0, 0, 12)
+        self.input_instructions = freetype.render("Enter your name below:", (50, 50, 50), None, 0, 0, 12)
+        self.submission_instructions = freetype.render("Press Enter to submit or Esc to go back", (50, 50, 50), None, 0, 0, 8)
+        self.request_posted_successfully = False
+
+    def handle_events(self):
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                quit()
+            elif event.type == pg.KEYDOWN:
+                if event.key == pg.K_F4 and (event.mod & pg.KMOD_ALT):
+                    pg.quit()
+                    quit()
+                elif event.key == pg.K_RETURN:
+                    if len(self.player_name) <= 0:
+                        self.render_length_warning = True
+                    else:
+                        self.render_length_warning = False
+                        # Useragent is here to validate requests
+                        if not self.request_posted_successfully:
+                            try:
+                                post_request = requests.post('https://recursivesandwich-api.herokuapp.com/highscores',
+                                                             headers = {"User-Agent": "The Tower - Game Client"},
+                                                             data = {"user": self.player_name, "time": 9999})
+                                if post_request.status_code == 201:
+                                    self.request_posted_successfully = True
+                                    self.render_fail_warning = False
+                                else:
+                                    self.render_fail_warning = True
+                            except requests.RequestException:
+                                self.render_fail_warning = True
+                elif event.key == pg.K_ESCAPE:
+                    self.manager.go_to_previous_scene()
+                    if self.request_posted_successfully:
+                        # TODO: modify previous state
+                        self.manager.scene.change_menu_upon_successful_submission()
+                        self.manager.scene.fetch_leaderboard()
+                        self.manager.scene.submitted = True
+                elif event.key == pg.K_BACKSPACE:
+                    # array slicing is safe from null pointers
+                    self.player_name = self.player_name[:-1]
+                else:
+                    self.player_name += event.unicode
 
     def update(self, *args):
         pass
 
     def render(self, surface: pg.Surface):
-        # TODO: render all elements on the screen
-        pass
+        name_display = freetype.render(self.player_name, (0, 0, 0), None, 0, 0, 24)
+
+        self.game_display.fill((235, 235, 235))
+
+        # Render name
+        self.game_display.blit(name_display[0],
+                               (int((self.game_display.get_width() - name_display[0].get_width()) / 2),
+                                int((self.game_display.get_height() - name_display[0].get_height()) / 2))
+                               )
+
+        # Render instructions
+        self.game_display.blit(self.input_instructions[0],
+                               (int((self.game_display.get_width() - self.input_instructions[0].get_width()) / 2),
+                                int((self.game_display.get_height() - self.input_instructions[0].get_height()) / 2) - 30)
+                               )
+
+        self.game_display.blit(self.submission_instructions[0],
+                               (int((self.game_display.get_width() - self.submission_instructions[0].get_width()) / 2),
+                                int((self.game_display.get_height() - self.submission_instructions[0].get_height()) / 2) + 30)
+                               )
+
+        # Render warnings
+        if self.render_fail_warning:
+            self.game_display.blit(self.fail_warning[0],
+                                   (int((self.game_display.get_width() - self.fail_warning[0].get_width()) / 2),
+                                    int((self.game_display.get_height() - self.fail_warning[0].get_height()) / 2) + 50)
+                                   )
+        elif self.render_length_warning:
+            self.game_display.blit(self.length_warning[0],
+                                   (int((self.game_display.get_width() - self.length_warning[0].get_width()) / 2),
+                                    int((self.game_display.get_height() - self.length_warning[0].get_height()) / 2) + 50)
+                                   )
+        elif self.request_posted_successfully:
+            self.game_display.blit(self.success_notification[0],
+                                   (int((self.game_display.get_width() - self.success_notification[0].get_width()) / 2),
+                                    int((self.game_display.get_height() - self.success_notification[0].get_height()) / 2) + 50)
+                                   )
+
+        surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 
 
 class PauseScene(Scene):
@@ -594,7 +774,9 @@ class FadeOutScene(Scene):
             # FIXME: This is super hacky and ideally should be resolved, but other methods are more complicated
             self.manager.scene.level_manager.load_next_level(self.manager.scene.player,
                                                              self.manager.scene.camera)
-            self.manager.switch_to_scene(LoadingScene())
+
+            if not self.manager.scene.level_manager.is_game_complete():
+                self.manager.switch_to_scene(LoadingScene())
 
     def render(self, surface: pg.Surface):
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))

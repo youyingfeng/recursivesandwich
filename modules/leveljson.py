@@ -71,6 +71,9 @@ class LevelManager:
         camera.snap_to_target(player)
         camera.update_boundaries(self.level.map.rect)
 
+    def is_game_complete(self):
+        return self.current_level > self.number_of_levels
+
 
 class Level:
     def __init__(self, filepath: str):
