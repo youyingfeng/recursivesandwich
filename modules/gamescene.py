@@ -506,7 +506,13 @@ class LeaderboardScene(Scene):
         self.leaderboard_timings_list = []
         self.render_heights = []
 
-        self.fetch_leaderboard()
+        self.render_error = False
+        self.fetch_error = freetype.render("There was an error in fetching the leaderboard", (150, 0, 0), None, 0, 0, 8)
+
+        try:
+            self.fetch_leaderboard()
+        except Exception:
+            pass
 
         self.submitted = submitted
         if submitted:
@@ -554,10 +560,16 @@ class LeaderboardScene(Scene):
         # TODO: render all elements on the screen
         self.game_display.fill((235, 235, 235))
         self.game_display.blit(self.title[0], self.title_blit_position)
-        for i in range (0, len(self.leaderboard_names_list)):
-            self.game_display.blit(self.leaderboard_names_list[i][0][0], self.leaderboard_names_list[i][1])
-            self.game_display.blit(self.leaderboard_timings_list[i][0][0], self.leaderboard_timings_list[i][1])
+        if self.render_error is True:
+            self.game_display.blit(self.fetch_error[0],
+                                   (int((self.game_display.get_width() - self.fetch_error[0].get_width()) / 2),
+                                    int((self.game_display.get_height() - self.fetch_error[0].get_height()) / 2) - 18))
+        else:
+            for i in range (0, len(self.leaderboard_names_list)):
+                self.game_display.blit(self.leaderboard_names_list[i][0][0], self.leaderboard_names_list[i][1])
+                self.game_display.blit(self.leaderboard_timings_list[i][0][0], self.leaderboard_timings_list[i][1])
         self.menu.render(self.game_display)
+
 
         surface.blit(pg.transform.scale(self.game_display, WINDOW_SIZE), (0, 0))
 
