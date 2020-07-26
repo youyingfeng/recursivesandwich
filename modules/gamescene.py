@@ -10,6 +10,7 @@ from .userinterface import Menu, MenuButton, LevelSelectButton
 import os
 import json
 import requests
+import pyaes
 
 """
 * =============================================================== *
@@ -258,6 +259,8 @@ class LevelSelectionScene(Scene):
                 self.manager.scene.level_manager.load_level(event.code,
                                                             self.manager.scene.player,
                                                             self.manager.scene.camera)
+                # prevents the user from submitting scores to leaderboard
+                self.manager.scene.can_submit_leaderboard = False
 
     def update(self, *args):
         pass
@@ -316,6 +319,9 @@ class GameScene(Scene):
         self.score_timer = pg.time.Clock()
         self.score_timer.tick()
 
+        # hack to control ability to submit leaderboard
+        self.can_submit_leaderboard = True
+
     def handle_events(self):
         # Clears the event queue and processes the events
         for event in pg.event.get():
@@ -336,6 +342,8 @@ class GameScene(Scene):
             elif event.type == GameEvent.GAME_COMPLETE.value:
                 # FIXME: this is unnecessary, check and remove
                 self.manager.switch_to_scene(GameBeatenScene(self.score_timer.tick() / 1000))
+                if not self.can_submit_leaderboard:
+                    self.manager.scene.submitted = True
 
         # Processes the input for the player
         self.player.handle_input()
