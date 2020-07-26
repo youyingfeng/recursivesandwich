@@ -651,7 +651,7 @@ class LeaderboardSubmissionScene(Scene):
                     pg.quit()
                     quit()
                 elif event.key == pg.K_RETURN:
-                    if len(self.player_name) <= 0:
+                    if len(self.player_name) <= 0 or self.player_name.isspace():
                         self.render_length_warning = True
                     else:
                         self.render_length_warning = False
