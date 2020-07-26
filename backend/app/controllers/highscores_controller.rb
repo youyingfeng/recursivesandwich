@@ -1,4 +1,12 @@
 require 'json'
+require 'openssl'
+
+def unpad(text)
+  code = text.to_s[-1].ord
+  if code <= 16
+    return text.delete_suffix(text[-1] * code)
+  end
+end
 
 class HighscoresController < ApplicationController
   def get_top_ten
@@ -17,9 +25,19 @@ class HighscoresController < ApplicationController
 
   def create_new_highscore
     # posts the new highscore list
+    # using AES CBC as the encryption method, with key 'atotallyrandomencryptionkey'
+    
+    decipher = OpenSSL::Cipher::AES256.new :CBC
+    decipher.decrypt
+    decipher.padding = 0
+    decipher.key = "u8x/A?D(G+KaPdSgVkYp3s6v9y$B&E)H"
+    decipher.iv = "LoremIpsumDolorS"
+
     if request.user_agent == 'The Tower - Game Client'
-      highscore = Highscore.new(user: params[:user], 
-                                time: params[:time])
+      userparam = unpad(decipher.update(params[:user]) + decipher.final)
+      timeparam = unpad((decipher.update(params[:time]) + decipher.final)).to_f
+      highscore = Highscore.new(user: userparam, 
+                                time: timeparam)
       if highscore.save
         render status: 201                                # Highscore created
       else

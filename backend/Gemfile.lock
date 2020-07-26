@@ -68,6 +68,7 @@ GEM
       activesupport (>= 4.2.0)
     i18n (1.8.3)
       concurrent-ruby (~> 1.0)
+    ipaddr (1.2.2)
     listen (3.2.1)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -87,6 +88,8 @@ GEM
     nio4r (2.5.2)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
+    openssl (2.1.2)
+      ipaddr
     pg (1.2.3)
     puma (4.3.5)
       nio4r (~> 2.0)
@@ -150,6 +153,7 @@ DEPENDENCIES
   bootsnap (>= 1.4.2)
   byebug
   listen (~> 3.2)
+  openssl
   pg (>= 0.18, < 2.0)
   puma (~> 4.1)
   rails (~> 6.0.3, >= 6.0.3.2)
