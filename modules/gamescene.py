@@ -10,7 +10,7 @@ from .userinterface import Menu, MenuButton, LevelSelectButton
 import os
 import json
 import requests
-import pyaes
+from Crypto.Cipher import AES
 
 """
 * =============================================================== *
@@ -439,6 +439,7 @@ class GameOverScene(Scene):
 class GameBeatenScene(Scene):
     def __init__(self, time: float):
         super().__init__()
+        self.time = time
         # Initialize title
         self.title = freetype.render("VICTORY", (0, 0, 0), None, 0, 0, 32)
         self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 100)
@@ -452,7 +453,6 @@ class GameBeatenScene(Scene):
                          ("Leaderboard", lambda: self.manager.switch_to_scene(LeaderboardScene(self.time, self.submitted)), (182, 220)),
                          ("Quit", lambda: pg.event.post(pg.event.Event(pg.QUIT)), (182, 240)))
 
-        self.time = time
         self.submitted = False          # This is the last place to change this
 
     def handle_events(self):
@@ -535,7 +535,6 @@ class LeaderboardScene(Scene):
                               (90, 250)),
                              ("Back", lambda: self.manager.go_to_previous_scene(), (280, 250))
                              )
-
 
     def handle_events(self):
         for event in pg.event.get():
@@ -657,10 +656,21 @@ class LeaderboardSubmissionScene(Scene):
                         self.render_length_warning = False
                         # Useragent is here to validate requests
                         if not self.request_posted_successfully:
+                            def pad(string_or_number):
+                                pad_length = (16 - (len(str(string_or_number)) % 16)) % 16
+                                output = (str(string_or_number) + (str(chr(pad_length)) * pad_length)).encode("utf-8")
+                                return output
+                            
                             try:
+                                encryptor = AES.new("u8x/A?D(G+KaPdSgVkYp3s6v9y$B&E)H".encode("utf-8"),
+                                                    AES.MODE_CBC,
+                                                    "LoremIpsumDolorS".encode("utf-8"))
                                 post_request = requests.post('https://recursivesandwich-api.herokuapp.com/highscores',
                                                              headers = {"User-Agent": "The Tower - Game Client"},
-                                                             data = {"user": self.player_name, "time": 9999})
+                                                             data = {"user": encryptor.encrypt(pad(self.player_name)),
+                                                                     "time": encryptor.encrypt(pad(self.time))
+                                                                     }
+                                                             )
                                 if post_request.status_code == 201:
                                     self.request_posted_successfully = True
                                     self.render_fail_warning = False
