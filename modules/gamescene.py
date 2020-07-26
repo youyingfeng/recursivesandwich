@@ -599,7 +599,9 @@ class LeaderboardScene(Scene):
         for i in range(0, 10):
             # get key, if key not valid break immediately
             try:
-                self.leaderboard_names_list.append((freetype.render(leaderboard_json_dict[i]["user"],
+                user = leaderboard_json_dict[i]["user"]
+                user = user if len(user) <= 20 else user[0:20] + "..."
+                self.leaderboard_names_list.append((freetype.render(user,
                                                                     (0, 0, 0),
                                                                     None,
                                                                     0,
