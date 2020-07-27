@@ -8,9 +8,9 @@ ft.init()
 freetype = ft.Font("assets/fonts/pixChicago.ttf", 12)
 freetype.antialiased = False
 
+
 class Scene:
     """Represents a scene in the program, which is analogous to the state of the game"""
-
     def __init__(self):
         self.manager = SceneManager(self)
         self.game_display = pg.Surface((525, 300))
@@ -27,7 +27,6 @@ class Scene:
 
 class SceneManager:
     """Handles scene transitions from one scene to another"""
-
     def __init__(self, scene: Scene):
         # TODO: Implement previous_scene as stack without dictionary
         self.scene = scene
@@ -116,8 +115,6 @@ class MapEditorScene(Scene):
         current_keys = pg.key.get_pressed()
         self.palette_panel.update(current_keys)
         self.map_panel.update(current_keys)
-
-        # pass
 
     def render(self, surface: pg.Surface):
         self.palette_panel.render(self.palette_display)

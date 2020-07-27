@@ -507,7 +507,7 @@ class LeaderboardScene(Scene):
         # First list the top ten
         # then list your score
         # then have submit and back buttons
-        self.title = freetype.render("Leaderboard", (0, 0, 0), None, 0, 0, 18)
+        self.title = freetype.render("Your timing: " + ('%.1f' % self.time) + 's', (0, 0, 0), None, 0, 0, 18)
         self.title_blit_position = (int((self.game_display.get_width() - self.title[0].get_width()) / 2), 25)
 
         self.leaderboard_names_list = []
@@ -607,7 +607,7 @@ class LeaderboardScene(Scene):
                                                                     0,
                                                                     12),
                                                     (name_x, starting_y)))
-                self.leaderboard_timings_list.append((freetype.render('%.1f' % leaderboard_json_dict[i]["time"],
+                self.leaderboard_timings_list.append((freetype.render(('%.1f' % leaderboard_json_dict[i]["time"]) + "s",
                                                                       (0, 0, 0),
                                                                       None,
                                                                       0,
